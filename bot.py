@@ -23,7 +23,7 @@ def handle_message(update, context):
                 {"role": "system", "content": "You are a friendly English tutor. Correct the user's English and teach them."},
                 {"role": "user", "content": user_text}
             ],
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
         )
         reply = chat_completion.choices[0].message.content
         update.message.reply_text(reply)
