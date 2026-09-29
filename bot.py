@@ -18,7 +18,7 @@ def home():
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "Hi! I am Sir English!")
+    bot.reply_to(message, "Hi! I am Sir English! Send me any English sentence!")
 
 @bot.message_handler(func=lambda m: True)
 def handle_all(message):
@@ -35,12 +35,13 @@ def handle_all(message):
 
     try:
         res = client.chat.completions.create(
-            model="model="llama-3.1-8b-instant",
+            model="llama-3.1-8b-instant",
             messages=[{"role":"system","content":"You are Sir English teacher, explain in Bangla+English short."},{"role":"user","content":text}]
         )
         bot.reply_to(message, res.choices[0].message.content)
     except Exception as e:
-        print(e)
+        print(f"Error: {e}")
+        bot.reply_to(message, f"Error: {e}")
 
 def run_bot():
     bot.remove_webhook()
