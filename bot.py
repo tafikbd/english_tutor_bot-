@@ -244,7 +244,7 @@ def ask_groq(user_text: str) -> str:
             },
         ],
         temperature=0.3,
-        max_tokens=350,
+        max_tokens=700, 
     )
 
     return response.choices[0].message.content.strip()
