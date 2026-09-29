@@ -1,27 +1,46 @@
 import os
+import threading
+from flask import Flask
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from groq import Groq
-from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, ContextTypes, filters
 
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-client = Groq(api_key=GROQ_API_KEY)
+# Flask for Render Port
+app = Flask('')
+@app.route('/')
+def home(): return "Bot is Running!"
 
-SYSTEM_PROMPT = "You are Sir English, a friendly English Teacher from Bangladesh. Explain in Bangla + English with examples. Short and fun."
+# Groq Client
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Assalamu Alaikum! Ami Sir English. 😊\nKi shikhte chan? Grammar / Vocabulary / Spoken?")
+def start(update, context):
+    update.message.reply_text("Hi! I am your English Tutor Bot. Send me any English sentence!")
 
-async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def handle_message(update, context):
     user_text = update.message.text
     try:
-        res = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role":"system","content":SYSTEM_PROMPT},{"role":"user","content":user_text}])
-        await update.message.reply_text(res.choices[0].message.content)
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": "You are a friendly English tutor. Correct the user's English and teach them."},
+                {"role": "user", "content": user_text}
+            ],
+            model="llama-3.1-8b-instant",
+        )
+        reply = chat_completion.choices[0].message.content
+        update.message.reply_text(reply)
     except Exception as e:
-        await update.message.reply_text("Ektu problem hocche, abar message din.")
+        update.message.reply_text(f"Error: {e}")
 
-app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
-print("Sir English Bot Running!")
-app.run_polling()
+def main():
+    TOKEN = os.environ.get("TELEGRAM_TOKEN")
+    # Start Flask in background
+    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=10000)).start()
+
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
