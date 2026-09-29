@@ -35,7 +35,7 @@ def handle_all(message):
 
     try:
         res = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="model="llama-3.1-8b-instant",
             messages=[{"role":"system","content":"You are Sir English teacher, explain in Bangla+English short."},{"role":"user","content":text}]
         )
         bot.reply_to(message, res.choices[0].message.content)
