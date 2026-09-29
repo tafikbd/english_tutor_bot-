@@ -1,46 +1,45 @@
 import os
 import threading
 from flask import Flask
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import telebot
 from groq import Groq
 
-# Flask for Render Port
-app = Flask('')
+BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+GROQ_KEY = os.environ.get("GROQ_API_KEY")
+
+bot = telebot.TeleBot(BOT_TOKEN)
+client = Groq(api_key=GROQ_KEY)
+app = Flask(__name__)
+
 @app.route('/')
-def home(): return "Bot is Running!"
+def home():
+    return "Bot is Live!"
 
-# Groq Client
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+SYSTEM_PROMPT = "You are an English Tutor. Correct grammar and explain in Bangla + English."
 
-def start(update, context):
-    update.message.reply_text("Hi! I am your English Tutor Bot. Send me any English sentence!")
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.reply_to(message, "Hi! I am your English Tutor Bot. Send me any English sentence!")
 
-def handle_message(update, context):
-    user_text = update.message.text
+@bot.message_handler(func=lambda m: True)
+def handle_all(message):
     try:
-        chat_completion = client.chat.completions.create(
-            messages=[
-                {"role": "system", "content": "You are a friendly English tutor. Correct the user's English and teach them."},
-                {"role": "user", "content": user_text}
-            ],
+        response = client.chat.completions.create(
             model="openai/gpt-oss-20b",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": message.text}
+            ]
         )
-        reply = chat_completion.choices[0].message.content
-        update.message.reply_text(reply)
+        reply = response.choices[0].message.content
+        bot.reply_to(message, reply)
     except Exception as e:
-        update.message.reply_text(f"Error: {e}")
+        bot.reply_to(message, f"Error: {e}")
 
-def main():
-    TOKEN = os.environ.get("TELEGRAM_TOKEN")
-    # Start Flask in background
-    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=10000)).start()
+def run_bot():
+    print("Bot is running...")
+    bot.infinity_polling()
 
-    updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
-    updater.start_polling()
-    updater.idle()
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    threading.Thread(target=run_bot).start()
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
