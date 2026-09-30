@@ -955,8 +955,6 @@ async def student_menu_callback(
         return
 
     try:
-    
-
         await query.message.chat.send_action("typing")
 
         answer = await asyncio.to_thread(
@@ -969,11 +967,13 @@ async def student_menu_callback(
 
         if len(answer) > 4000:
             answer = answer[:4000]
-# Save the current practice so the next student message
-# can be checked as an answer.
-context.user_data["practice"] = {
-    "mode": query.data,
-    "exercise": answer,
+
+        # Save the current practice for answer checking
+        context.user_data["practice"] = {
+            "mode": query.data,
+            "exercise": answer,
+        }
+
         await query.message.reply_text(answer)
 
     except Exception as e:
