@@ -6,9 +6,15 @@ import threading
 from flask import Flask
 from groq import Groq
 
-from telegram import Update
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+)
 from telegram.ext import (
     Application,
+    CommandHandler,
+    CallbackQueryHandler,
     MessageHandler,
     ContextTypes,
     filters,
@@ -23,9 +29,9 @@ from telegram.error import Conflict, TelegramError
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# User requested model.
-# If Groq no longer supports it, set:
-# GROQ_MODEL=openai/gpt-oss-20b
+# Render Environment Variable can override this.
+# Recommended:
+# GROQ_MODEL=openai/gpt-oss-120b
 GROQ_MODEL = os.getenv(
     "GROQ_MODEL",
     "llama-3.1-8b-instant"
@@ -55,21 +61,31 @@ logger = logging.getLogger(__name__)
 # =========================
 # GROQ
 # =========================
+uncoq_client = Groq(api_key=GROQ_API_KEY)
 
-groq_client = Groq(api_key=GROQ_API_KEY)
 
+# ==========================================================
+# SYSTEM PROMPT
+# ==========================================================
+#
+# IMPORTANT:
+# Paste your COMPLETE existing SYSTEM_PROMPT between the
+# triple quotes below.
+#
+# Do not change the three quotes.
+#
+# ==========================================================
 
 SYSTEM_PROMPT = """
+
 EduMate AI
-Role: Smart AI Teacher + AI Assistant for Telegram
+Role: Smart AI Teacher + AI Assistant for 
 
 ==================================================
 1. CORE IDENTITY
 ==================================================
 
-You are EduMate AI — a smart, friendly, accurate, and natural AI Teacher + AI Assistant.
-
-Your two primary roles are:
+You are EduMate t, friendly, accurate, and natural AI Teacher + AI AssistTeacherour two primary roles are:
 
 1. AI Teacher
 - Help users learn English and other languages.
@@ -136,9 +152,7 @@ When teaching English or another language:
 - Do not assume the user's nationality, native language, or country.
 
 For an isolated word with no clear language preference:
-Use the most recently established explanation language.
-
-==================================================
+Use the most recently established explanation language================================
 4. INTENT DETECTION
 ==================================================
 
@@ -222,8 +236,6 @@ Prioritize practical, natural language over unnecessarily academic explanations.
 
 ==================================================
 7. SPECIFIC HANDLING RULES
-==================================================
-
 7.1 VOCABULARY / WORD MODE
 
 When the user gives a single word or asks about a word, provide only the information useful for the request.
@@ -322,9 +334,7 @@ When teaching a tense, explain the parts that are relevant:
 
 Do not force all sections into a short answer.
 
-Avoid absolute rules when real English has legitimate exceptions.
-
-==================================================
+Avoid absolute rules when real English has legitimate exceptions======================
 7.5 PRONUNCIATION MODE
 ==================================================
 
@@ -397,9 +407,7 @@ If the user says:
 "Just talk"
 → Focus on natural conversation and avoid unnecessary corrections.
 
-Use realistic conversational language.
-
-==================================================
+Use realistic conversational language============================================
 9. WRITING MODE
 ==================================================
 
@@ -533,8 +541,6 @@ Then provide a more detailed response.
 Never make an answer unnecessarily long.
 
 User-requested length always has priority.
-
-==================================================
 13. ACCURACY & UNCERTAINTY
 ==================================================
 
@@ -559,8 +565,6 @@ or
 "I don't have reliable information to confirm that."
 
 If the user provides incorrect information, correct it politely when relevant.
-
-==================================================
 14. NATURAL HUMAN-LIKE COMMUNICATION
 ==================================================
 
@@ -809,19 +813,269 @@ def ask_groq(user_text: str) -> str:
             },
         ],
         temperature=0.3,
-        max_tokens=700, 
+        max_tokens=700,
     )
 
     return response.choices[0].message.content.strip()
 
 
 # =========================
-# TELEGRAM HANDLER
+# STUDENT MENU
+# =========================
+
+def get_student_menu():
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "🎓 Learn",
+                callback_data="student_learn",
+            ),
+            InlineKeyboardButton(
+                "📚 Vocabulary",
+                callback_data="student_vocab",
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                "📝 Grammar",
+                callback_data="student_grammar",
+            ),
+            InlineKeyboardButton(
+                "⏱ Tenses",
+                callback_data="student_tenses",
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                "🗣 Speaking",
+                callback_data="student_speaking",
+            ),
+            InlineKeyboardButton(
+                "✍️ Writing",
+                callback_data="student_writing",
+            ),
+        ],
+    ]
+
+    return InlineKeyboardMarkup(keyboard)
+
+
+# =========================
+# START / MENU
+# =========================
+
+async def start_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+    message = update.effective_message
+
+    if not message:
+        return
+
+    await message.reply_text(
+        "🎓 Welcome to EduMate AI!\n\n"
+        "Choose a learning option:",
+        reply_markup=get_student_menu(),
+    )
+
+
+async def menu_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+    await start_command(update, context)
+
+
+# =========================
+# STUDENT MENU ACTIONS
+# =========================
+
+STUDENT_PROMPTS = {
+    "student_learn": (
+        "Start a short English lesson for a student. "
+        "First choose one useful topic suitable for a beginner or "
+        "intermediate learner. Explain it simply, give one or two "
+        "examples, then give one short practice question. "
+        "Do not give the answer to the practice question immediately."
+    ),
+
+    "student_vocab": (
+        "Start vocabulary learning. Teach one useful English word with "
+        "meaning, pronunciation, part of speech, one simple example, "
+        "and one short practice question. Keep it concise."
+    ),
+
+    "student_grammar": (
+        "Start a short English grammar lesson. Teach one useful grammar "
+        "point simply, give one or two examples, mention one common "
+        "mistake if useful, then give one short practice question."
+    ),
+
+    "student_tenses": (
+        "Start a short English tense lesson. Choose one useful tense and "
+        "explain its use and structure simply, give examples, mention one "
+        "common mistake if useful, then give one short practice question."
+    ),
+
+    "student_speaking": (
+        "Start English speaking practice. Ask the student ONE simple "
+        "real-life question and wait for their answer. Keep the "
+        "conversation natural. Correct only important mistakes unless "
+        "the student asks for full correction."
+    ),
+
+    "student_writing": (
+        "Start English writing practice. Give the student ONE short "
+        "writing task suitable for their level and wait for their answer. "
+        "After they answer, correct important mistakes and explain briefly."
+    ),
+}
+
+
+async def student_menu_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+    query = update.callback_query
+
+    if not query:
+        return
+
+    await query.answer()
+
+    prompt = STUDENT_PROMPTS.get(query.data)
+
+    if not prompt:
+        return
+
+    try:
+        await query.message.chat.send_action("typing")
+
+        answer = await asyncio.to_thread(
+            ask_groq,
+            prompt,
+        )
+
+        if not answer:
+            answer = "Sorry, I couldn't generate a response."
+
+        if len(answer) > 4000:
+            answer = answer[:4000]
+
+        await query.message.reply_text(answer)
+
+    except Exception as e:
+        logger.exception(
+            "Student menu AI error: %s",
+            e,
+        )
+
+        await query.message.reply_text(
+            "Sorry, something went wrong. Please try again."
+        )
+
+
+# =========================
+# BASIC COMMANDS
+# =========================
+
+async def run_command_ai(
+    update: Update,
+    prompt: str,
+):
+    message = update.effective_message
+
+    if not message:
+        return
+
+    try:
+        await message.chat.send_action("typing")
+
+        answer = await asyncio.to_thread(
+            ask_groq,
+            prompt,
+        )
+
+        if not answer:
+            answer = "Sorry, I couldn't generate a response."
+
+        if len(answer) > 4000:
+            answer = answer[:4000]
+
+        await message.reply_text(answer)
+
+    except Exception as e:
+        logger.exception(
+            "Command AI error: %s",
+            e,
+        )
+
+        await message.reply_text(
+            "Sorry, something went wrong. Please try again."
+        )
+
+
+async def vocab_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+    await run_command_ai(
+        update,
+        (
+            "Start vocabulary learning. Ask the student for one English "
+            "word they want to learn, then explain it briefly."
+        ),
+    )
+
+
+async def grammar_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+    await run_command_ai(
+        update,
+        (
+            "Start grammar learning. Ask the student which English "
+            "grammar topic they want to learn, then teach it simply."
+        ),
+    )
+
+
+async def practice_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+    await run_command_ai(
+        update,
+        (
+            "Start English speaking practice. Ask ONE simple real-life "
+            "question and wait for the student's answer. Correct only "
+            "important mistakes."
+        ),
+    )
+
+
+async def write_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+    await run_command_ai(
+        update,
+        (
+            "Start English writing practice. Give the student ONE short "
+            "writing task and wait for their answer."
+        ),
+    )
+
+
+# =========================
+# TELEGRAM MESSAGE HANDLER
 # =========================
 
 async def handle_message(
     update: Update,
-    context: ContextTypes.DEFAULT_TYPE
+    context: ContextTypes.DEFAULT_TYPE,
 ):
     message = update.effective_message
 
@@ -852,7 +1106,8 @@ async def handle_message(
         is_reply_to_bot = (
             message.reply_to_message is not None
             and message.reply_to_message.from_user is not None
-            and message.reply_to_message.from_user.id == context.bot.id
+            and message.reply_to_message.from_user.id
+            == context.bot.id
         )
 
         mention = f"@{bot_username.lower()}"
@@ -867,13 +1122,11 @@ async def handle_message(
         # Remove @BotUsername from the message
         user_text = user_text.replace(
             f"@{bot_username}",
-            ""
+            "",
         ).strip()
 
         if not user_text:
-            user_text = (
-                "Please help me with English."
-            )
+            user_text = "Please help me with English."
 
     # -------------------------
     # Ask AI
@@ -885,7 +1138,7 @@ async def handle_message(
         # Run blocking Groq request outside Telegram event loop
         answer = await asyncio.to_thread(
             ask_groq,
-            user_text
+            user_text,
         )
 
         if not answer:
@@ -898,7 +1151,10 @@ async def handle_message(
         await message.reply_text(answer)
 
     except Exception as e:
-        logger.exception("AI error: %s", e)
+        logger.exception(
+            "AI error: %s",
+            e,
+        )
 
         await message.reply_text(
             "Sorry, something went wrong. Please try again."
@@ -921,10 +1177,70 @@ def run_bot():
             .build()
         )
 
+        # -------------------------
+        # COMMAND HANDLERS
+        # -------------------------
+
+        application.add_handler(
+            CommandHandler(
+                "start",
+                start_command,
+            )
+        )
+
+        application.add_handler(
+            CommandHandler(
+                "menu",
+                menu_command,
+            )
+        )
+
+        application.add_handler(
+            CommandHandler(
+                "vocab",
+                vocab_command,
+            )
+        )
+
+        application.add_handler(
+            CommandHandler(
+                "grammar",
+                grammar_command,
+            )
+        )
+
+        application.add_handler(
+            CommandHandler(
+                "practice",
+                practice_command,
+            )
+        )
+
+        application.add_handler(
+            CommandHandler(
+                "write",
+                write_command,
+            )
+        )
+
+        # -------------------------
+        # STUDENT MENU BUTTONS
+        # -------------------------
+
+        application.add_handler(
+            CallbackQueryHandler(
+                student_menu_callback,
+            )
+        )
+
+        # -------------------------
+        # NORMAL TEXT MESSAGES
+        # -------------------------
+
         application.add_handler(
             MessageHandler(
                 filters.TEXT & ~filters.COMMAND,
-                handle_message
+                handle_message,
             )
         )
 
@@ -932,18 +1248,22 @@ def run_bot():
         # This helps prevent webhook/polling conflicts.
         try:
             await application.bot.delete_webhook(
-                drop_pending_updates=False
+                drop_pending_updates=False,
             )
-            logger.info("Webhook removed.")
+
+            logger.info(
+                "Webhook removed."
+            )
+
         except Exception as e:
             logger.warning(
                 "Could not remove webhook: %s",
-                e
+                e,
             )
 
         logger.info(
             "Bot starting with model: %s",
-            GROQ_MODEL
+            GROQ_MODEL,
         )
 
         try:
@@ -951,10 +1271,12 @@ def run_bot():
             await application.start()
 
             await application.updater.start_polling(
-                drop_pending_updates=False
+                drop_pending_updates=False,
             )
 
-            logger.info("Telegram polling started.")
+            logger.info(
+                "Telegram polling started."
+            )
 
             # Keep the bot alive
             while True:
@@ -969,7 +1291,7 @@ def run_bot():
         except TelegramError as e:
             logger.exception(
                 "Telegram error: %s",
-                e
+                e,
             )
 
         finally:
@@ -997,7 +1319,7 @@ if __name__ == "__main__":
     # Telegram bot in background thread
     bot_thread = threading.Thread(
         target=run_bot,
-        daemon=True
+        daemon=True,
     )
 
     bot_thread.start()
@@ -1006,5 +1328,5 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=PORT,
-        threaded=True
+        threaded=True,
     )
