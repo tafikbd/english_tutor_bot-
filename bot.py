@@ -2,7 +2,7 @@ import os
 import asyncio
 import logging
 import threading
-
+import random
 from flask import Flask
 from groq import Groq
 
@@ -420,30 +420,61 @@ STUDENT_PROMPTS = {
         "After they answer, correct important mistakes briefly."
     ),
 }
-
+SPEAKING_QUESTIONS = [
+    "What did you have for breakfast today?",
+    "What do you usually do in your free time?",
+    "What is your favorite food, and why?",
+    "What did you do yesterday?",
+    "What kind of music do you enjoy listening to?",
+    "What is one place you would love to visit?",
+    "What do you usually do on weekends?",
+    "Who is someone you really respect, and why?",
+    "What is something new you learned recently?",
+    "What makes you happy on a normal day?",
+    "What is your favorite movie or TV show?",
+    "What would you like to improve about your English?",
+]
 
 # ==========================================================
 # STUDENT MENU CALLBACK
 # ==========================================================
+if query.data == "student_speaking":
 
-async def student_menu_callback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-):
+    last_question = context.user_data.get(
+        "last_speaking_question"
+    )
 
-    query = update.callback_query
+    available_questions = [
+        question
+        for question in SPEAKING_QUESTIONS
+        if question != last_question
+    ]
 
-    if not query:
-        return
+    question = random.choice(
+        available_questions
+    )
 
-    await query.answer()
+    context.user_data[
+        "last_speaking_question"
+    ] = question
+
+    prompt = (
+        "Start English speaking practice.\n"
+        "Ask the student this exact question:\n\n"
+        f"{question}\n\n"
+        "Wait for the student's answer. "
+        "Keep the conversation natural. "
+        "Correct only important mistakes."
+    )
+
+else:
 
     prompt = STUDENT_PROMPTS.get(
         query.data
     )
 
-    if not prompt:
-        return
+if not prompt:
+    return
 
     try:
 
