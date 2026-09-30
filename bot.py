@@ -956,7 +956,7 @@ async def student_menu_callback(
 
     try:
     
-}
+
         await query.message.chat.send_action("typing")
 
         answer = await asyncio.to_thread(
