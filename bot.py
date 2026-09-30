@@ -443,11 +443,7 @@ STUDENT_PROMPTS = {
         "Start English writing practice. Give the student ONE short "
         "writing task suitable for their level and wait for their answer. "
         "After they answer, correct important mistakes briefly."
-    ),
-}
-
-
-SPEAKING_QUESTIONS = [
+        SPEAKING_QUESTIONS = [
     "What did you have for breakfast today?",
     "What do you usually do in your free time?",
     "What is your favorite food, and why?",
@@ -461,6 +457,11 @@ SPEAKING_QUESTIONS = [
     "What is your favorite movie or TV show?",
     "What would you like to improve about your English?",
 ]
+    ),
+}
+
+
+
 
 
 # ==========================================================
