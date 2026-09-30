@@ -437,39 +437,8 @@ STUDENT_PROMPTS = {
     ),
    
 }
-
-# ==========================================================
-# STUDENT PROMPTS
-# ==========================================================
-
 STUDENT_PROMPTS = {
-
-    "student_learn": (
-        "Start a short English lesson for a beginner or intermediate "
-        "student. Choose one useful topic. Explain it simply, give "
-        "one or two examples, then give ONE short practice question. "
-        "Do not give the answer immediately."
-    ),
-
-    "student_vocab": (
-        "Teach ONE useful English word. Give its meaning, pronunciation, "
-        "part of speech, and one simple example. Then give ONE short "
-        "practice question. Do NOT show the answer."
-    ),
-
-    "student_grammar": (
-        "Teach ONE useful English grammar point. Explain its use and "
-        "structure simply, give examples, mention one common mistake, "
-        "then give ONE short practice question. Do NOT show the answer."
-    ),
-
-    "student_tenses": (
-        "Start a short English tense lesson. Choose ONE useful tense. "
-        "Explain its use and structure simply, give examples, mention "
-        "one common mistake if useful, then give ONE short practice "
-        "question. Do not give the answer immediately."
-    ),
-
+    ...
     "student_writing": (
         "Start English writing practice. Give the student ONE short "
         "writing task suitable for their level and wait for their answer. "
@@ -477,10 +446,6 @@ STUDENT_PROMPTS = {
     ),
 }
 
-
-# ==========================================================
-# SPEAKING QUESTIONS
-# ==========================================================
 
 SPEAKING_QUESTIONS = [
     "What did you have for breakfast today?",
