@@ -468,15 +468,13 @@ if query.data == "student_speaking":
     )
 
 else:
-
-    prompt = STUDENT_PROMPTS.get(
+prompt = STUDENT_PROMPTS.get(
         query.data
     )
 
 if not prompt:
     return
-
-    try:
+try:
 
         if query.message:
             await query.message.chat.send_action(
@@ -513,6 +511,7 @@ if not prompt:
                 "Sorry, something went wrong. Please try again."
             )
 
+    
 
 # ==========================================================
 # COMMAND AI HELPER
