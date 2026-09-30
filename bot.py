@@ -1033,7 +1033,9 @@ async def practice_command(
 
 
 async def write_command(
-    
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
     await run_command_ai(
         update,
         (
@@ -1041,7 +1043,6 @@ async def write_command(
             "writing task and wait for their answer."
         ),
     )
-
 
 
 # =========================
