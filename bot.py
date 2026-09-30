@@ -3,6 +3,7 @@ import asyncio
 import logging
 import threading
 import random
+
 from flask import Flask
 from groq import Groq
 
@@ -11,7 +12,9 @@ from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
 )
+
 from telegram.error import Conflict, TelegramError
+
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -266,6 +269,7 @@ Focus on what the user is asking NOW.
 # ==========================================================
 
 def ask_groq(user_text: str) -> str:
+
     response = groq_client.chat.completions.create(
         model=GROQ_MODEL,
         messages=[
@@ -408,60 +412,44 @@ STUDENT_PROMPTS = {
         "question. Do not give the answer immediately."
     ),
 
-    "student_speaking": (
-        "Start English speaking practice. Ask the student ONE simple "
-        "real-life question and wait for their answer. Keep the "
-        "conversation natural. Correct only important mistakes."
-    ),
-
-    "student_writing": (
-        "Start English writing practice. Give the student ONE short "
-        "writing task suitable for their level and wait for their answer. "
-    
-       "After they answer, correct important mistakes briefly."
-
-        SPEAKING_QUESTIONS = [
-    "What did you have for breakfast today?",
-    "What do you usually do in your free time?",
-    "What is your favorite food, and why?",
-    "What did you do yesterday?",
-    "What kind of music do you enjoy listening to?",
-    "What is one place you would love to visit?",
-    "What do you usually do on weekends?",
-    "Who is someone you really respect, and why?",
-    "What is something new you learned recently?",
-    "What makes you happy on a normal day?",
-    "What is your favorite movie or TV show?",
-    "What would you like to improve about your English?",
-]
-    ),
-   
-}
-STUDENT_PROMPTS = {
-    ...
     "student_writing": (
         "Start English writing practice. Give the student ONE short "
         "writing task suitable for their level and wait for their answer. "
         "After they answer, correct important mistakes briefly."
-        SPEAKING_QUESTIONS = [
-    "What did you have for breakfast today?",
-    "What do you usually do in your free time?",
-    "What is your favorite food, and why?",
-    "What did you do yesterday?",
-    "What kind of music do you enjoy listening to?",
-    "What is one place you would love to visit?",
-    "What do you usually do on weekends?",
-    "Who is someone you really respect, and why?",
-    "What is something new you learned recently?",
-    "What makes you happy on a normal day?",
-    "What is your favorite movie or TV show?",
-    "What would you like to improve about your English?",
-]
     ),
 }
 
 
+# ==========================================================
+# SPEAKING QUESTIONS
+# ==========================================================
 
+SPEAKING_QUESTIONS = [
+
+    "What did you have for breakfast today?",
+
+    "What do you usually do in your free time?",
+
+    "What is your favorite food, and why?",
+
+    "What did you do yesterday?",
+
+    "What kind of music do you enjoy listening to?",
+
+    "What is one place you would love to visit?",
+
+    "What do you usually do on weekends?",
+
+    "Who is someone you really respect, and why?",
+
+    "What is something new you learned recently?",
+
+    "What makes you happy on a normal day?",
+
+    "What is your favorite movie or TV show?",
+
+    "What would you like to improve about your English?",
+]
 
 
 # ==========================================================
@@ -479,6 +467,7 @@ async def student_menu_callback(
         return
 
     await query.answer()
+
 
     # ------------------------------------------------------
     # SPEAKING
@@ -505,13 +494,14 @@ async def student_menu_callback(
         ] = question
 
         prompt = (
-            "Start English speaking practice.\n"
+            "Start English speaking practice.\n\n"
             "Ask the student this exact question:\n\n"
             f"{question}\n\n"
             "Wait for the student's answer. "
             "Keep the conversation natural. "
             "Correct only important mistakes."
         )
+
 
     # ------------------------------------------------------
     # OTHER STUDENT MENU OPTIONS
@@ -523,8 +513,14 @@ async def student_menu_callback(
             query.data
         )
 
+
     if not prompt:
         return
+
+
+    # ------------------------------------------------------
+    # AI RESPONSE
+    # ------------------------------------------------------
 
     try:
 
@@ -562,6 +558,11 @@ async def student_menu_callback(
             await query.message.reply_text(
                 "Sorry, something went wrong. Please try again."
             )
+
+
+# ==========================================================
+# COMMAND AI HELPER
+# ==========================================================
 
 async def run_command_ai(
     update: Update,
@@ -693,6 +694,7 @@ async def handle_message(
     if not chat:
         return
 
+
     # ------------------------------------------------------
     # PRIVATE CHAT
     # ------------------------------------------------------
@@ -703,6 +705,7 @@ async def handle_message(
 
         if not user_text:
             return
+
 
     # ------------------------------------------------------
     # GROUP / SUPERGROUP
@@ -739,9 +742,11 @@ async def handle_message(
         ).strip()
 
         if not user_text:
+
             user_text = (
                 "Please help me with English."
             )
+
 
     # ------------------------------------------------------
     # AI RESPONSE
@@ -796,6 +801,7 @@ def run_bot():
             .build()
         )
 
+
         # --------------------------------------------------
         # COMMANDS
         # --------------------------------------------------
@@ -842,6 +848,7 @@ def run_bot():
             )
         )
 
+
         # --------------------------------------------------
         # INLINE BUTTONS
         # --------------------------------------------------
@@ -851,6 +858,7 @@ def run_bot():
                 student_menu_callback,
             )
         )
+
 
         # --------------------------------------------------
         # NORMAL TEXT
@@ -863,11 +871,16 @@ def run_bot():
             )
         )
 
+
         try:
 
             await application.initialize()
 
-            # Remove any old webhook before polling.
+
+            # --------------------------------------------------
+            # REMOVE OLD WEBHOOK
+            # --------------------------------------------------
+
             await application.bot.delete_webhook(
                 drop_pending_updates=False
             )
@@ -876,7 +889,17 @@ def run_bot():
                 "Webhook removed."
             )
 
+
+            # --------------------------------------------------
+            # START APPLICATION
+            # --------------------------------------------------
+
             await application.start()
+
+
+            # --------------------------------------------------
+            # START POLLING
+            # --------------------------------------------------
 
             await application.updater.start_polling(
                 drop_pending_updates=False
@@ -886,9 +909,16 @@ def run_bot():
                 "Telegram polling started successfully."
             )
 
+
+            # --------------------------------------------------
+            # BOT INFO
+            # --------------------------------------------------
+
+            bot_info = await application.bot.get_me()
+
             logger.info(
                 "Bot username: @%s",
-                (await application.bot.get_me()).username,
+                bot_info.username,
             )
 
             logger.info(
@@ -896,9 +926,17 @@ def run_bot():
                 GROQ_MODEL,
             )
 
-            # Keep Telegram bot alive.
+
+            # --------------------------------------------------
+            # KEEP BOT ALIVE
+            # --------------------------------------------------
+
             while True:
-                await asyncio.sleep(3600)
+
+                await asyncio.sleep(
+                    3600
+                )
+
 
         except Conflict:
 
@@ -907,12 +945,14 @@ def run_bot():
                 "is already running."
             )
 
+
         except TelegramError as e:
 
             logger.exception(
                 "Telegram error: %s",
                 e,
             )
+
 
         except Exception as e:
 
@@ -921,23 +961,28 @@ def run_bot():
                 e,
             )
 
+
         finally:
 
             try:
 
                 if application.updater.running:
+
                     await application.updater.stop()
 
             except Exception:
                 pass
 
+
             try:
 
                 if application.running:
+
                     await application.stop()
 
             except Exception:
                 pass
+
 
             try:
 
@@ -945,6 +990,7 @@ def run_bot():
 
             except Exception:
                 pass
+
 
     asyncio.run(
         start_bot()
@@ -961,16 +1007,20 @@ if __name__ == "__main__":
         "Starting EduMate AI..."
     )
 
+
     bot_thread = threading.Thread(
         target=run_bot,
         daemon=True,
     )
 
+
     bot_thread.start()
+
 
     logger.info(
         "Telegram bot thread started."
     )
+
 
     app.run(
         host="0.0.0.0",
