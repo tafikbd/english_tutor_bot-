@@ -1157,14 +1157,6 @@ async def write_command(
     )
 
 
-# =========================
-# TELEGRAM MESSAGE HANDLER
-# =========================
-
-async def handle_message(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-):
     message = update.effective_message
 
     if not message or not message.text:
@@ -1241,69 +1233,6 @@ Rules:
 - Keep the response concise and encouraging.
 """
 
-    try:
-        await message.chat.send_action("typing")
-
-        answer = await asyncio.to_thread(
-            ask_groq,
-            checking_prompt,
-        )
-
-        if not answer:
-            answer = "I couldn't check your answer. Please try again."
-
-        if len(answer) > 4000:
-            answer = answer[:4000]
-
-        # Clear the practice after checking one answer.
-        context.user_data.pop("practice", None)
-
-        await message.reply_text(answer)
-        return
-
-    except Exception as e:
-        logger.exception(
-            "Practice checking error: %s",
-            e,
-        )
-
-        await message.reply_text(
-            "Sorry, I couldn't check your answer. Please try again."
-        )
-
-        return
-
-    # -------------------------
-    # Ask AI
-    # -------------------------
-
-    try:
-        await message.chat.send_action("typing")
-
-        # Run blocking Groq request outside Telegram event loop
-        answer = await asyncio.to_thread(
-            ask_groq,
-            user_text,
-        )
-
-        if not answer:
-            answer = "Sorry, I couldn't generate a response."
-
-        # Telegram message limit protection
-        if len(answer) > 4000:
-            answer = answer[:4000]
-
-        await message.reply_text(answer)
-
-    except Exception as e:
-        logger.exception(
-            "AI error: %s",
-            e,
-        )
-
-        await message.reply_text(
-            "Sorry, something went wrong. Please try again."
-        )
 
 
 # =========================
