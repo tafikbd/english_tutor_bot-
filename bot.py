@@ -438,47 +438,129 @@ STUDENT_PROMPTS = {
    
 }
 
+# ==========================================================
+# STUDENT PROMPTS
+# ==========================================================
+
+STUDENT_PROMPTS = {
+
+    "student_learn": (
+        "Start a short English lesson for a beginner or intermediate "
+        "student. Choose one useful topic. Explain it simply, give "
+        "one or two examples, then give ONE short practice question. "
+        "Do not give the answer immediately."
+    ),
+
+    "student_vocab": (
+        "Teach ONE useful English word. Give its meaning, pronunciation, "
+        "part of speech, and one simple example. Then give ONE short "
+        "practice question. Do NOT show the answer."
+    ),
+
+    "student_grammar": (
+        "Teach ONE useful English grammar point. Explain its use and "
+        "structure simply, give examples, mention one common mistake, "
+        "then give ONE short practice question. Do NOT show the answer."
+    ),
+
+    "student_tenses": (
+        "Start a short English tense lesson. Choose ONE useful tense. "
+        "Explain its use and structure simply, give examples, mention "
+        "one common mistake if useful, then give ONE short practice "
+        "question. Do not give the answer immediately."
+    ),
+
+    "student_writing": (
+        "Start English writing practice. Give the student ONE short "
+        "writing task suitable for their level and wait for their answer. "
+        "After they answer, correct important mistakes briefly."
+    ),
+}
+
+
+# ==========================================================
+# SPEAKING QUESTIONS
+# ==========================================================
+
+SPEAKING_QUESTIONS = [
+    "What did you have for breakfast today?",
+    "What do you usually do in your free time?",
+    "What is your favorite food, and why?",
+    "What did you do yesterday?",
+    "What kind of music do you enjoy listening to?",
+    "What is one place you would love to visit?",
+    "What do you usually do on weekends?",
+    "Who is someone you really respect, and why?",
+    "What is something new you learned recently?",
+    "What makes you happy on a normal day?",
+    "What is your favorite movie or TV show?",
+    "What would you like to improve about your English?",
+]
+
 
 # ==========================================================
 # STUDENT MENU CALLBACK
 # ==========================================================
-if query.data == "student_speaking":
 
-    last_question = context.user_data.get(
-        "last_speaking_question"
-    )
+async def student_menu_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
 
-    available_questions = [
-        question
-        for question in SPEAKING_QUESTIONS
-        if question != last_question
-    ]
+    query = update.callback_query
 
-    question = random.choice(
-        available_questions
-    )
+    if not query:
+        return
 
-    context.user_data[
-        "last_speaking_question"
-    ] = question
+    await query.answer()
 
-    prompt = (
-        "Start English speaking practice.\n"
-        "Ask the student this exact question:\n\n"
-        f"{question}\n\n"
-        "Wait for the student's answer. "
-        "Keep the conversation natural. "
-        "Correct only important mistakes."
-    )
+    # ------------------------------------------------------
+    # SPEAKING
+    # ------------------------------------------------------
 
-else:
-prompt = STUDENT_PROMPTS.get(
-        query.data
-    )
+    if query.data == "student_speaking":
 
-if not prompt:
-    return
-try:
+        last_question = context.user_data.get(
+            "last_speaking_question"
+        )
+
+        available_questions = [
+            question
+            for question in SPEAKING_QUESTIONS
+            if question != last_question
+        ]
+
+        question = random.choice(
+            available_questions
+        )
+
+        context.user_data[
+            "last_speaking_question"
+        ] = question
+
+        prompt = (
+            "Start English speaking practice.\n"
+            "Ask the student this exact question:\n\n"
+            f"{question}\n\n"
+            "Wait for the student's answer. "
+            "Keep the conversation natural. "
+            "Correct only important mistakes."
+        )
+
+    # ------------------------------------------------------
+    # OTHER STUDENT MENU OPTIONS
+    # ------------------------------------------------------
+
+    else:
+
+        prompt = STUDENT_PROMPTS.get(
+            query.data
+        )
+
+    if not prompt:
+        return
+
+    try:
 
         if query.message:
             await query.message.chat.send_action(
@@ -514,12 +596,6 @@ try:
             await query.message.reply_text(
                 "Sorry, something went wrong. Please try again."
             )
-
-    
-
-# ==========================================================
-# COMMAND AI HELPER
-# ==========================================================
 
 async def run_command_ai(
     update: Update,
