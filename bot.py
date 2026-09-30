@@ -902,16 +902,19 @@ STUDENT_PROMPTS = {
     ),
 
     "student_vocab": (
-        "Start vocabulary learning. Teach one useful English word with "
-        "meaning, pronunciation, part of speech, one simple example, "
-        "and one short practice question. Keep it concise."
+       "Start vocabulary learning. Teach one useful English word with "
+"meaning, pronunciation, part of speech, one simple example, "
+"and one short practice question. Do NOT show the answer to the "
+"practice question. Wait for the student to answer, then check "
+"their answer and give a brief explanation if needed. Keep it concise." 
     ),
 
     "student_grammar": (
-        "Start a short English grammar lesson. Teach one useful grammar "
-        "point simply, give one or two examples, mention one common "
-        "mistake if useful, then give one short practice question."
-    ),
+      "Teach one useful English grammar point with a clear explanation, "
+"when to use it, simple structure, examples, one common mistake, "
+"and one short practice question. Do NOT show the answer to the "
+"practice question. Wait for the student to answer, then check "
+"their answer and briefly explain any mistake. Keep it concise."
 
     "student_tenses": (
         "Start a short English tense lesson. Choose one useful tense and "
