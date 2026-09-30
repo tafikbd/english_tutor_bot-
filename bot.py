@@ -19,7 +19,6 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
-from telegram.error import Conflict, TelegramError
 
 
 # =========================
@@ -799,6 +798,9 @@ def health():
 # AI RESPONSE
 # =========================
 
+groq_client = Groq(api_key=GROQ_API_KEY)
+
+
 def ask_groq(user_text: str) -> str:
     response = groq_client.chat.completions.create(
         model=GROQ_MODEL,
@@ -817,7 +819,6 @@ def ask_groq(user_text: str) -> str:
     )
 
     return response.choices[0].message.content.strip()
-
 
 # =========================
 # STUDENT MENU
