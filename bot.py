@@ -948,119 +948,7 @@ async def handle_message(
     chat = update.effective_chat
 
     # Private chat: reply to every message.
-    if chat.type == "private":
-        user_text = message.text
-
-    # Group/supergroup: reply only when mentioned or replied to.
-    else:
-        bot_username = context.bot.username
-
-        if not bot_username:
-            return
-
-        is_reply_to_bot = (
-            message.reply_to_message is not None
-            and message.reply_to_message.from_user is not None
-            and message.reply_to_message.from_user.id
-            == context.bot.id
-        )
-
-        mention = f"@{bot_username.lower()}"
-        is_mentioned = mention in message.text.lower()
-
-        if not is_mentioned and not is_reply_to_bot:
-            return
-
-        user_text = message.text
-
-        # Remove the bot mention from the message.
-        user_text = user_text.replace(
-            f"@{bot_username}",
-            "",
-        ).strip()
-
-        if not user_text:
-            user_text = "Please help me with English."
-
-    # Check an active practice answer before treating it as a new request.
-    if chat.type == "private" and "practice" in context.user_data:
-        practice = context.user_data["practice"]
-
-        checking_prompt = f"""
-The student is answering a practice exercise from the previous EduMate lesson.
-
-Previous lesson:
-{practice["exercise"]}
-
-Student's answer:
-{user_text}
-
-Check the student's answer against the practice question.
-
-Rules:
-- Decide whether the answer is correct or incorrect.
-- If correct, clearly say it is correct and briefly explain why.
-- If incorrect, give the correct answer and briefly explain the mistake.
-- Do not treat this message as a new general AI request.
-- Keep the response concise and encouraging.
-"""
-
-        try:
-            await message.chat.send_action("typing")
-
-            answer = await asyncio.to_thread(
-                ask_groq,
-                checking_prompt,
-            )
-
-            if not answer:
-                answer = "I couldn't check your answer. Please try again."
-
-            if len(answer) > 4000:
-                answer = answer[:4000]
-
-            context.user_data.pop("practice", None)
-
-            await message.reply_text(answer)
-            return
-
-        except Exception as e:
-            logger.exception(
-                "Practice checking error: %s",
-                e,
-            )
-
-            await message.reply_text(
-                "Sorry, I couldn't check your answer. Please try again."
-            )
-            return
-
-    # Ask AI for a normal response.
-    try:
-        await message.chat.send_action("typing")
-
-        answer = await asyncio.to_thread(
-            ask_groq,
-            user_text,
-        )
-
-        if not answer:
-            answer = "Sorry, I couldn't generate a response."
-
-        if len(answer) > 4000:
-            answer = answer[:4000]
-
-        await message.reply_text(answer)
-
-    except Exception as e:
-        logger.exception(
-            "AI error: %s",
-            e,
-        )
-
-        await message.reply_text(
-            "Sorry, something went wrong. Please try again."
-        )
+    
 
 
 
@@ -1145,9 +1033,7 @@ async def practice_command(
 
 
 async def write_command(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-):
+    
     await run_command_ai(
         update,
         (
@@ -1155,83 +1041,6 @@ async def write_command(
             "writing task and wait for their answer."
         ),
     )
-
-
-    message = update.effective_message
-
-    if not message or not message.text:
-        return
-
-    chat = update.effective_chat
-
-    # -------------------------
-    # PRIVATE CHAT
-    # Reply to every message
-    # -------------------------
-
-    if chat.type == "private":
-        user_text = message.text
-
-    # -------------------------
-    # GROUP / SUPERGROUP
-    # Only mention or reply
-    # -------------------------
-
-    else:
-        bot_username = context.bot.username
-
-        if not bot_username:
-            return
-
-        is_reply_to_bot = (
-            message.reply_to_message is not None
-            and message.reply_to_message.from_user is not None
-            and message.reply_to_message.from_user.id
-            == context.bot.id
-        )
-
-        mention = f"@{bot_username.lower()}"
-
-        is_mentioned = mention in message.text.lower()
-
-        if not is_mentioned and not is_reply_to_bot:
-            return
-
-        user_text = message.text
-
-        # Remove @BotUsername from the message
-        user_text = user_text.replace(
-            f"@{bot_username}",
-            "",
-        ).strip()
-
-        if not user_text:
-            user_text = "Please help me with English."
-            # -------------------------
-# CHECK ACTIVE PRACTICE ANSWER
-# -------------------------
-
-if chat.type == "private" and "practice" in context.user_data:
-    practice = context.user_data["practice"]
-
-    checking_prompt = f"""
-The student is answering a practice exercise from the previous EduMate lesson.
-
-Previous lesson:
-{practice["exercise"]}
-
-Student's answer:
-{user_text}
-
-Check the student's answer against the practice question.
-
-Rules:
-- Decide whether the answer is correct or incorrect.
-- If correct, clearly say it is correct and briefly explain why.
-- If incorrect, give the correct answer and briefly explain the mistake.
-- Do not treat this message as a new general AI request.
-- Keep the response concise and encouraging.
-"""
 
 
 
