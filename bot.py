@@ -915,6 +915,7 @@ STUDENT_PROMPTS = {
 "and one short practice question. Do NOT show the answer to the "
 "practice question. Wait for the student to answer, then check "
 "their answer and briefly explain any mistake. Keep it concise."
+    ) 
 
     "student_tenses": (
         "Start a short English tense lesson. Choose one useful tense and "
