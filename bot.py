@@ -70,7 +70,20 @@ PREMIUM_DAYS = 30
 # ==========================================================
 # DATABASE
 # ==========================================================
-
+async def init_db():
+    global db_pool
+    
+    # URL ফিক্স
+    url = DATABASE_URL
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    
+    db_pool = await asyncpg.create_pool(url, min_size=1, max_size=5)
+    async with db_pool.acquire() as conn:
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS t_users (...);
+        """)
+    logger.info("Database initialized.")
 async def init_db():
     global db_pool
     db_pool = await asyncpg.create_pool(DATABASE_URL, min_size=1, max_size=5)
