@@ -73,17 +73,59 @@ PREMIUM_DAYS = 30
 async def init_db():
     global db_pool
     
-    # URL ফিক্স
+    # URL ফিক্স: postgres:// কে postgresql:// করে দেবে
     url = DATABASE_URL
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
     
-    db_pool = await asyncpg.create_pool(url, min_size=1, max_size=5)
-    async with db_pool.acquire() as conn:
-        await conn.execute("""
-            CREATE TABLE IF NOT EXISTS t_users (...);
-        """)
-    logger.info("Database initialized.")
+    try:
+        logger.info("Connecting to database...")
+        db_pool = await asyncpg.create_pool(url, min_size=1, max_size=5)
+        async with db_pool.acquire() as conn:
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS t_users (
+                    user_id BIGINT PRIMARY KEY,
+                    name VARCHAR(100),
+                    language VARCHAR(5) DEFAULT 'bn',
+                    level VARCHAR(20) DEFAULT 'beginner',
+                    coins INTEGER DEFAULT 0,
+                    streak INTEGER DEFAULT 0,
+                    last_practice DATE,
+                    words_learned INTEGER DEFAULT 0,
+                    quizzes_taken INTEGER DEFAULT 0,
+                    quiz_score INTEGER DEFAULT 0,
+                    is_premium BOOLEAN DEFAULT FALSE,
+                    premium_until TIMESTAMP,
+                    referred_by BIGINT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE TABLE IF NOT EXISTS t_history (
+                    id SERIAL PRIMARY KEY,
+                    user_id BIGINT,
+                    role VARCHAR(20),
+                    content TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE INDEX IF NOT EXISTS idx_history_user ON t_history(user_id);
+                CREATE TABLE IF NOT EXISTS t_words (
+                    id SERIAL PRIMARY KEY,
+                    word VARCHAR(100) UNIQUE,
+                    meaning TEXT,
+                    example TEXT
+                );
+                CREATE TABLE IF NOT EXISTS t_reports (
+                    id SERIAL PRIMARY KEY,
+                    reporter_id BIGINT,
+                    reported_id BIGINT,
+                    reason TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+        logger.info("Database initialized successfully.")
+    except Exception as e:
+        logger.error(f"Database connection failed: {e}")
+        raise
 async def init_db():
     global db_pool
     db_pool = await asyncpg.create_pool(DATABASE_URL, min_size=1, max_size=5)
