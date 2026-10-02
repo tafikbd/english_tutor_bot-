@@ -70,9 +70,9 @@ ACHIEVEMENTS = {
 # ==========================================================
 T = {
     "welcome": {
-        "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI — আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary শেখানো\n• 📝 Grammar ব্যাখ্যা\n• 🎯 Quiz ও Leaderboard\n• 💬 বাংলা ↔ ইংরেজি অনুবাদ\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 নিচের বাটন থেকে বেছে নিন।",
-        "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI — your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Teach Vocabulary\n• 📝 Explain Grammar\n• 🎯 Quiz & Leaderboard\n• 💬 Bangla ↔ English Translation\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 Choose from the buttons below.",
-        "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ — आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary सिखाना\n• 📝 Grammar समझाना\n• 🎯 Quiz और Leaderboard\n• 💬 Bangla ↔ English अनुवाद\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 नीचे से चुनें।",
+        "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI - আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary শেখানো\n• 📝 Grammar ব্যাখ্যা\n• 🎯 Quiz ও Leaderboard\n• 💬 বাংলা ↔ ইংরেজি অনুবাদ\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 নিচের বাটন থেকে বেছে নিন।",
+        "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI - your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Teach Vocabulary\n• 📝 Explain Grammar\n• 🎯 Quiz & Leaderboard\n• 💬 Bangla ↔ English Translation\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 Choose from the buttons below.",
+        "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ - आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary सिखाना\n• 📝 Grammar समझाना\n• 🎯 Quiz और Leaderboard\n• 💬 Bangla ↔ English अनुवाद\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 नीचे से चुनें।",
     },
     "main_menu": {"bn": "🏠 মেইন মেনু:", "en": "🏠 Main Menu:", "hi": "🏠 मुख्य मेनू:"},
     "menu_btn": {"bn": "🏠 মেইন মেনু", "en": "🏠 Main Menu", "hi": "🏠 मुख्य मेनू"},
@@ -164,73 +164,69 @@ def t(key, lang="bn", **kwargs):
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 SYSTEM_PROMPT = """
-groq_client = Groq(api_key=GROQ_API_KEY)
+You are EduMate AI, a smart AI Teacher and AI Assistant for students.
 
-"""
+Roles:
+1. AI Teacher - Vocabulary, Grammar, Tenses, Pronunciation, Speaking,
+   Writing, Sentence Correction, Translation, Communication.
+2. AI Assistant - Everyday questions, explanations, planning, general knowledge.
 
+BE FRIENDLY, PATIENT, AND CLEAR. Avoid robotic phrases and excessive emojis.
 
-def ask_groq(user_text, history=None):
-    try:
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        if history:
-            messages.extend(history[-6:])
-        messages.append({"role": "user", "content": user_text})
-        response = groq_client.chat.completions.create(
-            model=GROQ_MODEL,
-            messages=messages,
-            temperature=0.3,
-            max_tokens=900,
-        )
-        text = response.choices[0].message.content.strip()
-        return text if text else None
-    except Exception as e:
-        logger.error(f"Groq error: {e}")
-        return None
+LANGUAGE: Match user's language (Bangla to Bangla, English to English,
+Hindi to Hindi, Azerbaijani to Azerbaijani). When teaching English,
+explain in user's language with English examples.
 
-═══════════════════════════════════════
+FORMATTING RULES:
+1. NEVER use Markdown tables. No pipes and no dash separators.
+2. Use ONLY simple bullet points or numbered lists.
+3. Use single asterisks for italic text.
+4. Use double asterisks ONLY for main heading words.
+5. Keep layout clean, mobile-friendly, easy to read.
+6. Separate each item with a BLANK LINE.
+7. Use emojis at the start of lines.
+
+VOCABULARY FORMAT:
+1. Word - /pronunciation/ - Part of Speech
+   Meaning: [meaning in user's language]
+   Example: [English example sentence]
+   Translation: [translation in user's language]
+
+Leave a blank line between each word.
+
 GRAMMAR FORMAT:
-═══════════════════════════════════════
-📌 *Rule Name*
+Rule Name
 
-🔹 Usage: [brief explanation]
-✅ Example: [correct example]
-❌ Common Mistake: [what learners do wrong]
+Usage: brief explanation
+Example: correct example
+Common Mistake: what learners do wrong
 
-═══════════════════════════════════════
 SENTENCE CORRECTION FORMAT:
-═══════════════════════════════════════
-❌ Wrong: [user's sentence]
+Wrong: user's sentence
 
-✅ Correct: [corrected sentence]
+Correct: corrected sentence
 
-📝 Why: [brief reason in bullet points]
+Why: brief reason
 
-═══════════════════════════════════════
 TRANSLATION FORMAT:
-═══════════════════════════════════════
 Give natural translation directly. No table. No explanation unless asked.
 
-═══════════════════════════════════════
-WRITING (Paragraph/Essay/Email):
-═══════════════════════════════════════
+WRITING:
 Write clean, well-structured content. Use short paragraphs.
-Don't use tables. Don't use '---' separators.
+Do not use tables. Do not use dash separators.
 
-═══════════════════════════════════════
 RESPONSE LENGTH:
-═══════════════════════════════════════
-Be concise. Simple question → short answer.
-Complex request → structured answer.
+Be concise. Simple question gets short answer.
+Complex request gets structured answer.
 Keep under 3500 characters.
 
-═══════════════════════════════════════
 FINAL RULES:
-═══════════════════════════════════════
 - Never invent facts.
 - If unsure, say so.
 - Focus on what the user asks NOW.
 - No walls of text.
 """
+
 
 def ask_groq(user_text, history=None):
     try:
@@ -262,7 +258,7 @@ _mem_history = {}
 async def init_db():
     global db_pool
     if not DATABASE_URL or not HAS_ASYNCPG:
-        logger.warning("DB disabled — in-memory mode.")
+        logger.warning("DB disabled - in-memory mode.")
         db_pool = None
         return
     try:
@@ -307,7 +303,7 @@ async def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """)
-        logger.info("✅ Database initialized.")
+        logger.info("Database initialized.")
     except Exception as e:
         logger.error(f"DB init failed: {e}. In-memory mode.")
         db_pool = None
@@ -505,7 +501,6 @@ async def safe_reply(message, text):
 
 
 async def safe_edit(query, text, reply_markup=None):
-    """Try edit; if fails, send new message."""
     if not text:
         text = "⚠️"
     if len(text) > 4000:
@@ -519,7 +514,6 @@ async def safe_edit(query, text, reply_markup=None):
     except Exception as e:
         logger.error(f"edit fail: {e}")
 
-    # Fallback: send new message
     try:
         if query.message:
             await query.message.reply_text(text, reply_markup=reply_markup)
@@ -643,20 +637,20 @@ async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = await get_user_lang(update.effective_user.id)
     if lang == "en":
-        text = ("📖 Help\n\n/start — Main\n/menu — Menu\n/profile — Profile\n"
-                "/daily — Lesson\n/leaderboard — Leaderboard\n/coins — Balance\n"
-                "/invite — Invite link\n/mistakes — Mistakes\n/achievements — Badges\n"
-                "/level — Set level\n/reminder — Set reminder\n/language — Change lang\n/reset — Clear chat")
+        text = ("📖 Help\n\n/start - Main\n/menu - Menu\n/profile - Profile\n"
+                "/daily - Lesson\n/leaderboard - Leaderboard\n/coins - Balance\n"
+                "/invite - Invite link\n/mistakes - Mistakes\n/achievements - Badges\n"
+                "/level - Set level\n/reminder - Set reminder\n/language - Change lang\n/reset - Clear chat")
     elif lang == "hi":
-        text = ("📖 सहायता\n\n/start — मुख्य\n/menu — मेनू\n/profile — प्रोफ़ाइल\n"
-                "/daily — पाठ\n/leaderboard — लीडरबोर्ड\n/coins — सिक्के\n"
-                "/invite — आमंत्रण\n/mistakes — गलतियाँ\n/achievements — बैज\n"
-                "/level — स्तर\n/reminder — रिमाइंडर\n/language — भाषा\n/reset — चैट साफ़")
+        text = ("📖 सहायता\n\n/start - मुख्य\n/menu - मेनू\n/profile - प्रोफ़ाइल\n"
+                "/daily - पाठ\n/leaderboard - लीडरबोर्ड\n/coins - सिक्के\n"
+                "/invite - आमंत्रण\n/mistakes - गलतियाँ\n/achievements - बैज\n"
+                "/level - स्तर\n/reminder - रिमाइंडर\n/language - भाषा\n/reset - चैट साफ़")
     else:
-        text = ("📖 সাহায্য\n\n/start — মেইন\n/menu — মেনু\n/profile — প্রোফাইল\n"
-                "/daily — পাঠ\n/leaderboard — লিডারবোর্ড\n/coins — কয়েন\n"
-                "/invite — ইনভাইট\n/mistakes — ভুল\n/achievements — ব্যাজ\n"
-                "/level — লেভেল\n/reminder — রিমাইন্ডার\n/language — ভাষা\n/reset — চ্যাট ক্লিয়ার")
+        text = ("📖 সাহায্য\n\n/start - মেইন\n/menu - মেনু\n/profile - প্রোফাইল\n"
+                "/daily - পাঠ\n/leaderboard - লিডারবোর্ড\n/coins - কয়েন\n"
+                "/invite - ইনভাইট\n/mistakes - ভুল\n/achievements - ব্যাজ\n"
+                "/level - লেভেল\n/reminder - রিমাইন্ডার\n/language - ভাষা\n/reset - চ্যাট ক্লিয়ার")
     await update.message.reply_text(text)
 
 
@@ -694,7 +688,7 @@ async def daily_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "1 grammar tip with 2 examples, 1 practice question. Plain text."
     )
     if not answer:
-        answer = "📚 Word: Persistent — অর্থ: অধ্যবসায়ী\nExample: Be persistent.\n\n❓ What is past tense of 'eat'?"
+        answer = "📚 Word: Persistent - অর্থ: অধ্যবসায়ী\nExample: Be persistent.\n\n❓ What is past tense of 'eat'?"
     await safe_reply(
         update.message,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
@@ -728,7 +722,7 @@ async def leaderboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     medals = ["🥇", "🥈", "🥉"]
     for i, r in enumerate(rows):
         m = medals[i] if i < 3 else f"{i+1}."
-        text += f"{m} {r.get('name', '?')} — ⭐ {r.get('quiz_score', 0)}\n"
+        text += f"{m} {r.get('name', '?')} - ⭐ {r.get('quiz_score', 0)}\n"
     await safe_reply(update.message, text)
 
 
@@ -1040,7 +1034,7 @@ async def cb_daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Give today's short English lesson: 1 new word + Bangla meaning + example, 1 grammar tip, 1 practice question. Plain text."
     )
     if not answer:
-        answer = "📚 Word: Diligent — অর্থ: পরিশ্রমী\nExample: She is a diligent student.\n\n❓ Past tense of 'go'?"
+        answer = "📚 Word: Diligent - অর্থ: পরিশ্রমী\nExample: She is a diligent student.\n\n❓ Past tense of 'go'?"
     await safe_edit(
         q,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
@@ -1059,7 +1053,7 @@ async def cb_word_of_day(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Give ONE advanced English word of the day. Include: word, Bangla meaning, pronunciation, part of speech, 2 examples, 2 synonyms. Plain text."
     )
     if not answer:
-        answer = "🔤 Word: Resilient\n📖 অর্থ: স্থিতিস্থাপক\n🔊 /rɪˈzɪliənt/\n✏️ Children are resilient.\n🔁 Synonyms: Strong, Tough"
+        answer = "🔤 Word: Resilient\n📖 অর্থ: স্থিতিস্থাপক\n🔊 /riˈziliənt/\n✏️ Children are resilient.\n🔁 Synonyms: Strong, Tough"
     await safe_edit(q, f"{t('word_title', lang)}\n\n{answer}", reply_markup=back_kb(lang))
 
 
@@ -1121,7 +1115,7 @@ async def cb_premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(
         q,
         f"{t('premium_title', lang)}\n\n"
-        f"⭐ {PREMIUM_STARS} Telegram Stars → {PREMIUM_DAYS} {t('days', lang)}\n\n"
+        f"⭐ {PREMIUM_STARS} Telegram Stars -> {PREMIUM_DAYS} {t('days', lang)}\n\n"
         f"🎁 Benefits:\n• Unlimited AI\n• Detailed Lessons\n• Priority Response",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton(t("premium_buy", lang, n=PREMIUM_STARS), callback_data="buy_premium")],
@@ -1179,7 +1173,7 @@ async def cb_leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     medals = ["🥇", "🥈", "🥉"]
     for i, r in enumerate(rows):
         m = medals[i] if i < 3 else f"{i+1}."
-        text += f"{m} {r.get('name', '?')} — ⭐ {r.get('quiz_score', 0)}\n"
+        text += f"{m} {r.get('name', '?')} - ⭐ {r.get('quiz_score', 0)}\n"
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
@@ -1372,7 +1366,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ==========================================================
 async def post_init(app):
     await init_db()
-    logger.info("✅ Init done.")
+    logger.info("Init done.")
 
 
 async def post_shutdown(app):
@@ -1393,7 +1387,6 @@ def run_bot():
             logger.exception(f"Application build failed: {e}")
             return
 
-        # Commands
         for cmd, fn in [
             ("start", start_command), ("menu", menu_command),
             ("help", help_command), ("profile", profile_command),
@@ -1406,7 +1399,6 @@ def run_bot():
         ]:
             application.add_handler(CommandHandler(cmd, fn))
 
-        # Callbacks — specific patterns first
         application.add_handler(CallbackQueryHandler(cb_set_language, pattern="^setlang_"))
         application.add_handler(CallbackQueryHandler(cb_lang_menu, pattern="^m_lang$"))
         application.add_handler(CallbackQueryHandler(student_menu_callback, pattern="^student_"))
@@ -1429,14 +1421,11 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_reminder_set, pattern="^rem_"))
         application.add_handler(CallbackQueryHandler(cb_set_level, pattern="^setlvl_"))
 
-        # Payment
         application.add_handler(PreCheckoutQueryHandler(precheckout_cb))
         application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_cb))
 
-        # Catch-all callback (must be last)
         application.add_handler(CallbackQueryHandler(cb_fallback))
 
-        # Text
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
         try:
@@ -1444,7 +1433,7 @@ def run_bot():
             await application.bot.delete_webhook(drop_pending_updates=False)
             await application.start()
             await application.updater.start_polling(drop_pending_updates=False)
-            logger.info("✅ Bot started.")
+            logger.info("Bot started.")
             bot_info = await application.bot.get_me()
             logger.info(f"Bot: @{bot_info.username} | Model: {GROQ_MODEL}")
             while True:
