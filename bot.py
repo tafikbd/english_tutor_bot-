@@ -193,7 +193,6 @@ VOCABULARY FORMAT (use this exact structure):
 
 (blank line between each word)
 
-
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 ═══════════════════════════════════════
