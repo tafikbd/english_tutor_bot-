@@ -74,25 +74,15 @@ T = {
         "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI — your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Teach Vocabulary\n• 📝 Explain Grammar\n• 🎯 Quiz & Leaderboard\n• 💬 Bangla ↔ English Translation\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 Choose from the buttons below.",
         "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ — आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary सिखाना\n• 📝 Grammar समझाना\n• 🎯 Quiz और Leaderboard\n• 💬 Bangla ↔ English अनुवाद\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 नीचे से चुनें।",
     },
-    "main_menu": {
-        "bn": "🏠 মেইন মেনু:",
-        "en": "🏠 Main Menu:",
-        "hi": "🏠 मुख्य मेनू:",
-    },
-    "menu_btn": {
-        "bn": "🏠 মেইন মেনু", "en": "🏠 Main Menu", "hi": "🏠 मुख्य मेनू",
-    },
-    "loading": {
-        "bn": "⏳ তৈরি হচ্ছে...", "en": "⏳ Generating...", "hi": "⏳ बना रहा हूँ...",
-    },
+    "main_menu": {"bn": "🏠 মেইন মেনু:", "en": "🏠 Main Menu:", "hi": "🏠 मुख्य मेनू:"},
+    "menu_btn": {"bn": "🏠 মেইন মেনু", "en": "🏠 Main Menu", "hi": "🏠 मुख्य मेनू"},
+    "loading": {"bn": "⏳ তৈরি হচ্ছে...", "en": "⏳ Generating...", "hi": "⏳ बना रहा हूँ..."},
     "ai_error": {
         "bn": "⚠️ এখন AI-তে সমস্যা হচ্ছে। আবার চেষ্টা করুন।",
         "en": "⚠️ AI is having issues. Please try again.",
         "hi": "⚠️ AI में समस्या है। कृपया पुनः प्रयास करें।",
     },
-    "profile_title": {
-        "bn": "👤 আপনার প্রোফাইল", "en": "👤 Your Profile", "hi": "👤 आपकी प्रोफ़ाइल",
-    },
+    "profile_title": {"bn": "👤 আপনার প্রোফাইল", "en": "👤 Your Profile", "hi": "👤 आपकी प्रोफ़ाइल"},
     "name": {"bn": "📛 নাম", "en": "📛 Name", "hi": "📛 नाम"},
     "level": {"bn": "🎓 লেভেল", "en": "🎓 Level", "hi": "🎓 स्तर"},
     "coins": {"bn": "🪙 কয়েন", "en": "🪙 Coins", "hi": "🪙 सिक्के"},
@@ -420,7 +410,7 @@ def run_flask():
 
 
 # ==========================================================
-# KEYBOARDS (regenerated per language)
+# KEYBOARDS
 # ==========================================================
 def main_menu_kb():
     return InlineKeyboardMarkup([
@@ -475,7 +465,7 @@ async def safe_reply(message, text):
 
 
 async def safe_edit(query, text, reply_markup=None):
-    """Try edit; if fails, delete old message & send new."""
+    """Try edit; if fails, send new message."""
     if not text:
         text = "⚠️"
     if len(text) > 4000:
@@ -484,11 +474,8 @@ async def safe_edit(query, text, reply_markup=None):
         await query.edit_message_text(text, reply_markup=reply_markup)
         return True
     except BadRequest as e:
-        msg = str(e).lower()
-        if "message is not modified" in msg:
-            # Same content — just return
+        if "message is not modified" in str(e).lower():
             return True
-        # Fall through to send new
     except Exception as e:
         logger.error(f"edit fail: {e}")
 
@@ -578,7 +565,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not existing:
         await create_user(u.id, u.full_name or "Student")
         await update.message.reply_text(t("choose_lang", "bn"), reply_markup=lang_kb())
-        # Save referral pending
         args = context.args or []
         if args and args[0].startswith("ref_"):
             try:
@@ -587,7 +573,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 pass
         return
 
-    # Existing user — handle referral
     args = context.args or []
     if args and args[0].startswith("ref_"):
         try:
@@ -606,10 +591,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             pass
 
     lang = existing.get("language") or "bn"
-    await safe_reply(
-        update.message,
-        t("welcome", lang, name=u.first_name or "Student"),
-    )
+    await safe_reply(update.message, t("welcome", lang, name=u.first_name or "Student"))
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -621,29 +603,20 @@ async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = await get_user_lang(update.effective_user.id)
     if lang == "en":
-        text = ("📖 Help\n\n"
-                "/start — Main menu\n/menu — Menu\n/profile — Profile\n"
-                "/daily — Today's lesson\n/leaderboard — Leaderboard\n"
-                "/coins — Balance\n/invite — Invite link\n"
-                "/mistakes — Your mistakes\n/achievements — Badges\n"
-                "/level — Set level\n/reminder — Set reminder\n"
-                "/language — Change language\n/reset — Clear chat")
+        text = ("📖 Help\n\n/start — Main\n/menu — Menu\n/profile — Profile\n"
+                "/daily — Lesson\n/leaderboard — Leaderboard\n/coins — Balance\n"
+                "/invite — Invite link\n/mistakes — Mistakes\n/achievements — Badges\n"
+                "/level — Set level\n/reminder — Set reminder\n/language — Change lang\n/reset — Clear chat")
     elif lang == "hi":
-        text = ("📖 सहायता\n\n"
-                "/start — मुख्य मेनू\n/menu — मेनू\n/profile — प्रोफ़ाइल\n"
-                "/daily — आज का पाठ\n/leaderboard — लीडरबोर्ड\n"
-                "/coins — सिक्के\n/invite — आमंत्रण लिंक\n"
-                "/mistakes — आपकी गलतियाँ\n/achievements — बैज\n"
-                "/level — स्तर\n/reminder — रिमाइंडर\n"
-                "/language — भाषा\n/reset — चैट साफ़ करें")
+        text = ("📖 सहायता\n\n/start — मुख्य\n/menu — मेनू\n/profile — प्रोफ़ाइल\n"
+                "/daily — पाठ\n/leaderboard — लीडरबोर्ड\n/coins — सिक्के\n"
+                "/invite — आमंत्रण\n/mistakes — गलतियाँ\n/achievements — बैज\n"
+                "/level — स्तर\n/reminder — रिमाइंडर\n/language — भाषा\n/reset — चैट साफ़")
     else:
-        text = ("📖 সাহায্য\n\n"
-                "/start — মেইন মেনু\n/menu — মেনু\n/profile — প্রোফাইল\n"
-                "/daily — আজকের পাঠ\n/leaderboard — লিডারবোর্ড\n"
-                "/coins — কয়েন\n/invite — ইনভাইট লিংক\n"
-                "/mistakes — আপনার ভুল\n/achievements — ব্যাজ\n"
-                "/level — লেভেল\n/reminder — রিমাইন্ডার\n"
-                "/language — ভাষা পরিবর্তন\n/reset — চ্যাট ক্লিয়ার")
+        text = ("📖 সাহায্য\n\n/start — মেইন\n/menu — মেনু\n/profile — প্রোফাইল\n"
+                "/daily — পাঠ\n/leaderboard — লিডারবোর্ড\n/coins — কয়েন\n"
+                "/invite — ইনভাইট\n/mistakes — ভুল\n/achievements — ব্যাজ\n"
+                "/level — লেভেল\n/reminder — রিমাইন্ডার\n/language — ভাষা\n/reset — চ্যাট ক্লিয়ার")
     await update.message.reply_text(text)
 
 
@@ -678,15 +651,31 @@ async def daily_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     answer = await asyncio.to_thread(
         ask_groq,
         "Give today's short English lesson: 1 new word (with Bangla meaning + pronunciation + example), "
-        "1 grammar tip with 2 examples, 1 practice question. Plain text, no complex Markdown."
+        "1 grammar tip with 2 examples, 1 practice question. Plain text."
     )
     if not answer:
         answer = "📚 Word: Persistent — অর্থ: অধ্যবসায়ী\nExample: Be persistent.\n\n❓ What is past tense of 'eat'?"
     await safe_reply(
         update.message,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
-        f"{t('bonus_coins', lang)}: +{bonus} {t('coins', lang)}\n\n{answer}"
+        f"{t('bonus_coins', lang)}: +{bonus}\n\n{answer}"
     )
+
+
+async def fetch_leaderboard():
+    if db_pool is None:
+        return sorted(_mem_users.values(),
+                     key=lambda x: (x.get("quiz_score", 0), x.get("words_learned", 0)),
+                     reverse=True)[:10]
+    try:
+        async with db_pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT name, quiz_score, words_learned, streak FROM s_users "
+                "ORDER BY quiz_score DESC, words_learned DESC LIMIT 10"
+            )
+            return [dict(r) for r in rows]
+    except Exception:
+        return []
 
 
 async def leaderboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -699,28 +688,8 @@ async def leaderboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     medals = ["🥇", "🥈", "🥉"]
     for i, r in enumerate(rows):
         m = medals[i] if i < 3 else f"{i+1}."
-        name = r.get("name", "?")
-        score = r.get("quiz_score", 0)
-        text += f"{m} {name} — ⭐ {score}\n"
+        text += f"{m} {r.get('name', '?')} — ⭐ {r.get('quiz_score', 0)}\n"
     await safe_reply(update.message, text)
-
-
-async def fetch_leaderboard():
-    if db_pool is None:
-        return sorted(
-            _mem_users.values(),
-            key=lambda x: (x.get("quiz_score", 0), x.get("words_learned", 0)),
-            reverse=True,
-        )[:10]
-    try:
-        async with db_pool.acquire() as conn:
-            rows = await conn.fetch(
-                "SELECT name, quiz_score, words_learned, streak FROM s_users "
-                "ORDER BY quiz_score DESC, words_learned DESC LIMIT 10"
-            )
-            return [dict(r) for r in rows]
-    except Exception:
-        return []
 
 
 async def coins_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -733,8 +702,7 @@ async def coins_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     status = t("active", lang) if user.get("is_premium") else t("inactive", lang)
     await safe_reply(
         update.message,
-        f"{t('coins', lang)}: {user.get('coins') or 0}\n"
-        f"{t('premium_status', lang)}: {status}"
+        f"{t('coins', lang)}: {user.get('coins') or 0}\n{t('premium_status', lang)}: {status}"
     )
 
 
@@ -908,17 +876,16 @@ SPEAKING_QUESTIONS = [
 
 
 # ==========================================================
-# LANGUAGE CALLBACK
+# CALLBACKS
 # ==========================================================
 async def cb_set_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
-    lang = q.data.replace("setlang_", "")  # bn/en/hi
+    lang = q.data.replace("setlang_", "")
     uid = q.from_user.id
     await create_user(uid, q.from_user.full_name or "Student")
     await update_user(uid, language=lang)
 
-    # Handle pending referral
     ref_id = context.user_data.pop("pending_ref", None)
     if ref_id and ref_id != uid:
         user = await get_user(uid)
@@ -934,15 +901,13 @@ async def cb_set_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 pass
 
     await safe_edit(q, t("language_set", lang))
-    await q.message.reply_text(
-        t("welcome", lang, name=q.from_user.first_name or "Student"),
-    )
-    await q.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
+    try:
+        await q.message.reply_text(t("welcome", lang, name=q.from_user.first_name or "Student"))
+        await q.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
+    except Exception as e:
+        logger.error(f"lang reply fail: {e}")
 
 
-# ==========================================================
-# STUDENT MENU CALLBACK
-# ==========================================================
 async def student_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
@@ -964,7 +929,6 @@ async def student_menu_callback(update: Update, context: ContextTypes.DEFAULT_TY
         await q.answer("Unknown option", show_alert=False)
         return
 
-    # Show loading
     try:
         await q.edit_message_text(t("loading", lang))
     except Exception:
@@ -991,9 +955,6 @@ async def student_menu_callback(update: Update, context: ContextTypes.DEFAULT_TY
     await safe_edit(q, answer, reply_markup=back_kb(lang))
 
 
-# ==========================================================
-# OTHER CALLBACKS
-# ==========================================================
 async def cb_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
@@ -1039,7 +1000,7 @@ async def cb_daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Give today's short English lesson: 1 new word + Bangla meaning + example, 1 grammar tip, 1 practice question. Plain text."
     )
     if not answer:
-        answer = "📚 Word: Diligent — অর্থ: পরিশ্রমী\nExample: She is a diligent student.\n\n❓ What is past tense of 'go'?"
+        answer = "📚 Word: Diligent — অর্থ: পরিশ্রমী\nExample: She is a diligent student.\n\n❓ Past tense of 'go'?"
     await safe_edit(
         q,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
@@ -1178,9 +1139,7 @@ async def cb_leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     medals = ["🥇", "🥈", "🥉"]
     for i, r in enumerate(rows):
         m = medals[i] if i < 3 else f"{i+1}."
-        name = r.get("name", "?")
-        score = r.get("quiz_score", 0)
-        text += f"{m} {name} — ⭐ {score}\n"
+        text += f"{m} {r.get('name', '?')} — ⭐ {r.get('quiz_score', 0)}\n"
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
@@ -1295,7 +1254,6 @@ async def cb_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def cb_fallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Catch-all — unknown callbacks er jonno."""
     q = update.callback_query
     await q.answer("Unknown option", show_alert=False)
     logger.warning(f"Unhandled callback: {q.data}")
@@ -1370,72 +1328,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # ==========================================================
-# JOBS
-# ==========================================================
-async def daily_auto_lesson(context: ContextTypes.DEFAULT_TYPE):
-    logger.info("📅 Daily auto lesson...")
-    if db_pool is None:
-        uids = list(_mem_users.keys())
-    else:
-        try:
-            async with db_pool.acquire() as conn:
-                rows = await conn.fetch("SELECT user_id FROM s_users")
-                uids = [r["user_id"] for r in rows]
-        except Exception:
-            uids = []
-
-    answer = await asyncio.to_thread(
-        ask_groq,
-        "Give today's daily English lesson: 1 new word + Bangla meaning + example, 1 grammar tip, 1 practice question. Plain text."
-    )
-    if not answer:
-        answer = "📚 Word: Consistent\n📖 অর্থ: ধারাবাহিক\n✏️ She is consistent.\n\n❓ Past tense of 'eat'?"
-
-    for u_id in uids[:500]:
-        try:
-            lang = await get_user_lang(u_id)
-            await context.bot.send_message(u_id, f"🌅 {t('daily_title', lang)}\n\n{answer}")
-            await asyncio.sleep(0.05)
-        except Exception:
-            pass
-    logger.info(f"Sent daily lesson to {len(uids)} users.")
-
-
-async def reminder_job(context: ContextTypes.DEFAULT_TYPE):
-    now_hm = datetime.now().strftime("%H:%M")
-    if db_pool is None:
-        users = [{"user_id": u["user_id"]} for u in _mem_users.values() if u.get("remind_at") == now_hm]
-    else:
-        try:
-            async with db_pool.acquire() as conn:
-                rows = await conn.fetch("SELECT user_id FROM s_users WHERE remind_at = $1", now_hm)
-                users = [{"user_id": r["user_id"]} for r in rows]
-        except Exception:
-            users = []
-    for u in users:
-        try:
-            await context.bot.send_message(
-                u["user_id"],
-                "🔔 Time to study! /daily",
-            )
-        except Exception:
-            pass
-
-
-# ==========================================================
 # BOT SETUP
 # ==========================================================
 async def post_init(app):
     await init_db()
-    try:
-        app.job_queue.run_daily(
-            daily_auto_lesson,
-            time=datetime.strptime("08:00", "%H:%M").time(),
-        )
-        app.job_queue.run_repeating(reminder_job, interval=60, first=10)
-        logger.info("⏰ Jobs scheduled.")
-    except Exception as e:
-        logger.error(f"Job schedule error: {e}")
+    logger.info("✅ Init done.")
 
 
 async def post_shutdown(app):
@@ -1444,13 +1341,17 @@ async def post_shutdown(app):
 
 def run_bot():
     async def _run():
-        application = (
-            Application.builder()
-            .token(BOT_TOKEN)
-            .post_init(post_init)
-            .post_shutdown(post_shutdown)
-            .build()
-        )
+        try:
+            application = (
+                Application.builder()
+                .token(BOT_TOKEN)
+                .post_init(post_init)
+                .post_shutdown(post_shutdown)
+                .build()
+            )
+        except Exception as e:
+            logger.exception(f"Application build failed: {e}")
+            return
 
         # Commands
         for cmd, fn in [
@@ -1465,15 +1366,11 @@ def run_bot():
         ]:
             application.add_handler(CommandHandler(cmd, fn))
 
-        # Callbacks — ORDER MATTERS! Specific patterns first
-        # Language
+        # Callbacks — specific patterns first
         application.add_handler(CallbackQueryHandler(cb_set_language, pattern="^setlang_"))
         application.add_handler(CallbackQueryHandler(cb_lang_menu, pattern="^m_lang$"))
-
-        # Student menu (specific prefix)
         application.add_handler(CallbackQueryHandler(student_menu_callback, pattern="^student_"))
 
-        # Main menu items
         application.add_handler(CallbackQueryHandler(cb_menu, pattern="^m_menu$"))
         application.add_handler(CallbackQueryHandler(cb_profile, pattern="^m_profile$"))
         application.add_handler(CallbackQueryHandler(cb_daily, pattern="^m_daily$"))
@@ -1488,7 +1385,6 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_reminder, pattern="^m_reminder$"))
         application.add_handler(CallbackQueryHandler(cb_help, pattern="^m_help$"))
 
-        # Sub-actions
         application.add_handler(CallbackQueryHandler(cb_buy_premium, pattern="^buy_premium$"))
         application.add_handler(CallbackQueryHandler(cb_reminder_set, pattern="^rem_"))
         application.add_handler(CallbackQueryHandler(cb_set_level, pattern="^setlvl_"))
@@ -1497,10 +1393,10 @@ def run_bot():
         application.add_handler(PreCheckoutQueryHandler(precheckout_cb))
         application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_cb))
 
-        # Catch-all callback (must be last among callbacks)
+        # Catch-all callback (must be last)
         application.add_handler(CallbackQueryHandler(cb_fallback))
 
-        # Text messages
+        # Text
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
         try:
@@ -1520,12 +1416,20 @@ def run_bot():
         except Exception as e:
             logger.exception(f"Unexpected: {e}")
         finally:
-            for fn in (application.updater.stop, application.stop, application.shutdown):
-                try:
-                    if getattr(application.updater, "running", False) or getattr(application, "running", False):
-                        await fn()
-                except Exception:
-                    pass
+            try:
+                if application.updater.running:
+                    await application.updater.stop()
+            except Exception:
+                pass
+            try:
+                if application.running:
+                    await application.stop()
+            except Exception:
+                pass
+            try:
+                await application.shutdown()
+            except Exception:
+                pass
 
     asyncio.run(_run())
 
