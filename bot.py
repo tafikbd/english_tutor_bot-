@@ -47,8 +47,6 @@ if not BOT_TOKEN:
     raise RuntimeError("BOT_TOKEN is missing.")
 if not GROQ_API_KEY:
     raise RuntimeError("GROQ_API_KEY is missing.")
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL is missing.")
 
 
 logging.basicConfig(
@@ -66,21 +64,28 @@ STREAK_BONUS = 2
 PREMIUM_STARS = 50
 PREMIUM_DAYS = 30
 
+# In-memory fallback (DB কাজ না করলে এখানে ডেটা সেভ হবে)
+_mem_users = {}
+
 
 # ==========================================================
 # DATABASE
 # ==========================================================
+
 async def init_db():
     global db_pool
-    
-    # URL ফিক্স: postgres:// কে postgresql:// করে দেবে
-    url = DATABASE_URL
-    if url.startswith("postgres://"):
-        url = url.replace("postgres://", "postgresql://", 1)
-    
+    if not DATABASE_URL:
+        logger.warning("DATABASE_URL missing. Running in-memory only.")
+        db_pool = None
+        return
+
     try:
-        logger.info("Connecting to database...")
+        url = DATABASE_URL
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+
         db_pool = await asyncpg.create_pool(url, min_size=1, max_size=5)
+
         async with db_pool.acquire() as conn:
             await conn.execute("""
                 CREATE TABLE IF NOT EXISTS t_users (
@@ -108,12 +113,6 @@ async def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
                 CREATE INDEX IF NOT EXISTS idx_history_user ON t_history(user_id);
-                CREATE TABLE IF NOT EXISTS t_words (
-                    id SERIAL PRIMARY KEY,
-                    word VARCHAR(100) UNIQUE,
-                    meaning TEXT,
-                    example TEXT
-                );
                 CREATE TABLE IF NOT EXISTS t_reports (
                     id SERIAL PRIMARY KEY,
                     reporter_id BIGINT,
@@ -122,123 +121,179 @@ async def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """)
-        logger.info("Database initialized successfully.")
+        logger.info("✅ Database initialized successfully.")
     except Exception as e:
-        logger.error(f"Database connection failed: {e}")
-        raise
-async def init_db():
-    global db_pool
-    db_pool = await asyncpg.create_pool(DATABASE_URL, min_size=1, max_size=5)
-    async with db_pool.acquire() as conn:
-        await conn.execute("""
-            CREATE TABLE IF NOT EXISTS t_users (
-                user_id BIGINT PRIMARY KEY,
-                name VARCHAR(100),
-                language VARCHAR(5) DEFAULT 'bn',
-                level VARCHAR(20) DEFAULT 'beginner',
-                coins INTEGER DEFAULT 0,
-                streak INTEGER DEFAULT 0,
-                last_practice DATE,
-                words_learned INTEGER DEFAULT 0,
-                quizzes_taken INTEGER DEFAULT 0,
-                quiz_score INTEGER DEFAULT 0,
-                is_premium BOOLEAN DEFAULT FALSE,
-                premium_until TIMESTAMP,
-                referred_by BIGINT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE TABLE IF NOT EXISTS t_history (
-                id SERIAL PRIMARY KEY,
-                user_id BIGINT,
-                role VARCHAR(20),
-                content TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE INDEX IF NOT EXISTS idx_history_user ON t_history(user_id);
-            CREATE TABLE IF NOT EXISTS t_words (
-                id SERIAL PRIMARY KEY,
-                word VARCHAR(100) UNIQUE,
-                meaning TEXT,
-                example TEXT
-            );
-            CREATE TABLE IF NOT EXISTS t_reports (
-                id SERIAL PRIMARY KEY,
-                reporter_id BIGINT,
-                reported_id BIGINT,
-                reason TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        """)
-    logger.info("Database initialized.")
+        logger.error(f"⚠️ Database init failed: {e}")
+        logger.warning("⚠️ Bot running WITHOUT database (in-memory mode).")
+        db_pool = None
 
 
 async def close_db():
     if db_pool:
-        await db_pool.close()
+        try:
+            await db_pool.close()
+        except Exception:
+            pass
 
+
+# ==========================================================
+# USER HELPERS (with in-memory fallback)
+# ==========================================================
 
 async def get_user(uid):
-    async with db_pool.acquire() as conn:
-        row = await conn.fetchrow("SELECT * FROM t_users WHERE user_id = $1", uid)
-        return dict(row) if row else None
+    if db_pool is None:
+        return _mem_users.get(uid)
+    try:
+        async with db_pool.acquire() as conn:
+            row = await conn.fetchrow("SELECT * FROM t_users WHERE user_id = $1", uid)
+            return dict(row) if row else None
+    except Exception as e:
+        logger.error(f"get_user error: {e}")
+        return _mem_users.get(uid)
 
 
 async def create_user(uid, name):
-    async with db_pool.acquire() as conn:
-        await conn.execute(
-            "INSERT INTO t_users (user_id, name) VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING",
-            uid, name,
-        )
+    if db_pool is None:
+        if uid not in _mem_users:
+            _mem_users[uid] = {
+                "user_id": uid,
+                "name": name,
+                "language": "bn",
+                "level": "beginner",
+                "coins": 0,
+                "streak": 0,
+                "last_practice": None,
+                "words_learned": 0,
+                "quizzes_taken": 0,
+                "quiz_score": 0,
+                "is_premium": False,
+                "premium_until": None,
+                "referred_by": None,
+            }
+        return
+    try:
+        async with db_pool.acquire() as conn:
+            await conn.execute(
+                "INSERT INTO t_users (user_id, name) VALUES ($1, $2) "
+                "ON CONFLICT (user_id) DO NOTHING",
+                uid, name,
+            )
+    except Exception as e:
+        logger.error(f"create_user error: {e}")
 
 
 async def update_user(uid, **kwargs):
+    if db_pool is None:
+        if uid in _mem_users:
+            _mem_users[uid].update(kwargs)
+        return
     if not kwargs:
         return
-    cols = list(kwargs.keys())
-    vals = list(kwargs.values())
-    sets = ", ".join([f"{c} = ${i+2}" for i, c in enumerate(cols)])
-    async with db_pool.acquire() as conn:
-        await conn.execute(f"UPDATE t_users SET {sets} WHERE user_id = $1", uid, *vals)
+    try:
+        cols = list(kwargs.keys())
+        vals = list(kwargs.values())
+        sets = ", ".join([f"{c} = ${i+2}" for i, c in enumerate(cols)])
+        async with db_pool.acquire() as conn:
+            await conn.execute(
+                f"UPDATE t_users SET {sets} WHERE user_id = $1",
+                uid, *vals,
+            )
+    except Exception as e:
+        logger.error(f"update_user error: {e}")
 
 
 async def add_coins(uid, amount):
-    async with db_pool.acquire() as conn:
-        await conn.execute("UPDATE t_users SET coins = coins + $1 WHERE user_id = $2", amount, uid)
+    if db_pool is None:
+        if uid in _mem_users:
+            _mem_users[uid]["coins"] = _mem_users[uid].get("coins", 0) + amount
+        return
+    try:
+        async with db_pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE t_users SET coins = coins + $1 WHERE user_id = $2",
+                amount, uid,
+            )
+    except Exception as e:
+        logger.error(f"add_coins error: {e}")
 
 
 async def get_coins(uid):
-    async with db_pool.acquire() as conn:
-        c = await conn.fetchval("SELECT coins FROM t_users WHERE user_id = $1", uid)
-        return c or 0
+    if db_pool is None:
+        return _mem_users.get(uid, {}).get("coins", 0)
+    try:
+        async with db_pool.acquire() as conn:
+            c = await conn.fetchval(
+                "SELECT coins FROM t_users WHERE user_id = $1", uid
+            )
+            return c or 0
+    except Exception:
+        return 0
 
 
 async def save_history(uid, role, content):
-    async with db_pool.acquire() as conn:
-        await conn.execute(
-            "INSERT INTO t_history (user_id, role, content) VALUES ($1, $2, $3)",
-            uid, role, content,
-        )
-        # Keep last 20
-        await conn.execute("""
-            DELETE FROM t_history WHERE user_id = $1 AND id NOT IN (
-                SELECT id FROM t_history WHERE user_id = $1 ORDER BY id DESC LIMIT 20
+    if db_pool is None:
+        return
+    try:
+        async with db_pool.acquire() as conn:
+            await conn.execute(
+                "INSERT INTO t_history (user_id, role, content) VALUES ($1, $2, $3)",
+                uid, role, content,
             )
-        """, uid)
+            await conn.execute("""
+                DELETE FROM t_history
+                WHERE user_id = $1 AND id NOT IN (
+                    SELECT id FROM t_history
+                    WHERE user_id = $1
+                    ORDER BY id DESC LIMIT 20
+                )
+            """, uid)
+    except Exception as e:
+        logger.error(f"save_history error: {e}")
 
 
 async def get_history(uid):
-    async with db_pool.acquire() as conn:
-        rows = await conn.fetch(
-            "SELECT role, content FROM t_history WHERE user_id = $1 ORDER BY id ASC",
-            uid,
-        )
-        return [{"role": r["role"], "content": r["content"]} for r in rows]
+    if db_pool is None:
+        return []
+    try:
+        async with db_pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT role, content FROM t_history "
+                "WHERE user_id = $1 ORDER BY id ASC",
+                uid,
+            )
+            return [{"role": r["role"], "content": r["content"]} for r in rows]
+    except Exception:
+        return []
 
 
 async def clear_history(uid):
-    async with db_pool.acquire() as conn:
-        await conn.execute("DELETE FROM t_history WHERE user_id = $1", uid)
+    if db_pool is None:
+        return
+    try:
+        async with db_pool.acquire() as conn:
+            await conn.execute("DELETE FROM t_history WHERE user_id = $1", uid)
+    except Exception:
+        pass
+
+
+async def get_leaderboard():
+    if db_pool is None:
+        return sorted(
+            _mem_users.values(),
+            key=lambda x: (x.get("quiz_score", 0), x.get("words_learned", 0)),
+            reverse=True,
+        )[:10]
+    try:
+        async with db_pool.acquire() as conn:
+            rows = await conn.fetch("""
+                SELECT name, quiz_score, words_learned, streak
+                FROM t_users
+                ORDER BY quiz_score DESC, words_learned DESC
+                LIMIT 10
+            """)
+            return rows
+    except Exception:
+        return []
 
 
 # ==========================================================
@@ -249,14 +304,14 @@ SYSTEM_PROMPT = """
 You are Sir English — an expert, friendly, patient English teacher for Bangla-speaking students.
 
 Core rules:
-- Reply in the user's language (Bangla → Bangla, English → English).
+- Reply in the user's language (Bangla -> Bangla, English -> English).
 - Keep answers SHORT and clear unless detail is requested.
 - For corrections, use:
   ❌ Wrong: ...
   ✅ Correct: ...
   📝 Why: ...
 - For vocabulary: word, meaning (Bangla), pronunciation, part of speech, example.
-- For grammar: rule → example → common mistake.
+- For grammar: rule -> example -> common mistake.
 - For translations: natural, not literal.
 - For writing help (paragraph/essay/email): well-structured, appropriate length.
 - Adapt to level: beginner (simple), intermediate (deeper), advanced (nuance).
@@ -356,17 +411,6 @@ async def check_streak(user_id):
     return 1
 
 
-async def get_leaderboard():
-    async with db_pool.acquire() as conn:
-        rows = await conn.fetch("""
-            SELECT name, quiz_score, words_learned, streak
-            FROM t_users
-            ORDER BY quiz_score DESC, words_learned DESC
-            LIMIT 10
-        """)
-        return rows
-
-
 # ==========================================================
 # START
 # ==========================================================
@@ -377,7 +421,6 @@ async def start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     await create_user(u.id, u.full_name or "Student")
 
-    # Referral
     args = context.args or []
     if args and args[0].startswith("ref_"):
         try:
@@ -431,9 +474,7 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def menu_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "🏠 মেইন মেনু:", reply_markup=main_menu_kb()
-    )
+    await update.message.reply_text("🏠 মেইন মেনু:", reply_markup=main_menu_kb())
 
 
 async def profile_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -471,7 +512,11 @@ async def leaderboard_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     medals = ["🥇", "🥈", "🥉"]
     for i, r in enumerate(rows):
         m = medals[i] if i < 3 else f"{i+1}."
-        text += f"{m} {r['name']} — ⭐ {r['quiz_score']} | 📚 {r['words_learned']} | 🔥 {r['streak']}\n"
+        name = r["name"] if isinstance(r, dict) else r.get("name", "?")
+        score = r["quiz_score"] if isinstance(r, dict) else r.get("quiz_score", 0)
+        words = r["words_learned"] if isinstance(r, dict) else r.get("words_learned", 0)
+        streak = r["streak"] if isinstance(r, dict) else r.get("streak", 0)
+        text += f"{m} {name} — ⭐ {score} | 📚 {words} | 🔥 {streak}\n"
     await update.message.reply_text(text, parse_mode="Markdown")
 
 
@@ -511,17 +556,35 @@ async def adminstats_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if uid not in ADMIN_IDS:
         await update.message.reply_text("⛔ অ্যাডমিন নন।")
         return
-    async with db_pool.acquire() as conn:
-        total = await conn.fetchval("SELECT COUNT(*) FROM t_users")
-        today = await conn.fetchval(
-            "SELECT COUNT(*) FROM t_users WHERE last_active > NOW() - INTERVAL '24 hours'"
-        )
-        week = await conn.fetchval(
-            "SELECT COUNT(*) FROM t_users WHERE last_active > NOW() - INTERVAL '7 days'"
-        )
-        premium = await conn.fetchval("SELECT COUNT(*) FROM t_users WHERE is_premium = TRUE")
-        total_coins = await conn.fetchval("SELECT COALESCE(SUM(coins), 0) FROM t_users")
-        total_msgs = await conn.fetchval("SELECT COUNT(*) FROM t_history")
+
+    if db_pool is None:
+        total = len(_mem_users)
+        today = total
+        week = total
+        premium = sum(1 for u in _mem_users.values() if u.get("is_premium"))
+        total_coins = sum(u.get("coins", 0) for u in _mem_users.values())
+        total_msgs = 0
+    else:
+        try:
+            async with db_pool.acquire() as conn:
+                total = await conn.fetchval("SELECT COUNT(*) FROM t_users")
+                today = await conn.fetchval(
+                    "SELECT COUNT(*) FROM t_users WHERE last_active > NOW() - INTERVAL '24 hours'"
+                )
+                week = await conn.fetchval(
+                    "SELECT COUNT(*) FROM t_users WHERE last_active > NOW() - INTERVAL '7 days'"
+                )
+                premium = await conn.fetchval(
+                    "SELECT COUNT(*) FROM t_users WHERE is_premium = TRUE"
+                )
+                total_coins = await conn.fetchval(
+                    "SELECT COALESCE(SUM(coins), 0) FROM t_users"
+                )
+                total_msgs = await conn.fetchval("SELECT COUNT(*) FROM t_history")
+        except Exception as e:
+            await update.message.reply_text(f"❌ DB error: {e}")
+            return
+
     await update.message.reply_text(
         f"📊 **Admin Dashboard**\n\n"
         f"👥 মোট ইউজার: {total}\n"
@@ -529,7 +592,8 @@ async def adminstats_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📅 ৭ দিনে সক্রিয়: {week}\n"
         f"💎 Premium: {premium}\n"
         f"🪙 মোট কয়েন: {total_coins}\n"
-        f"💬 মোট মেসেজ: {total_msgs}",
+        f"💬 মোট মেসেজ: {total_msgs}\n\n"
+        f"💾 DB Mode: {'PostgreSQL ✅' if db_pool else 'In-Memory ⚠️'}",
         parse_mode="Markdown",
     )
 
@@ -599,19 +663,16 @@ async def cb_vocab(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.from_user.id
     await update_user(uid, last_active=datetime.now())
-    async with db_pool.acquire() as conn:
-        await conn.execute(
-            "UPDATE t_users SET words_learned = words_learned + 1 WHERE user_id = $1", uid
-        )
+    user = await get_user(uid)
+    words = (user.get("words_learned") or 0) + 1 if user else 1
+    await update_user(uid, words_learned=words)
     await q.edit_message_text("📚 শব্দ তৈরি হচ্ছে...")
     answer = await asyncio.to_thread(
         ask_groq,
         "Teach ONE useful English word: word, Bangla meaning, pronunciation, part of speech, one example. "
         "Then give ONE short practice question. Do NOT show the answer."
     )
-    await q.edit_message_text(
-        answer, reply_markup=back_kb(), parse_mode="Markdown"
-    )
+    await q.edit_message_text(answer, reply_markup=back_kb(), parse_mode="Markdown")
 
 
 async def cb_grammar(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -624,9 +685,7 @@ async def cb_grammar(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Teach ONE English grammar point: rule, simple explanation, 2 examples, 1 common mistake, "
         "1 short practice question. Do not give answer."
     )
-    await q.edit_message_text(
-        answer, reply_markup=back_kb(), parse_mode="Markdown"
-    )
+    await q.edit_message_text(answer, reply_markup=back_kb(), parse_mode="Markdown")
 
 
 async def cb_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -634,15 +693,15 @@ async def cb_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.from_user.id
     await update_user(uid, last_active=datetime.now())
+    user = await get_user(uid)
+    quizzes = (user.get("quizzes_taken") or 0) + 1 if user else 1
+    await update_user(uid, quizzes_taken=quizzes)
     await q.edit_message_text("🎯 কুইজ তৈরি হচ্ছে...")
     answer = await asyncio.to_thread(
         ask_groq,
         "Create ONE English multiple-choice quiz with 4 options. "
         "Format:\nQuestion: ...\nA) ...\nB) ...\nC) ...\nD) ...\n"
         "Answer: X) ...\nKeep it short."
-    )
-    await update_user(
-        uid, quizzes_taken=(await get_user(uid)).get("quizzes_taken", 0) + 1
     )
     await q.edit_message_text(
         f"🎯 **Quiz**\n\n{answer}",
@@ -678,9 +737,7 @@ async def cb_speaking(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Start English speaking practice. Ask ONE simple real-life question and wait for the answer. "
         "Keep it short and friendly."
     )
-    await q.edit_message_text(
-        answer, reply_markup=back_kb(), parse_mode="Markdown"
-    )
+    await q.edit_message_text(answer, reply_markup=back_kb(), parse_mode="Markdown")
 
 
 async def cb_translate(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -719,7 +776,7 @@ async def cb_premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = await get_user(uid)
     if user and user.get("is_premium"):
         await q.edit_message_text(
-            f"💎 আপনি ইতিমধ্যে Premium!",
+            "💎 আপনি ইতিমধ্যে Premium!",
             reply_markup=back_kb(),
         )
         return
@@ -814,10 +871,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update_user(uid, last_active=datetime.now())
     await check_streak(uid)
 
-    # Save user message
     await save_history(uid, "user", text)
     history = await get_history(uid)
-    level = user.get("level", "beginner")
+    level = (user or {}).get("level", "beginner")
 
     try:
         await update.message.chat.send_action("typing")
@@ -827,13 +883,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(answer) > 4000:
             answer = answer[:4000]
         await save_history(uid, "assistant", answer)
-        await update.message.reply_text(answer, parse_mode="Markdown")
+        try:
+            await update.message.reply_text(answer, parse_mode="Markdown")
+        except Exception:
+            await update.message.reply_text(answer)
     except Exception as e:
         logger.exception("AI error: %s", e)
-        try:
-            await update.message.reply_text(answer)
-        except Exception:
-            await update.message.reply_text("⚠️ কিছু ভুল হয়েছে। আবার চেষ্টা করুন।")
+        await update.message.reply_text("⚠️ কিছু ভুল হয়েছে। আবার চেষ্টা করুন।")
 
 
 # ==========================================================
@@ -897,7 +953,7 @@ def run_bot():
             await application.bot.delete_webhook(drop_pending_updates=False)
             await application.start()
             await application.updater.start_polling(drop_pending_updates=False)
-            logger.info("Bot started successfully.")
+            logger.info("✅ Bot started successfully.")
             bot_info = await application.bot.get_me()
             logger.info("Bot username: @%s", bot_info.username)
             while True:
@@ -936,7 +992,6 @@ if __name__ == "__main__":
     threading.Thread(target=run_flask, daemon=True).start()
     threading.Thread(target=run_bot, daemon=True).start()
     logger.info("Bot + Flask threads started.")
-    # Keep main thread alive
+    import time
     while True:
-        import time
         time.sleep(3600)
