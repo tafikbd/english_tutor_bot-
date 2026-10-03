@@ -45,10 +45,6 @@ if not GROQ_API_KEY:
 logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-# ==========================================================
-# CONSTANTS
-# ==========================================================
 REFERRAL_REWARD = 10
 DAILY_BONUS = 5
 STREAK_BONUS = 2
@@ -66,15 +62,11 @@ ACHIEVEMENTS = {
     "referrer": ("🎁", {"bn": "কাউকে ইনভাইট করেছেন", "en": "Invited someone", "hi": "किसी को आमंत्रित किया"}),
 }
 
-
-# ==========================================================
-# TRANSLATIONS
-# ==========================================================
 T = {
     "welcome": {
-        "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI - আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary শেখানো\n• 📝 Grammar ব্যাখ্যা\n• 🎯 Quiz ও Leaderboard\n• 💬 বাংলা ↔ ইংরেজি অনুবাদ\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 নিচের বাটন থেকে বেছে নিন।",
-        "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI - your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Teach Vocabulary\n• 📝 Explain Grammar\n• 🎯 Quiz & Leaderboard\n• 💬 Bangla ↔ English Translation\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 Choose from the buttons below.",
-        "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ - आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary सिखाना\n• 📝 Grammar समझाना\n• 🎯 Quiz और Leaderboard\n• 💬 Bangla ↔ English अनुवाद\n• ✍️ Writing Help\n• 🗣 Speaking Practice\n• 🔥 Daily Lesson + Streak\n• 🎁 Invite & Earn Coins\n\n👉 नीचे से चुनें।",
+        "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI - আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 অনুবাদ\n• ✍️ Writing\n• 🗣 Speaking\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 নিচের বাটন থেকে বেছে নিন।",
+        "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI - your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 Translation\n• ✍️ Writing\n• 🗣 Speaking\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 Choose from below.",
+        "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ - आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 अनुवाद\n• ✍️ Writing\n• 🗣 Speaking\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 नीचे से चुनें।",
     },
     "main_menu": {"bn": "🏠 মেইন মেনু:", "en": "🏠 Main Menu:", "hi": "🏠 मुख्य मेनू:"},
     "menu_btn": {"bn": "🏠 মেইন মেনু", "en": "🏠 Main Menu", "hi": "🏠 मुख्य मेनू"},
@@ -95,7 +87,6 @@ T = {
     "premium_status": {"bn": "💎 Premium", "en": "💎 Premium", "hi": "💎 Premium"},
     "active": {"bn": "✅ সক্রিয়", "en": "✅ Active", "hi": "✅ सक्रिय"},
     "inactive": {"bn": "❌ নিষ্ক্রিয়", "en": "❌ Inactive", "hi": "❌ निष्क्रिय"},
-    "help_title": {"bn": "📖 সাহায্য", "en": "📖 Help", "hi": "📖 सहायता"},
     "language_set": {
         "bn": "✅ ভাষা সেট হয়েছে: বাংলা",
         "en": "✅ Language set: English",
@@ -122,11 +113,10 @@ T = {
     "word_title": {"bn": "📖 Word of the Day", "en": "📖 Word of the Day", "hi": "📖 आज का शब्द"},
     "quiz_title": {"bn": "🎯 Quiz", "en": "🎯 Quiz", "hi": "🎯 Quiz"},
     "quiz_more": {"bn": "🎯 আরেকটি কুইজ", "en": "🎯 Another Quiz", "hi": "🎯 एक और Quiz"},
-    "translate_title": {"bn": "💬 Translation", "en": "💬 Translation", "hi": "💬 अनुवाद"},
     "translate_hint": {
-        "bn": "যেকোনো বাংলা বা ইংরেজি বাক্য লিখে পাঠান।\n\nউদাহরণ:\n• আমি ভাত খাই → I eat rice.\n• I love my family → আমি আমার পরিবারকে ভালোবাসি।",
-        "en": "Send any Bangla or English sentence.\n\nExamples:\n• আমি ভাত খাই → I eat rice.\n• I love my family → আমি আমার পরিবারকে ভালোবাসি।",
-        "hi": "कोई भी Bangla या English वाक्य भेजें।\n\nउदाहरण:\n• আমি ভাত খাই → I eat rice.\n• I love my family → আমি আমার পরিবারকে ভালোবাসি।",
+        "bn": "যেকোনো বাংলা বা ইংরেজি বাক্য লিখে পাঠান।",
+        "en": "Send any Bangla or English sentence.",
+        "hi": "कोई भी Bangla या English वाक्य भेजें।",
     },
     "invite_title": {"bn": "🎁 Invite & Earn", "en": "🎁 Invite & Earn", "hi": "🎁 Invite & Earn"},
     "invite_hint": {"bn": "💡 প্রতি ইনভাইটে {n} কয়েন পাবেন!", "en": "💡 Earn {n} coins per invite!", "hi": "💡 हर invite पर {n} सिक्के!"},
@@ -150,16 +140,16 @@ T = {
         "hi": "🔒 इस बॉट का उपयोग करने के लिए हमारे ग्रुप से जुड़ें",
     },
     "force_sub_desc": {
-        "bn": "আমাদের Friendship Hub কমিউনিটিতে জয়েন করে সেখান থেকে বন্ধু খুঁজুন এবং ইংরেজি শিখুন। জয়েন করার পর নিচের বাটনে ক্লিক করুন।",
-        "en": "Join our Friendship Hub community to find friends and learn English together. After joining, tap the button below.",
-        "hi": "दोस्त बनाने और English सीखने के लिए हमारे Friendship Hub से जुड़ें। जुड़ने के बाद नीचे के बटन पर क्लिक करें।",
+        "bn": "আমাদের Friendship Hub কমিউনিটিতে জয়েন করুন। জয়েন করার পর নিচের বাটনে ক্লিক করুন।",
+        "en": "Join our Friendship Hub community. After joining, tap the button below.",
+        "hi": "हमारे Friendship Hub से जुड़ें। जुड़ने के बाद नीचे के बटन पर क्लिक करें।",
     },
     "force_sub_join_btn": {"bn": "👥 গ্রুপে জয়েন করুন", "en": "👥 Join Group", "hi": "👥 ग्रुप जॉइन करें"},
     "force_sub_check_btn": {"bn": "✅ জয়েন করেছি, চেক করুন", "en": "✅ I Joined, Check", "hi": "✅ जुड़ गया, चेक करें"},
     "force_sub_not_joined": {
         "bn": "❌ আপনি এখনো গ্রুপে জয়েন করেননি। জয়েন করে আবার চেক করুন।",
-        "en": "❌ You haven't joined the group yet. Please join and check again.",
-        "hi": "❌ आपने अभी तक ग्रुप जॉइन नहीं किया। जॉइन करके फिर से चेक करें।",
+        "en": "❌ You haven't joined the group yet.",
+        "hi": "❌ आपने अभी तक ग्रुप जॉइन नहीं किया।",
     },
     "force_sub_thanks": {
         "bn": "✅ ধন্যবাদ! এখন আপনি বট ব্যবহার করতে পারবেন।",
@@ -183,92 +173,43 @@ def t(key, lang="bn", **kwargs):
 
 
 # ==========================================================
-# GROQ + SYSTEM PROMPT
+# GROQ
 # ==========================================================
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 SYSTEM_PROMPT = """
-You are EduMate AI - an expert, warm, and highly intelligent English teacher
-and general assistant for South Asian students (Bangladesh, India, Pakistan,
-Azerbaijan, and beyond).
+You are EduMate AI - an expert English teacher and general assistant for South Asian students.
 
-IDENTITY & ROLE
-You combine two roles:
-1. Expert English Teacher - Grammar, Vocabulary, Tenses, Pronunciation,
-   Speaking, Writing, Sentence Correction, Translation, Communication.
-2. Smart AI Assistant - Everyday questions, explanations, planning, study
-   help, general knowledge, life advice.
+LANGUAGE: Match the user's language (Bangla->Bangla, English->English, Hindi->Hindi, Azerbaijani->Azerbaijani).
 
-You are: friendly, patient, precise, encouraging, natural, human-like.
-You are NOT: robotic, repetitive, over-formal, fake-enthusiastic.
-
-LANGUAGE INTELLIGENCE
-- Detect the user's language from their message and reply in the SAME language.
-- Bangla -> Bangla reply (with English examples when teaching English).
-- English -> English reply.
-- Hindi -> Hindi reply.
-- Azerbaijani -> Azerbaijani reply.
-- Mixed language -> respond naturally in the dominant language.
-- If user writes broken English, gently reply in their comfortable language
-  (e.g., Bangla) to make them feel safe, then show English example.
-
-INTELLIGENCE RULES
-1. Understand the user's TRUE intent - not just the literal words.
-2. Adapt depth to the user's level.
-3. Give CONTEXTUAL answers.
-4. Anticipate follow-up needs - offer 1-2 similar examples.
-5. Be ACCURATE - never invent grammar rules, meanings, or facts.
-6. Remember context from recent conversation.
-
-FORMATTING RULES (STRICTLY FOLLOW)
+RULES:
 1. NEVER use markdown tables.
 2. NEVER use asterisks (*), double asterisks (**), underscores, or backticks.
 3. Use PLAIN TEXT only with emojis.
-4. Use emojis at the start of lines: 🔷 👉 ✏️ 📝 ✅ ❌ 🎯 📚 💡 🔊 🔁 ⭐ 🔥
+4. Use emojis as bullets: 🔷 👉 ✏️ 📝 ✅ ❌ 🎯 📚 💡 🔊 🔁 ⭐ 🔥
 5. Separate each item with a BLANK LINE.
-6. Keep responses clean, mobile-friendly, easy to scan.
+6. Be accurate. Never invent facts.
+7. Be warm but not over-friendly. Never mock the user.
+8. Keep responses under 3500 characters.
+9. Match the user's level (beginner/intermediate/advanced).
+10. Focus on what the user asks NOW.
 
-VOCABULARY FORMAT
+VOCABULARY FORMAT:
 🔷 word - /pronunciation/ - Part of Speech
-👉 Meaning: [meaning in user's language]
+👉 Meaning: [meaning]
 ✏️ Example: [English sentence]
-📝 Translation: [translation in user's language]
+📝 Translation: [translation]
 
-GRAMMAR / TENSE FORMAT
+GRAMMAR FORMAT:
 📌 Rule Name
-🔹 Usage: brief clear explanation
+🔹 Usage: brief explanation
 ✅ Example: correct example
 ❌ Common Mistake: what learners do wrong
-💡 Tip: quick memory hook
 
-SENTENCE CORRECTION FORMAT
+SENTENCE CORRECTION FORMAT:
 ❌ Wrong: [user's sentence]
-✅ Correct: [corrected sentence]
-📝 Why: [brief reason in 2-3 lines, in user's language]
-
-TRANSLATION FORMAT
-Give natural translation directly. No table.
-
-WRITING
-Write clean, well-structured content. Use short paragraphs.
-Do not use tables. Do not use dash separators.
-
-RESPONSE LENGTH
-Be concise. Simple question -> short answer.
-Complex request -> structured answer.
-Never exceed 3500 characters.
-
-TONE & EMPATHY
-- Be warm but not over-friendly.
-- Never mock, judge, or shame the user.
-- Encourage without being fake.
-
-FINAL NON-NEGOTIABLE RULES
-- NO asterisks, NO tables, NO markdown.
-- Use emojis as bullets.
-- Match user's language.
-- Never invent facts.
-- Focus on what the user asks NOW.
+✅ Correct: [corrected]
+📝 Why: [brief reason]
 """
 
 
@@ -292,7 +233,7 @@ def ask_groq(user_text, history=None):
 
 
 # ==========================================================
-# DATABASE (FIXED)
+# DATABASE
 # ==========================================================
 db_pool = None
 _mem_users = {}
@@ -316,14 +257,12 @@ async def init_db():
         db_pool = None
         return
 
-    # Clean the URL
     url = DATABASE_URL.strip().replace("\n", "").replace("\r", "")
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
 
     logger.info(f"Attempting DB connect with URL prefix: {url[:30]}...")
 
-    # Try connecting
     try:
         db_pool = await asyncio.wait_for(
             asyncpg.create_pool(url, min_size=1, max_size=5),
@@ -331,7 +270,7 @@ async def init_db():
         )
         logger.info("*** DB POOL CREATED SUCCESSFULLY ***")
     except asyncio.TimeoutError:
-        logger.error("*** DB TIMEOUT: Connection took too long ***")
+        logger.error("*** DB TIMEOUT ***")
         db_pool = None
         return
     except Exception as e:
@@ -339,7 +278,6 @@ async def init_db():
         db_pool = None
         return
 
-    # Create tables (separate try — if this fails, keep the pool)
     try:
         async with db_pool.acquire() as conn:
             await conn.execute("""
@@ -372,9 +310,7 @@ async def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            await conn.execute("""
-                CREATE INDEX IF NOT EXISTS idx_sh_user ON s_history(user_id)
-            """)
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_sh_user ON s_history(user_id)")
             await conn.execute("""
                 CREATE TABLE IF NOT EXISTS s_mistakes (
                     id SERIAL PRIMARY KEY,
@@ -384,9 +320,9 @@ async def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-        logger.info("*** ALL TABLES CREATED / VERIFIED ***")
+        logger.info("*** ALL TABLES CREATED ***")
     except Exception as e:
-        logger.error(f"*** TABLE CREATE FAILED (but pool is alive): {e} ***")
+        logger.error(f"*** TABLE CREATE FAILED: {e} ***")
 
     logger.info(f"========== DB INIT END (db_pool={'OK' if db_pool else 'NONE'}) ==========")
 
@@ -750,7 +686,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
 
-async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def menu_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -758,30 +694,30 @@ async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def help_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
     lang = await get_user_lang(update.effective_user.id)
     if lang == "en":
-        text = ("📖 Help\n\n/start - Main\n/menu - Menu\n/profile - Profile\n"
-                "/daily - Lesson\n/leaderboard - Leaderboard\n/coins - Balance\n"
-                "/invite - Invite link\n/mistakes - Mistakes\n/achievements - Badges\n"
-                "/level - Set level\n/reminder - Set reminder\n/language - Change lang\n/reset - Clear chat")
+        text = ("📖 Help\n\n/start Main\n/menu Menu\n/profile Profile\n"
+                "/daily Lesson\n/leaderboard Leaderboard\n/coins Balance\n"
+                "/invite Invite link\n/mistakes Mistakes\n/achievements Badges\n"
+                "/level Set level\n/reminder Set reminder\n/language Change lang\n/reset Clear chat")
     elif lang == "hi":
-        text = ("📖 सहायता\n\n/start - मुख्य\n/menu - मेनू\n/profile - प्रोफ़ाइल\n"
-                "/daily - पाठ\n/leaderboard - लीडरबोर्ड\n/coins - सिक्के\n"
-                "/invite - आमंत्रण\n/mistakes - गलतियाँ\n/achievements - बैज\n"
-                "/level - स्तर\n/reminder - रिमाइंडर\n/language - भाषा\n/reset - चैट साफ़")
+        text = ("📖 सहायता\n\n/start मुख्य\n/menu मेनू\n/profile प्रोफ़ाइल\n"
+                "/daily पाठ\n/leaderboard लीडरबोर्ड\n/coins सिक्के\n"
+                "/invite आमंत्रण\n/mistakes गलतियाँ\n/achievements बैज\n"
+                "/level स्तर\n/reminder रिमाइंडर\n/language भाषा\n/reset चैट साफ़")
     else:
-        text = ("📖 সাহায্য\n\n/start - মেইন\n/menu - মেনু\n/profile - প্রোফাইল\n"
-                "/daily - পাঠ\n/leaderboard - লিডারবোর্ড\n/coins - কয়েন\n"
-                "/invite - ইনভাইট\n/mistakes - ভুল\n/achievements - ব্যাজ\n"
-                "/level - লেভেল\n/reminder - রিমাইন্ডার\n/language - ভাষা\n/reset - চ্যাট ক্লিয়ার")
+        text = ("📖 সাহায্য\n\n/start মেইন\n/menu মেনু\n/profile প্রোফাইল\n"
+                "/daily পাঠ\n/leaderboard লিডারবোর্ড\n/coins কয়েন\n"
+                "/invite ইনভাইট\n/mistakes ভুল\n/achievements ব্যাজ\n"
+                "/level লেভেল\n/reminder রিমাইন্ডার\n/language ভাষা\n/reset চ্যাট ক্লিয়ার")
     await update.message.reply_text(text)
 
 
-async def profile_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def profile_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -805,7 +741,7 @@ async def profile_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def daily_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def daily_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -817,11 +753,11 @@ async def daily_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.chat.send_action("typing")
     answer = await asyncio.to_thread(
         ask_groq,
-        "Give today's short English lesson: 1 new word (with Bangla meaning + pronunciation + example), "
+        "Give today's short English lesson: 1 new word (with meaning + pronunciation + example), "
         "1 grammar tip with 2 examples, 1 practice question. Plain text."
     )
     if not answer:
-        answer = "📚 Word: Persistent - অর্থ: অধ্যবসায়ী\nExample: Be persistent.\n\n❓ What is past tense of 'eat'?"
+        answer = "📚 Word: Persistent - Meaning: continuing firmly\nExample: Be persistent."
     await safe_reply(
         update.message,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
@@ -845,7 +781,7 @@ async def fetch_leaderboard():
         return []
 
 
-async def leaderboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def leaderboard_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -862,7 +798,7 @@ async def leaderboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     await safe_reply(update.message, text)
 
 
-async def coins_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def coins_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -879,7 +815,7 @@ async def coins_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def invite_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def invite_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -893,7 +829,7 @@ async def invite_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def mistakes_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def mistakes_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -919,7 +855,7 @@ async def mistakes_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_reply(update.message, text[:4000])
 
 
-async def achievements_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def achievements_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -932,7 +868,7 @@ async def achievements_command(update: Update, context: ContextTypes.DEFAULT_TYP
     await safe_reply(update.message, f"{t('achievements_title', lang)}\n\n{achievements_text(user, lang)}")
 
 
-async def level_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def level_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -947,7 +883,7 @@ async def level_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def reminder_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def reminder_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -964,14 +900,14 @@ async def reminder_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def language_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
     await update.message.reply_text(t("choose_lang", "bn"), reply_markup=lang_kb())
 
 
-async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def reset_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
@@ -981,7 +917,7 @@ async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(t("reset_done", lang))
 
 
-async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def adminstats_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
         await update.message.reply_text("⛔ Admin only.")
@@ -1014,7 +950,7 @@ async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text(f"❌ DB error: {e}")
 
 
-async def broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def broadcast_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
         await update.message.reply_text("⛔ Admin only.")
@@ -1048,7 +984,7 @@ async def broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ==========================================================
 STUDENT_PROMPTS = {
     "student_learn": "Start a short English lesson. Choose one useful topic. Explain simply, give 2 examples, then ONE practice question. Plain text.",
-    "student_vocab": "Teach ONE English word: meaning (Bangla), pronunciation, part of speech, example. Then ONE practice question. Plain text.",
+    "student_vocab": "Teach ONE English word: meaning, pronunciation, part of speech, example. Then ONE practice question. Plain text.",
     "student_grammar": "Teach ONE English grammar point: rule, explanation, 2 examples, common mistake, 1 practice question. Plain text.",
     "student_tenses": "Teach ONE English tense: usage, structure, 2 examples, common mistake, 1 practice question. Plain text.",
     "student_writing": "Give ONE short English writing task. Wait for the student's answer. Plain text.",
@@ -1065,15 +1001,13 @@ SPEAKING_QUESTIONS = [
     "Who is someone you really respect, and why?",
     "What is something new you learned recently?",
     "What makes you happy on a normal day?",
-    "What is your favorite movie or TV show?",
-    "What would you like to improve about your English?",
 ]
 
 
 # ==========================================================
 # CALLBACKS
 # ==========================================================
-async def cb_forcesub_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_forcesub_check(update, context):
     q = update.callback_query
     uid = q.from_user.id
     lang = await get_user_lang(uid)
@@ -1102,7 +1036,7 @@ async def cb_forcesub_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await q.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
 
-async def cb_set_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_set_language(update, context):
     q = update.callback_query
     await q.answer()
     lang = q.data.replace("setlang_", "")
@@ -1132,7 +1066,7 @@ async def cb_set_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"lang reply fail: {e}")
 
 
-async def student_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def student_menu_callback(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1187,7 +1121,7 @@ async def student_menu_callback(update: Update, context: ContextTypes.DEFAULT_TY
     await safe_edit(q, answer, reply_markup=back_kb(lang))
 
 
-async def cb_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_menu(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1201,7 +1135,7 @@ async def cb_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
-async def cb_profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_profile(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1227,7 +1161,7 @@ async def cb_profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
-async def cb_daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_daily(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1244,10 +1178,10 @@ async def cb_daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.edit_message_text(t("loading", lang))
     answer = await asyncio.to_thread(
         ask_groq,
-        "Give today's short English lesson: 1 new word + Bangla meaning + example, 1 grammar tip, 1 practice question. Plain text."
+        "Give today's short English lesson: 1 new word + meaning + example, 1 grammar tip, 1 practice question. Plain text."
     )
     if not answer:
-        answer = "📚 Word: Diligent - অর্থ: পরিশ্রমী\nExample: She is a diligent student.\n\n❓ Past tense of 'go'?"
+        answer = "📚 Word: Diligent - hardworking\nExample: She is a diligent student."
     await safe_edit(
         q,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
@@ -1256,7 +1190,7 @@ async def cb_daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def cb_word_of_day(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_word_of_day(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1266,14 +1200,14 @@ async def cb_word_of_day(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.edit_message_text(t("loading", lang))
     answer = await asyncio.to_thread(
         ask_groq,
-        "Give ONE advanced English word of the day. Include: word, Bangla meaning, pronunciation, part of speech, 2 examples, 2 synonyms. Plain text."
+        "Give ONE advanced English word of the day. Include: word, meaning, pronunciation, part of speech, 2 examples, 2 synonyms. Plain text."
     )
     if not answer:
-        answer = "🔤 Word: Resilient\n📖 অর্থ: স্থিতিস্থাপক\n🔊 /riˈziliənt/\n✏️ Children are resilient.\n🔁 Synonyms: Strong, Tough"
+        answer = "🔤 Word: Resilient\n📖 Meaning: able to recover quickly\n🔊 /riˈziliənt/"
     await safe_edit(q, f"{t('word_title', lang)}\n\n{answer}", reply_markup=back_kb(lang))
 
 
-async def cb_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_quiz(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1304,7 +1238,7 @@ async def cb_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def cb_translate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_translate(update, context):
     q = update.callback_query
     await q.answer()
     lang = await get_user_lang(q.from_user.id)
@@ -1313,7 +1247,7 @@ async def cb_translate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(q, t("translate_hint", lang), reply_markup=back_kb(lang))
 
 
-async def cb_invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_invite(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1329,7 +1263,7 @@ async def cb_invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def cb_premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_premium(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1352,7 +1286,7 @@ async def cb_premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def cb_buy_premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_buy_premium(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1371,11 +1305,11 @@ async def cb_buy_premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await q.answer("❌ Payment failed", show_alert=True)
 
 
-async def precheckout_cb(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def precheckout_cb(update, context):
     await update.pre_checkout_query.answer(ok=True)
 
 
-async def successful_payment_cb(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def successful_payment_cb(update, context):
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
     until = datetime.now() + timedelta(days=PREMIUM_DAYS)
@@ -1389,7 +1323,7 @@ async def successful_payment_cb(update: Update, context: ContextTypes.DEFAULT_TY
         )
 
 
-async def cb_leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_leaderboard(update, context):
     q = update.callback_query
     await q.answer()
     lang = await get_user_lang(q.from_user.id)
@@ -1407,7 +1341,7 @@ async def cb_leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
-async def cb_mistakes(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_mistakes(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1434,7 +1368,7 @@ async def cb_mistakes(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(q, text[:4000], reply_markup=back_kb(lang))
 
 
-async def cb_achievements(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_achievements(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1449,7 +1383,7 @@ async def cb_achievements(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     reply_markup=back_kb(lang))
 
 
-async def cb_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_reminder(update, context):
     q = update.callback_query
     await q.answer()
     lang = await get_user_lang(q.from_user.id)
@@ -1468,7 +1402,7 @@ async def cb_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def cb_reminder_set(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_reminder_set(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1482,7 +1416,7 @@ async def cb_reminder_set(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await safe_edit(q, t("reminder_set", lang, t=val), reply_markup=back_kb(lang))
 
 
-async def cb_set_level(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_set_level(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
@@ -1492,7 +1426,7 @@ async def cb_set_level(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(q, t("level_set", lang, lvl=lvl), reply_markup=back_kb(lang))
 
 
-async def cb_lang_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_lang_menu(update, context):
     q = update.callback_query
     await q.answer()
     if not await is_user_joined(context.bot, q.from_user.id):
@@ -1500,26 +1434,26 @@ async def cb_lang_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(q, t("choose_lang", "bn"), reply_markup=lang_kb())
 
 
-async def cb_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_help(update, context):
     q = update.callback_query
     await q.answer()
     lang = await get_user_lang(q.from_user.id)
     if not await is_user_joined(context.bot, q.from_user.id):
         return
     if lang == "en":
-        text = ("ℹ️ Help\n\nAll buttons work:\n"
+        text = ("ℹ️ Help\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
                 "🎯 Quiz, 💬 Translate, 🔥 Daily, 📖 Word of Day\n"
                 "📊 Progress, 🏆 Leaderboard, 🎁 Invite, ⭐ Premium\n"
                 "📚 Mistakes, 🏅 Achievements, 🔔 Reminder, 🌍 Language")
     elif lang == "hi":
-        text = ("ℹ️ सहायता\n\nसभी बटन काम करते हैं:\n"
+        text = ("ℹ️ सहायता\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
                 "🎯 Quiz, 💬 Translate, 🔥 Daily, 📖 Word of Day\n"
                 "📊 Progress, 🏆 Leaderboard, 🎁 Invite, ⭐ Premium\n"
                 "📚 Mistakes, 🏅 Achievements, 🔔 Reminder, 🌍 Language")
     else:
-        text = ("ℹ️ সাহায্য\n\nসব বাটন কাজ করে:\n"
+        text = ("ℹ️ সাহায্য\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
                 "🎯 Quiz, 💬 Translate, 🔥 Daily, 📖 Word of Day\n"
                 "📊 Progress, 🏆 Leaderboard, 🎁 Invite, ⭐ Premium\n"
@@ -1527,7 +1461,7 @@ async def cb_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
-async def cb_fallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cb_fallback(update, context):
     q = update.callback_query
     await q.answer("Unknown option", show_alert=False)
     logger.warning(f"Unhandled callback: {q.data}")
@@ -1536,7 +1470,7 @@ async def cb_fallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ==========================================================
 # TEXT HANDLER
 # ==========================================================
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_message(update, context):
     message = update.effective_message
     if not message or not message.text:
         return
@@ -1676,7 +1610,6 @@ def run_bot():
         application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_cb))
 
         application.add_handler(CallbackQueryHandler(cb_fallback))
-
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
         try:
@@ -1714,9 +1647,6 @@ def run_bot():
     asyncio.run(_run())
 
 
-# ==========================================================
-# MAIN
-# ==========================================================
 if __name__ == "__main__":
     logger.info("Starting EduMate AI...")
     threading.Thread(target=run_flask, daemon=True).start()
