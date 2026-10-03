@@ -1,5 +1,4 @@
 import os
-
 import asyncio
 import logging
 import threading
@@ -32,7 +31,7 @@ except ImportError:
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 PORT = int(os.getenv("PORT", "10000"))
 ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
 FORCE_SUB_GROUP_ID = os.getenv("FORCE_SUB_GROUP_ID", "")
@@ -145,7 +144,6 @@ T = {
     "choose_level": {"bn": "🎓 আপনার লেভেল সেট করুন:", "en": "🎓 Set your level:", "hi": "🎓 अपना स्तर चुनें:"},
     "new_achievement": {"bn": "🎉 নতুন অ্যাচিভমেন্ট!", "en": "🎉 New Achievement!", "hi": "🎉 नई उपलब्धि!"},
     "referral_bonus": {"bn": "🎁 আপনি {n} কয়েন পেয়েছেন বন্ধু ইনভাইটের জন্য!", "en": "🎁 You earned {n} coins for referring a friend!", "hi": "🎁 दोस्त को invite करने पर {n} सिक्के मिले!"},
-    # Force Subscribe strings
     "force_sub_title": {
         "bn": "🔒 বট ব্যবহার করতে হলে আমাদের গ্রুপে জয়েন করুন",
         "en": "🔒 Please join our group to use this bot",
@@ -185,139 +183,92 @@ def t(key, lang="bn", **kwargs):
 
 
 # ==========================================================
-# GROQ + SYSTEM PROMPT (SMARTER)
+# GROQ + SYSTEM PROMPT
 # ==========================================================
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 SYSTEM_PROMPT = """
-You are EduMate AI — an expert, warm, and highly intelligent English teacher
+You are EduMate AI - an expert, warm, and highly intelligent English teacher
 and general assistant for South Asian students (Bangladesh, India, Pakistan,
 Azerbaijan, and beyond).
 
-═══════════════════════════════════════
 IDENTITY & ROLE
-═══════════════════════════════════════
 You combine two roles:
-1. Expert English Teacher — Grammar, Vocabulary, Tenses, Pronunciation,
+1. Expert English Teacher - Grammar, Vocabulary, Tenses, Pronunciation,
    Speaking, Writing, Sentence Correction, Translation, Communication.
-2. Smart AI Assistant — Everyday questions, explanations, planning, study
+2. Smart AI Assistant - Everyday questions, explanations, planning, study
    help, general knowledge, life advice.
 
 You are: friendly, patient, precise, encouraging, natural, human-like.
 You are NOT: robotic, repetitive, over-formal, fake-enthusiastic.
 
-═══════════════════════════════════════
 LANGUAGE INTELLIGENCE
-═══════════════════════════════════════
 - Detect the user's language from their message and reply in the SAME language.
-- Bangla → Bangla reply (with English examples when teaching English).
-- English → English reply.
-- Hindi → Hindi reply.
-- Azerbaijani → Azerbaijani reply.
-- Mixed language → respond naturally in the dominant language.
+- Bangla -> Bangla reply (with English examples when teaching English).
+- English -> English reply.
+- Hindi -> Hindi reply.
+- Azerbaijani -> Azerbaijani reply.
+- Mixed language -> respond naturally in the dominant language.
 - If user writes broken English, gently reply in their comfortable language
   (e.g., Bangla) to make them feel safe, then show English example.
 
-═══════════════════════════════════════
-INTELLIGENCE RULES (MAKE YOU SMARTER)
-═══════════════════════════════════════
-1. Understand the user's TRUE intent — not just the literal words.
-   Example: "He go school yesterday" → they want correction, not a definition.
-2. Adapt depth to the user's level:
-   - Beginner → simple words, short sentences, Bangla explanation.
-   - Intermediate → mix Bangla + English, natural examples.
-   - Advanced → English-only, nuanced usage, register, collocations.
-3. Give CONTEXTUAL answers — if user asks "difference between X and Y",
-   give a comparison table-free side-by-side, with examples.
-4. Anticipate follow-up needs — after correcting a sentence, offer 1-2
-   similar practice examples (only if helpful, don't overdo).
-5. Be ACCURATE — never invent grammar rules, meanings, or facts.
-   If unsure, say so honestly.
-6. Remember context from recent conversation — don't repeat yourself.
+INTELLIGENCE RULES
+1. Understand the user's TRUE intent - not just the literal words.
+2. Adapt depth to the user's level.
+3. Give CONTEXTUAL answers.
+4. Anticipate follow-up needs - offer 1-2 similar examples.
+5. Be ACCURATE - never invent grammar rules, meanings, or facts.
+6. Remember context from recent conversation.
 
-═══════════════════════════════════════
-FORMATTING RULES (CRITICAL — STRICTLY FOLLOW)
-═══════════════════════════════════════
-1. NEVER use markdown tables. No pipes | and no dashes separators.
+FORMATTING RULES (STRICTLY FOLLOW)
+1. NEVER use markdown tables.
 2. NEVER use asterisks (*), double asterisks (**), underscores, or backticks.
 3. Use PLAIN TEXT only with emojis.
-4. Use emojis at the start of lines for emphasis:
-   🔷 👉 ✏️ 📝 ✅ ❌ 🎯 📚 💡 🔊 🔁 ⭐ 🔥
+4. Use emojis at the start of lines: 🔷 👉 ✏️ 📝 ✅ ❌ 🎯 📚 💡 🔊 🔁 ⭐ 🔥
 5. Separate each item with a BLANK LINE.
 6. Keep responses clean, mobile-friendly, easy to scan.
 
-═══════════════════════════════════════
 VOCABULARY FORMAT
-═══════════════════════════════════════
-🔷 word — /pronunciation/ — Part of Speech
+🔷 word - /pronunciation/ - Part of Speech
 👉 Meaning: [meaning in user's language]
 ✏️ Example: [English sentence]
 📝 Translation: [translation in user's language]
 
-(blank line between each word)
-
-═══════════════════════════════════════
 GRAMMAR / TENSE FORMAT
-═══════════════════════════════════════
 📌 Rule Name
-
 🔹 Usage: brief clear explanation
-✅ Example: correct example (2 if useful)
+✅ Example: correct example
 ❌ Common Mistake: what learners do wrong
 💡 Tip: quick memory hook
 
-═══════════════════════════════════════
 SENTENCE CORRECTION FORMAT
-═══════════════════════════════════════
 ❌ Wrong: [user's sentence]
 ✅ Correct: [corrected sentence]
-📝 Why: [brief reason in 2-3 bullet lines, in user's language]
+📝 Why: [brief reason in 2-3 lines, in user's language]
 
-═══════════════════════════════════════
 TRANSLATION FORMAT
-═══════════════════════════════════════
-Give natural translation directly. No table. No extra explanation unless asked.
-If the sentence has idioms, briefly note the meaning.
+Give natural translation directly. No table.
 
-═══════════════════════════════════════
-WRITING (Paragraph / Essay / Email / Story)
-═══════════════════════════════════════
+WRITING
 Write clean, well-structured content. Use short paragraphs.
-Preserve requested tone, length, audience.
 Do not use tables. Do not use dash separators.
-Do not add markdown.
 
-═══════════════════════════════════════
-GENERAL KNOWLEDGE
-═══════════════════════════════════════
-Answer accurately and concisely. If time-sensitive, advise verification.
-For medical/legal/financial — give general info + suggest professionals.
-
-═══════════════════════════════════════
 RESPONSE LENGTH
-═══════════════════════════════════════
-Be concise. Simple question → short answer.
-Complex request → structured answer.
+Be concise. Simple question -> short answer.
+Complex request -> structured answer.
 Never exceed 3500 characters.
-Never write "walls of text."
 
-═══════════════════════════════════════
 TONE & EMPATHY
-═══════════════════════════════════════
 - Be warm but not over-friendly.
 - Never mock, judge, or shame the user.
-- If user is frustrated, stay calm and helpful.
 - Encourage without being fake.
 
-═══════════════════════════════════════
 FINAL NON-NEGOTIABLE RULES
-═══════════════════════════════════════
-- NO asterisks, NO tables, NO markdown that breaks Telegram.
+- NO asterisks, NO tables, NO markdown.
 - Use emojis as bullets.
 - Match user's language.
 - Never invent facts.
 - Focus on what the user asks NOW.
-- Be a teacher, be smart, be kind.
 """
 
 
@@ -341,7 +292,7 @@ def ask_groq(user_text, history=None):
 
 
 # ==========================================================
-# DATABASE
+# DATABASE (FIXED)
 # ==========================================================
 db_pool = None
 _mem_users = {}
@@ -350,15 +301,46 @@ _mem_history = {}
 
 async def init_db():
     global db_pool
-    if not DATABASE_URL or not HAS_ASYNCPG:
-        logger.warning("DB disabled - in-memory mode.")
+
+    logger.info("========== DB INIT START ==========")
+    logger.info(f"DATABASE_URL present? {bool(DATABASE_URL)}")
+    logger.info(f"HAS_ASYNCPG? {HAS_ASYNCPG}")
+
+    if not DATABASE_URL:
+        logger.warning("DB DISABLED: DATABASE_URL is empty")
         db_pool = None
         return
+
+    if not HAS_ASYNCPG:
+        logger.warning("DB DISABLED: asyncpg not installed")
+        db_pool = None
+        return
+
+    # Clean the URL
+    url = DATABASE_URL.strip().replace("\n", "").replace("\r", "")
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+
+    logger.info(f"Attempting DB connect with URL prefix: {url[:30]}...")
+
+    # Try connecting
     try:
-        url = DATABASE_URL
-        if url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql://", 1)
-        db_pool = await asyncpg.create_pool(url, min_size=1, max_size=5)
+        db_pool = await asyncio.wait_for(
+            asyncpg.create_pool(url, min_size=1, max_size=5),
+            timeout=25.0
+        )
+        logger.info("*** DB POOL CREATED SUCCESSFULLY ***")
+    except asyncio.TimeoutError:
+        logger.error("*** DB TIMEOUT: Connection took too long ***")
+        db_pool = None
+        return
+    except Exception as e:
+        logger.error(f"*** DB CONNECT FAILED: {type(e).__name__}: {e} ***")
+        db_pool = None
+        return
+
+    # Create tables (separate try — if this fails, keep the pool)
+    try:
         async with db_pool.acquire() as conn:
             await conn.execute("""
                 CREATE TABLE IF NOT EXISTS s_users (
@@ -379,27 +361,34 @@ async def init_db():
                     remind_at VARCHAR(5),
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
+                )
+            """)
+            await conn.execute("""
                 CREATE TABLE IF NOT EXISTS s_history (
                     id SERIAL PRIMARY KEY,
                     user_id BIGINT,
                     role VARCHAR(20),
                     content TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
-                CREATE INDEX IF NOT EXISTS idx_sh_user ON s_history(user_id);
+                )
+            """)
+            await conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_sh_user ON s_history(user_id)
+            """)
+            await conn.execute("""
                 CREATE TABLE IF NOT EXISTS s_mistakes (
                     id SERIAL PRIMARY KEY,
                     user_id BIGINT,
                     wrong_text TEXT,
                     corrected_text TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
+                )
             """)
-        logger.info("Database initialized.")
+        logger.info("*** ALL TABLES CREATED / VERIFIED ***")
     except Exception as e:
-        logger.error(f"DB init failed: {e}. In-memory mode.")
-        db_pool = None
+        logger.error(f"*** TABLE CREATE FAILED (but pool is alive): {e} ***")
+
+    logger.info(f"========== DB INIT END (db_pool={'OK' if db_pool else 'NONE'}) ==========")
 
 
 async def close_db():
@@ -519,10 +508,9 @@ async def get_user_lang(uid):
 
 
 # ==========================================================
-# FORCE SUBSCRIBE CHECK
+# FORCE SUBSCRIBE
 # ==========================================================
 async def is_user_joined(bot, user_id):
-    """Check if user is a member of the required group."""
     if not FORCE_SUB_GROUP_ID:
         return True
     try:
@@ -534,7 +522,6 @@ async def is_user_joined(bot, user_id):
         return member.status in ("creator", "administrator", "member", "restricted")
     except Exception as e:
         logger.error(f"ForceSub check error: {e}")
-        # If bot can't check, allow to avoid blocking users
         return True
 
 
@@ -723,7 +710,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not u or u.is_bot:
         return
 
-    # FORCE SUB CHECK
     if not await is_user_joined(context.bot, u.id):
         existing = await get_user(u.id)
         lang = (existing or {}).get("language") or "bn"
@@ -1002,7 +988,7 @@ async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         return
     if db_pool is None:
         await update.message.reply_text(
-            f"📊 Admin Stats\n\n👥 Users: {len(_mem_users)}\n💾 Mode: In-Memory"
+            f"📊 Admin Stats\n\n👥 Users: {len(_mem_users)}\n💾 Mode: In-Memory ❌\n\nDB not connected!"
         )
         return
     try:
@@ -1021,7 +1007,8 @@ async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
             update.message,
             f"📊 Admin Dashboard\n\n"
             f"👥 Total Users: {total}\n🟢 24h Active: {today}\n📅 7d Active: {week}\n"
-            f"💎 Premium: {premium}\n🪙 Total Coins: {total_coins}\n💬 Messages: {total_msgs}"
+            f"💎 Premium: {premium}\n🪙 Total Coins: {total_coins}\n💬 Messages: {total_msgs}\n\n"
+            f"💾 Mode: PostgreSQL ✅"
         )
     except Exception as e:
         await update.message.reply_text(f"❌ DB error: {e}")
@@ -1104,7 +1091,6 @@ async def cb_forcesub_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception:
         pass
-    # Send welcome after joining
     existing = await get_user(uid)
     if not existing:
         await create_user(uid, q.from_user.full_name or "Student")
@@ -1560,7 +1546,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     uid = update.effective_user.id
 
-    # FORCE SUB CHECK
     if not await is_user_joined(context.bot, uid):
         existing = await get_user(uid)
         lang = (existing or {}).get("language") or "bn"
@@ -1627,7 +1612,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # BOT SETUP
 # ==========================================================
 async def post_init(app):
-    await init_db()
+    try:
+        await init_db()
+    except Exception as e:
+        logger.error(f"post_init exception: {e}")
     logger.info("Init done.")
 
 
