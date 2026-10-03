@@ -31,9 +31,11 @@ except ImportError:
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 PORT = int(os.getenv("PORT", "10000"))
 ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
+FORCE_SUB_GROUP_ID = os.getenv("FORCE_SUB_GROUP_ID", "")
+FORCE_SUB_GROUP_LINK = os.getenv("FORCE_SUB_GROUP_LINK", "")
 
 if not BOT_TOKEN:
     raise RuntimeError("BOT_TOKEN missing.")
@@ -142,6 +144,29 @@ T = {
     "choose_level": {"bn": "🎓 আপনার লেভেল সেট করুন:", "en": "🎓 Set your level:", "hi": "🎓 अपना स्तर चुनें:"},
     "new_achievement": {"bn": "🎉 নতুন অ্যাচিভমেন্ট!", "en": "🎉 New Achievement!", "hi": "🎉 नई उपलब्धि!"},
     "referral_bonus": {"bn": "🎁 আপনি {n} কয়েন পেয়েছেন বন্ধু ইনভাইটের জন্য!", "en": "🎁 You earned {n} coins for referring a friend!", "hi": "🎁 दोस्त को invite करने पर {n} सिक्के मिले!"},
+    # Force Subscribe strings
+    "force_sub_title": {
+        "bn": "🔒 বট ব্যবহার করতে হলে আমাদের গ্রুপে জয়েন করুন",
+        "en": "🔒 Please join our group to use this bot",
+        "hi": "🔒 इस बॉट का उपयोग करने के लिए हमारे ग्रुप से जुड़ें",
+    },
+    "force_sub_desc": {
+        "bn": "আমাদের Friendship Hub কমিউনিটিতে জয়েন করে সেখান থেকে বন্ধু খুঁজুন এবং ইংরেজি শিখুন। জয়েন করার পর নিচের বাটনে ক্লিক করুন।",
+        "en": "Join our Friendship Hub community to find friends and learn English together. After joining, tap the button below.",
+        "hi": "दोस्त बनाने और English सीखने के लिए हमारे Friendship Hub से जुड़ें। जुड़ने के बाद नीचे के बटन पर क्लिक करें।",
+    },
+    "force_sub_join_btn": {"bn": "👥 গ্রুপে জয়েন করুন", "en": "👥 Join Group", "hi": "👥 ग्रुप जॉइन करें"},
+    "force_sub_check_btn": {"bn": "✅ জয়েন করেছি, চেক করুন", "en": "✅ I Joined, Check", "hi": "✅ जुड़ गया, चेक करें"},
+    "force_sub_not_joined": {
+        "bn": "❌ আপনি এখনো গ্রুপে জয়েন করেননি। জয়েন করে আবার চেক করুন।",
+        "en": "❌ You haven't joined the group yet. Please join and check again.",
+        "hi": "❌ आपने अभी तक ग्रुप जॉइन नहीं किया। जॉइन करके फिर से चेक करें।",
+    },
+    "force_sub_thanks": {
+        "bn": "✅ ধন্যবাদ! এখন আপনি বট ব্যবহার করতে পারবেন।",
+        "en": "✅ Thank you! You can now use the bot.",
+        "hi": "✅ धन्यवाद! अब आप बॉट का उपयोग कर सकते हैं।",
+    },
 }
 
 
@@ -159,72 +184,139 @@ def t(key, lang="bn", **kwargs):
 
 
 # ==========================================================
-# GROQ + SYSTEM PROMPT
+# GROQ + SYSTEM PROMPT (SMARTER)
 # ==========================================================
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 SYSTEM_PROMPT = """
-You are EduMate AI, a smart AI Teacher and AI Assistant for students.
+You are EduMate AI — an expert, warm, and highly intelligent English teacher
+and general assistant for South Asian students (Bangladesh, India, Pakistan,
+Azerbaijan, and beyond).
 
-Roles:
-1. AI Teacher - Vocabulary, Grammar, Tenses, Pronunciation, Speaking,
-   Writing, Sentence Correction, Translation, Communication.
-2. AI Assistant - Everyday questions, explanations, planning, general knowledge.
+═══════════════════════════════════════
+IDENTITY & ROLE
+═══════════════════════════════════════
+You combine two roles:
+1. Expert English Teacher — Grammar, Vocabulary, Tenses, Pronunciation,
+   Speaking, Writing, Sentence Correction, Translation, Communication.
+2. Smart AI Assistant — Everyday questions, explanations, planning, study
+   help, general knowledge, life advice.
 
-BE FRIENDLY, PATIENT, AND CLEAR. Avoid robotic phrases and excessive emojis.
+You are: friendly, patient, precise, encouraging, natural, human-like.
+You are NOT: robotic, repetitive, over-formal, fake-enthusiastic.
 
-LANGUAGE: Match user's language (Bangla to Bangla, English to English,
-Hindi to Hindi, Azerbaijani to Azerbaijani). When teaching English,
-explain in user's language with English examples.
+═══════════════════════════════════════
+LANGUAGE INTELLIGENCE
+═══════════════════════════════════════
+- Detect the user's language from their message and reply in the SAME language.
+- Bangla → Bangla reply (with English examples when teaching English).
+- English → English reply.
+- Hindi → Hindi reply.
+- Azerbaijani → Azerbaijani reply.
+- Mixed language → respond naturally in the dominant language.
+- If user writes broken English, gently reply in their comfortable language
+  (e.g., Bangla) to make them feel safe, then show English example.
 
-FORMATTING RULES:
-1. NEVER use Markdown tables. No pipes and no dash separators.
-2. Use ONLY simple bullet points or numbered lists.
-3. Use single asterisks for italic text.
-4. Use double asterisks ONLY for main heading words.
-5. Keep layout clean, mobile-friendly, easy to read.
-6. Separate each item with a BLANK LINE.
-7. Use emojis at the start of lines.
+═══════════════════════════════════════
+INTELLIGENCE RULES (MAKE YOU SMARTER)
+═══════════════════════════════════════
+1. Understand the user's TRUE intent — not just the literal words.
+   Example: "He go school yesterday" → they want correction, not a definition.
+2. Adapt depth to the user's level:
+   - Beginner → simple words, short sentences, Bangla explanation.
+   - Intermediate → mix Bangla + English, natural examples.
+   - Advanced → English-only, nuanced usage, register, collocations.
+3. Give CONTEXTUAL answers — if user asks "difference between X and Y",
+   give a comparison table-free side-by-side, with examples.
+4. Anticipate follow-up needs — after correcting a sentence, offer 1-2
+   similar practice examples (only if helpful, don't overdo).
+5. Be ACCURATE — never invent grammar rules, meanings, or facts.
+   If unsure, say so honestly.
+6. Remember context from recent conversation — don't repeat yourself.
 
-VOCABULARY FORMAT:
-1. Word - /pronunciation/ - Part of Speech
-   Meaning: [meaning in user's language]
-   Example: [English example sentence]
-   Translation: [translation in user's language]
+═══════════════════════════════════════
+FORMATTING RULES (CRITICAL — STRICTLY FOLLOW)
+═══════════════════════════════════════
+1. NEVER use markdown tables. No pipes | and no dashes separators.
+2. NEVER use asterisks (*), double asterisks (**), underscores, or backticks.
+3. Use PLAIN TEXT only with emojis.
+4. Use emojis at the start of lines for emphasis:
+   🔷 👉 ✏️ 📝 ✅ ❌ 🎯 📚 💡 🔊 🔁 ⭐ 🔥
+5. Separate each item with a BLANK LINE.
+6. Keep responses clean, mobile-friendly, easy to scan.
 
-Leave a blank line between each word.
+═══════════════════════════════════════
+VOCABULARY FORMAT
+═══════════════════════════════════════
+🔷 word — /pronunciation/ — Part of Speech
+👉 Meaning: [meaning in user's language]
+✏️ Example: [English sentence]
+📝 Translation: [translation in user's language]
 
-GRAMMAR FORMAT:
-Rule Name
+(blank line between each word)
 
-Usage: brief explanation
-Example: correct example
-Common Mistake: what learners do wrong
+═══════════════════════════════════════
+GRAMMAR / TENSE FORMAT
+═══════════════════════════════════════
+📌 Rule Name
 
-SENTENCE CORRECTION FORMAT:
-Wrong: user's sentence
+🔹 Usage: brief clear explanation
+✅ Example: correct example (2 if useful)
+❌ Common Mistake: what learners do wrong
+💡 Tip: quick memory hook
 
-Correct: corrected sentence
+═══════════════════════════════════════
+SENTENCE CORRECTION FORMAT
+═══════════════════════════════════════
+❌ Wrong: [user's sentence]
+✅ Correct: [corrected sentence]
+📝 Why: [brief reason in 2-3 bullet lines, in user's language]
 
-Why: brief reason
+═══════════════════════════════════════
+TRANSLATION FORMAT
+═══════════════════════════════════════
+Give natural translation directly. No table. No extra explanation unless asked.
+If the sentence has idioms, briefly note the meaning.
 
-TRANSLATION FORMAT:
-Give natural translation directly. No table. No explanation unless asked.
-
-WRITING:
+═══════════════════════════════════════
+WRITING (Paragraph / Essay / Email / Story)
+═══════════════════════════════════════
 Write clean, well-structured content. Use short paragraphs.
+Preserve requested tone, length, audience.
 Do not use tables. Do not use dash separators.
+Do not add markdown.
 
-RESPONSE LENGTH:
-Be concise. Simple question gets short answer.
-Complex request gets structured answer.
-Keep under 3500 characters.
+═══════════════════════════════════════
+GENERAL KNOWLEDGE
+═══════════════════════════════════════
+Answer accurately and concisely. If time-sensitive, advise verification.
+For medical/legal/financial — give general info + suggest professionals.
 
-FINAL RULES:
+═══════════════════════════════════════
+RESPONSE LENGTH
+═══════════════════════════════════════
+Be concise. Simple question → short answer.
+Complex request → structured answer.
+Never exceed 3500 characters.
+Never write "walls of text."
+
+═══════════════════════════════════════
+TONE & EMPATHY
+═══════════════════════════════════════
+- Be warm but not over-friendly.
+- Never mock, judge, or shame the user.
+- If user is frustrated, stay calm and helpful.
+- Encourage without being fake.
+
+═══════════════════════════════════════
+FINAL NON-NEGOTIABLE RULES
+═══════════════════════════════════════
+- NO asterisks, NO tables, NO markdown that breaks Telegram.
+- Use emojis as bullets.
+- Match user's language.
 - Never invent facts.
-- If unsure, say so.
 - Focus on what the user asks NOW.
-- No walls of text.
+- Be a teacher, be smart, be kind.
 """
 
 
@@ -232,13 +324,13 @@ def ask_groq(user_text, history=None):
     try:
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         if history:
-            messages.extend(history[-6:])
+            messages.extend(history[-8:])
         messages.append({"role": "user", "content": user_text})
         response = groq_client.chat.completions.create(
             model=GROQ_MODEL,
             messages=messages,
-            temperature=0.3,
-            max_tokens=900,
+            temperature=0.4,
+            max_tokens=1200,
         )
         text = response.choices[0].message.content.strip()
         return text if text else None
@@ -426,6 +518,41 @@ async def get_user_lang(uid):
 
 
 # ==========================================================
+# FORCE SUBSCRIBE CHECK
+# ==========================================================
+async def is_user_joined(bot, user_id):
+    """Check if user is a member of the required group."""
+    if not FORCE_SUB_GROUP_ID:
+        return True
+    try:
+        try:
+            chat_id = int(FORCE_SUB_GROUP_ID)
+        except ValueError:
+            chat_id = FORCE_SUB_GROUP_ID
+        member = await bot.get_chat_member(chat_id, user_id)
+        return member.status in ("creator", "administrator", "member", "restricted")
+    except Exception as e:
+        logger.error(f"ForceSub check error: {e}")
+        # If bot can't check, allow to avoid blocking users
+        return True
+
+
+def force_sub_kb(lang="bn"):
+    join_url = FORCE_SUB_GROUP_LINK or "https://t.me/friendships_hub"
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(t("force_sub_join_btn", lang), url=join_url)],
+        [InlineKeyboardButton(t("force_sub_check_btn", lang), callback_data="forcesub_check")],
+    ])
+
+
+async def send_force_sub_message(message, lang="bn"):
+    await message.reply_text(
+        f"{t('force_sub_title', lang)}\n\n{t('force_sub_desc', lang)}",
+        reply_markup=force_sub_kb(lang),
+    )
+
+
+# ==========================================================
 # FLASK
 # ==========================================================
 flask_app = Flask(__name__)
@@ -595,6 +722,13 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not u or u.is_bot:
         return
 
+    # FORCE SUB CHECK
+    if not await is_user_joined(context.bot, u.id):
+        existing = await get_user(u.id)
+        lang = (existing or {}).get("language") or "bn"
+        await send_force_sub_message(update.message, lang)
+        return
+
     existing = await get_user(u.id)
     if not existing:
         await create_user(u.id, u.full_name or "Student")
@@ -630,11 +764,17 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     lang = await get_user_lang(update.effective_user.id)
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     lang = await get_user_lang(update.effective_user.id)
     if lang == "en":
         text = ("📖 Help\n\n/start - Main\n/menu - Menu\n/profile - Profile\n"
@@ -655,6 +795,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def profile_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     uid = update.effective_user.id
     user = await get_user(uid)
     if not user:
@@ -676,6 +819,9 @@ async def profile_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def daily_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
     streak = await check_streak(uid)
@@ -713,6 +859,9 @@ async def fetch_leaderboard():
 
 
 async def leaderboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     lang = await get_user_lang(update.effective_user.id)
     rows = await fetch_leaderboard()
     if not rows:
@@ -727,6 +876,9 @@ async def leaderboard_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def coins_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
     user = await get_user(uid)
@@ -741,6 +893,9 @@ async def coins_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def invite_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
     bot = await context.bot.get_me()
@@ -752,6 +907,9 @@ async def invite_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def mistakes_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
     if db_pool is None:
@@ -775,6 +933,9 @@ async def mistakes_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def achievements_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
     user = await get_user(uid)
@@ -785,6 +946,9 @@ async def achievements_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 async def level_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     lang = await get_user_lang(update.effective_user.id)
     await update.message.reply_text(
         t("choose_level", lang),
@@ -797,6 +961,9 @@ async def level_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def reminder_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     lang = await get_user_lang(update.effective_user.id)
     await update.message.reply_text(
         t("reminder_title", lang),
@@ -811,10 +978,16 @@ async def reminder_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     await update.message.reply_text(t("choose_lang", "bn"), reply_markup=lang_kb())
 
 
 async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
     await clear_history(uid)
@@ -912,6 +1085,36 @@ SPEAKING_QUESTIONS = [
 # ==========================================================
 # CALLBACKS
 # ==========================================================
+async def cb_forcesub_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    q = update.callback_query
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    joined = await is_user_joined(context.bot, uid)
+    if not joined:
+        await q.answer(t("force_sub_not_joined", lang), show_alert=True)
+        return
+    await q.answer(t("force_sub_thanks", lang), show_alert=False)
+    try:
+        await q.edit_message_text(
+            t("force_sub_thanks", lang),
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
+            ]),
+        )
+    except Exception:
+        pass
+    # Send welcome after joining
+    existing = await get_user(uid)
+    if not existing:
+        await create_user(uid, q.from_user.full_name or "Student")
+        await q.message.reply_text(t("choose_lang", "bn"), reply_markup=lang_kb())
+    else:
+        await q.message.reply_text(
+            t("welcome", lang, name=q.from_user.first_name or "Student")
+        )
+        await q.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
+
+
 async def cb_set_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
@@ -947,6 +1150,14 @@ async def student_menu_callback(update: Update, context: ContextTypes.DEFAULT_TY
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+
+    if not await is_user_joined(context.bot, uid):
+        await q.edit_message_text(
+            f"{t('force_sub_title', lang)}\n\n{t('force_sub_desc', lang)}",
+            reply_markup=force_sub_kb(lang),
+        )
+        return
+
     await update_user(uid, last_active=datetime.now())
 
     data = q.data
@@ -992,7 +1203,14 @@ async def student_menu_callback(update: Update, context: ContextTypes.DEFAULT_TY
 async def cb_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
-    lang = await get_user_lang(q.from_user.id)
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        await q.edit_message_text(
+            f"{t('force_sub_title', lang)}\n\n{t('force_sub_desc', lang)}",
+            reply_markup=force_sub_kb(lang),
+        )
+        return
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -1001,6 +1219,8 @@ async def cb_profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
     user = await get_user(uid)
     if not user:
         await safe_edit(q, t("start_first", lang), reply_markup=back_kb(lang))
@@ -1025,6 +1245,12 @@ async def cb_daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        await q.edit_message_text(
+            f"{t('force_sub_title', lang)}\n\n{t('force_sub_desc', lang)}",
+            reply_markup=force_sub_kb(lang),
+        )
+        return
     streak = await check_streak(uid)
     bonus = DAILY_BONUS + (streak * STREAK_BONUS)
     await add_coins(uid, bonus)
@@ -1046,7 +1272,10 @@ async def cb_daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cb_word_of_day(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
-    lang = await get_user_lang(q.from_user.id)
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
     await q.edit_message_text(t("loading", lang))
     answer = await asyncio.to_thread(
         ask_groq,
@@ -1062,6 +1291,12 @@ async def cb_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        await q.edit_message_text(
+            f"{t('force_sub_title', lang)}\n\n{t('force_sub_desc', lang)}",
+            reply_markup=force_sub_kb(lang),
+        )
+        return
     user = await get_user(uid)
     quizzes = (user.get("quizzes_taken") or 0) + 1 if user else 1
     await update_user(uid, quizzes_taken=quizzes)
@@ -1086,6 +1321,8 @@ async def cb_translate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
     lang = await get_user_lang(q.from_user.id)
+    if not await is_user_joined(context.bot, q.from_user.id):
+        return
     await safe_edit(q, t("translate_hint", lang), reply_markup=back_kb(lang))
 
 
@@ -1094,6 +1331,8 @@ async def cb_invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
     bot = await context.bot.get_me()
     link = f"https://t.me/{bot.username}?start=ref_{uid}"
     await safe_edit(
@@ -1108,6 +1347,8 @@ async def cb_premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
     user = await get_user(uid)
     if user and user.get("is_premium"):
         await safe_edit(q, t("premium_already", lang), reply_markup=back_kb(lang))
@@ -1115,7 +1356,7 @@ async def cb_premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_edit(
         q,
         f"{t('premium_title', lang)}\n\n"
-        f"⭐ {PREMIUM_STARS} Telegram Stars -> {PREMIUM_DAYS} {t('days', lang)}\n\n"
+        f"⭐ {PREMIUM_STARS} Telegram Stars → {PREMIUM_DAYS} {t('days', lang)}\n\n"
         f"🎁 Benefits:\n• Unlimited AI\n• Detailed Lessons\n• Priority Response",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton(t("premium_buy", lang, n=PREMIUM_STARS), callback_data="buy_premium")],
@@ -1165,6 +1406,8 @@ async def cb_leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
     lang = await get_user_lang(q.from_user.id)
+    if not await is_user_joined(context.bot, q.from_user.id):
+        return
     rows = await fetch_leaderboard()
     if not rows:
         await safe_edit(q, t("no_users", lang), reply_markup=back_kb(lang))
@@ -1182,6 +1425,8 @@ async def cb_mistakes(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
     if db_pool is None:
         await safe_edit(q, t("mistakes_none", lang), reply_markup=back_kb(lang))
         return
@@ -1207,6 +1452,8 @@ async def cb_achievements(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
     user = await get_user(uid)
     if not user:
         await safe_edit(q, t("start_first", lang), reply_markup=back_kb(lang))
@@ -1219,6 +1466,8 @@ async def cb_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
     lang = await get_user_lang(q.from_user.id)
+    if not await is_user_joined(context.bot, q.from_user.id):
+        return
     await safe_edit(
         q,
         t("reminder_title", lang),
@@ -1259,6 +1508,8 @@ async def cb_set_level(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cb_lang_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
+    if not await is_user_joined(context.bot, q.from_user.id):
+        return
     await safe_edit(q, t("choose_lang", "bn"), reply_markup=lang_kb())
 
 
@@ -1266,6 +1517,8 @@ async def cb_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
     lang = await get_user_lang(q.from_user.id)
+    if not await is_user_joined(context.bot, q.from_user.id):
+        return
     if lang == "en":
         text = ("ℹ️ Help\n\nAll buttons work:\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
@@ -1305,6 +1558,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     uid = update.effective_user.id
+
+    # FORCE SUB CHECK
+    if not await is_user_joined(context.bot, uid):
+        existing = await get_user(uid)
+        lang = (existing or {}).get("language") or "bn"
+        await send_force_sub_message(message, lang)
+        return
+
     user = await get_user(uid)
     if not user:
         await create_user(uid, update.effective_user.full_name or "Student")
@@ -1399,6 +1660,7 @@ def run_bot():
         ]:
             application.add_handler(CommandHandler(cmd, fn))
 
+        application.add_handler(CallbackQueryHandler(cb_forcesub_check, pattern="^forcesub_check$"))
         application.add_handler(CallbackQueryHandler(cb_set_language, pattern="^setlang_"))
         application.add_handler(CallbackQueryHandler(cb_lang_menu, pattern="^m_lang$"))
         application.add_handler(CallbackQueryHandler(student_menu_callback, pattern="^student_"))
