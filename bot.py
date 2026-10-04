@@ -511,7 +511,7 @@ async def init_db():
     try:
         db_pool = await asyncio.wait_for(
             asyncpg.create_pool(url, min_size=1, max_size=5),
-            timeout=25.0
+            timeout=60.0
         )
         logger.info("*** DB POOL CREATED ***")
     except asyncio.TimeoutError:
