@@ -1582,6 +1582,62 @@ async def cb_set_language(update, context):
         logger.error(f"lang reply fail: {e}")
 
 
+async def student_menu_callback(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+
+    if not await is_user_joined(context.bot, uid):
+        await q.edit_message_text(
+            f"{t('force_sub_title', lang)}\n\n{t('force_sub_desc', lang)}",
+            reply_markup=force_sub_kb(lang),
+        )
+        return
+
+    await update_user(uid, last_active=datetime.now())
+
+    data = q.data
+    if data == "student_speaking":
+        last_q = context.user_data.get("last_speaking_question")
+        avail = [x for x in SPEAKING_QUESTIONS if x != last_q]
+        question = random.choice(avail)
+        context.user_data["last_speaking_question"] = question
+        prompt = f"Start English speaking practice. Ask this exact question:\n\n{question}\n\nWait for the answer. Plain text."
+    else:
+        prompt = STUDENT_PROMPTS.get(data)
+
+    if not prompt:
+        await q.answer("Unknown option", show_alert=False)
+        return
+
+    user = await get_user(uid)
+
+    try:
+        await q.edit_message_text(t("loading", lang))
+    except Exception:
+        pass
+
+    answer = await asyncio.to_thread(ask_groq, prompt, None, user)
+    if not answer:
+        answer = t("ai_error", lang)
+
+    if data == "student_vocab":
+        words = (user.get("words_learned") or 0) + 1 if user else 1
+        await update_user(uid, words_learned=words)
+        new = await check_achievements(uid)
+        if new:
+            try:
+                await q.message.reply_text(
+                    t("new_achievement", lang) + "\n" +
+                    "\n".join(f"{ACHIEVEMENTS[k][0]} {ACHIEVEMENTS[k][1].get(lang, k)}" for k in new)
+                )
+            except Exception:
+                pass
+
+    await safe_edit(q, answer, reply_markup=back_kb(lang))
+
+
 async def cb_practice_menu(update, context):
     q = update.callback_query
     await q.answer()
