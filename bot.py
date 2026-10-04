@@ -1,4 +1,4 @@
-import utils
+
 import os
 import asyncio
 import logging
@@ -402,6 +402,16 @@ def ask_groq(user_text, history=None, user=None, custom_system=None):
     except Exception as e:
         logger.error(f"Groq error: {e}")
         return None
+        async def text_to_voice(text, output_path):
+    """Convert text to speech using edge_tts."""
+    try:
+        import edge_tts
+        communicate = edge_tts.Communicate(text, TTS_VOICE)
+        await communicate.save(output_path)
+        return True
+    except Exception as e:
+        logger.error(f"TTS error: {e}")
+        return False
 
 def extract_correction(answer):
     """Extract ❌ Wrong / ✅ Correct from AI response."""
