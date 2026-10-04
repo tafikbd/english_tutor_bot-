@@ -491,6 +491,11 @@ async def init_db():
     logger.info("========== DB INIT START ==========")
     logger.info(f"DATABASE_URL present? {bool(DATABASE_URL)}")
     logger.info(f"HAS_ASYNCPG? {HAS_ASYNCPG}")
+logger.info("========== DB FUNCTION CALLED ==========")
+print("========== DB INIT START ==========")
+logger.info("========== DB INIT START ==========")
+logger.info(f"DATABASE_URL present? {bool(DATABASE_URL)}")
+logger.info(f"HAS_ASYNCPG? {HAS_ASYNCPG}")
 
     if not DATABASE_URL:
         logger.warning("DB DISABLED: DATABASE_URL is empty")
@@ -2481,6 +2486,7 @@ async def post_shutdown(app):
 
 def run_bot():
     async def _run():
+        await init_db()
         try:
             application = (
                 Application.builder()
