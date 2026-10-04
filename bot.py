@@ -409,15 +409,29 @@ def analyze_image_sync(image_path, prompt):
     try:
         with open(image_path, "rb") as f:
             img_data = base64.b64encode(f.read()).decode()
+        system_rules = (
+            "You analyze images for English learners. "
+            "CRITICAL FORMATTING RULES: "
+            "1. NEVER use markdown (no *, **, __, ```, ###, ---). "
+            "2. Use PLAIN TEXT only with emojis. "
+            "3. Use emojis as bullets: 🔷 👉 ✏️ 📝 ✅ ❌ 🎯 📚 💡 🔊 🔁 ⭐ 🔥. "
+            "4. Separate each item with a BLANK LINE. "
+            "5. Keep responses under 1500 characters. "
+            "6. Reply in the user's language (Bangla for Bangla users). "
+            "7. Start with a 1-line summary, then bullet points."
+        )
         response = groq_client.chat.completions.create(
             model=VISION_MODEL,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt or "Describe this image in English. Then give a Bangla translation. Use plain text with emojis only."},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_data}"}}
-                ]
-            }],
+            messages=[
+                {"role": "system", "content": system_rules},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt or "Describe this image briefly. Then list key points with emojis."},
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_data}"}}
+                    ]
+                }
+            ],
             temperature=0.4,
             max_tokens=800,
         )
@@ -425,45 +439,6 @@ def analyze_image_sync(image_path, prompt):
     except Exception as e:
         logger.error(f"Vision error: {e}")
         return None
-
-
-def transcribe_sync(voice_path):
-    try:
-        with open(voice_path, "rb") as f:
-            response = groq_client.audio.transcriptions.create(
-                file=("voice.ogg", f.read()),
-                model=WHISPER_MODEL,
-            )
-        return response.text.strip()
-    except Exception as e:
-        logger.error(f"Whisper error: {e}")
-        return None
-
-
-async def text_to_voice(text, out_path):
-    if not HAS_TTS:
-        return False
-    try:
-        comm = edge_tts.Communicate(text, TTS_VOICE)
-        await comm.save(out_path)
-        return os.path.exists(out_path)
-    except Exception as e:
-        logger.error(f"TTS error: {e}")
-        return False
-
-
-def extract_correction(answer):
-    """Extract ❌ Wrong / ✅ Correct from AI response."""
-    try:
-        if "❌ Wrong:" in answer and "✅ Correct:" in answer:
-            wrong = answer.split("❌ Wrong:")[1].split("✅")[0].strip().split("\n")[0].strip()
-            correct = answer.split("✅ Correct:")[1].split("📝")[0].split("\n")[0].strip()
-            if wrong and correct and len(wrong) < 250 and len(correct) < 250:
-                return wrong, correct
-    except Exception:
-        pass
-    return None
-
 
 # ==========================================================
 # DATABASE
