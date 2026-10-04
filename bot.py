@@ -4,6 +4,8 @@ import logging
 import threading
 import random
 import time
+import base64
+import json
 from datetime import datetime, timedelta
 
 from flask import Flask
@@ -24,6 +26,12 @@ try:
 except ImportError:
     HAS_ASYNCPG = False
 
+try:
+    import edge_tts
+    HAS_TTS = True
+except ImportError:
+    HAS_TTS = False
+
 
 # ==========================================================
 # CONFIG
@@ -32,6 +40,9 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+VISION_MODEL = os.getenv("VISION_MODEL", "llama-3.2-90b-vision-preview")
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "whisper-large-v3-turbo")
+TTS_VOICE = os.getenv("TTS_VOICE", "en-US-AriaNeural")
 PORT = int(os.getenv("PORT", "10000"))
 ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
 FORCE_SUB_GROUP_ID = os.getenv("FORCE_SUB_GROUP_ID", "")
@@ -50,6 +61,9 @@ DAILY_BONUS = 5
 STREAK_BONUS = 2
 PREMIUM_STARS = 50
 PREMIUM_DAYS = 30
+FREE_IMG_PER_DAY = 5
+FREE_VOICE_PER_DAY = 10
+MAX_REVIEW_PER_DAY = 5
 
 ACHIEVEMENTS = {
     "first_chat": ("🥇", {"bn": "প্রথম চ্যাট", "en": "First Chat", "hi": "पहला चैट"}),
@@ -60,13 +74,122 @@ ACHIEVEMENTS = {
     "streak_30": ("💪", {"bn": "৩০ দিনের স্ট্রিক", "en": "30-day streak", "hi": "30 दिन की स्ट्रीक"}),
     "premium": ("💎", {"bn": "Premium সদস্য", "en": "Premium member", "hi": "Premium सदस्य"}),
     "referrer": ("🎁", {"bn": "কাউকে ইনভাইট করেছেন", "en": "Invited someone", "hi": "किसी को आमंत्रित किया"}),
+    "photo_5": ("📸", {"bn": "৫টি ছবি পাঠিয়েছেন", "en": "5 photos sent", "hi": "5 फोटो भेजे"}),
+    "voice_10": ("🎤", {"bn": "১০টি ভয়েস পাঠিয়েছেন", "en": "10 voices sent", "hi": "10 वॉइस भेजे"}),
+    "roleplay_5": ("🎭", {"bn": "৫টি Role-Play করেছেন", "en": "5 role-plays done", "hi": "5 रोल-प्ले किए"}),
+    "review_10": ("🔁", {"bn": "১০টি রিভিউ করেছেন", "en": "10 reviews done", "hi": "10 रिव्यू किए"}),
 }
+
+
+# ==========================================================
+# ROLE-PLAY SCENARIOS
+# ==========================================================
+ROLEPLAY_SCENARIOS = {
+    "restaurant": {
+        "emoji": "🍽️",
+        "title": {"bn": "রেস্টুরেন্ট", "en": "Restaurant", "hi": "रेस्टोरेंट"},
+        "desc": {
+            "bn": "খাবার অর্ডার করা শিখুন",
+            "en": "Learn to order food",
+            "hi": "खाना ऑर्डर करना सीखें",
+        },
+        "system": (
+            "You are a friendly waiter at a restaurant. The user is a customer. "
+            "Start by greeting them and offering the menu. Stay in character at all times. "
+            "After EVERY user reply, if they made a real grammar/vocabulary error, "
+            "add a line at the end: [Correction: wrong -> correct]. "
+            "Keep each reply to 2-3 short lines. Use plain text with 1 emoji."
+        ),
+        "starter": "Good evening! Welcome to our restaurant. Here's the menu. What would you like to order?"
+    },
+    "airport": {
+        "emoji": "✈️",
+        "title": {"bn": "এয়ারপোর্ট", "en": "Airport Check-in", "hi": "एयरपोर्ट"},
+        "desc": {
+            "bn": "চেক-ইন শেখা",
+            "en": "Learn check-in English",
+            "hi": "चेक-इन सीखें",
+        },
+        "system": (
+            "You are an airport check-in agent. The user is a passenger. "
+            "Ask for passport, ticket, luggage details one by one. Stay in character. "
+            "If the user makes a major English error, add [Correction: wrong -> correct] at the end. "
+            "Keep replies to 2-3 short lines. Plain text with 1 emoji."
+        ),
+        "starter": "Good morning! May I see your passport and ticket, please?"
+    },
+    "interview": {
+        "emoji": "💼",
+        "title": {"bn": "চাকরির ইন্টারভিউ", "en": "Job Interview", "hi": "जॉब इंटरव्यू"},
+        "desc": {
+            "bn": "ইন্টারভিউ প্র্যাকটিস",
+            "en": "Practice job interviews",
+            "hi": "इंटरव्यू अभ्यास",
+        },
+        "system": (
+            "You are a hiring manager conducting a job interview. The user is a candidate. "
+            "Ask one interview question at a time. Give 1-line feedback after each answer. "
+            "If they make a major error, add [Correction: wrong -> correct] at the end. "
+            "Keep replies to 2-3 short lines. Plain text with 1 emoji."
+        ),
+        "starter": "Hello, thanks for coming in today. Please have a seat. Tell me a little about yourself."
+    },
+    "shopping": {
+        "emoji": "🛒",
+        "title": {"bn": "শপিং", "en": "Shopping", "hi": "शॉपिंग"},
+        "desc": {
+            "bn": "দোকানে কেনাকাটা",
+            "en": "Shopping at a store",
+            "hi": "दुकान में खरीदारी",
+        },
+        "system": (
+            "You are a friendly shop assistant. The user is a customer. "
+            "Help them find items, discuss prices, sizes. Stay in character. "
+            "If they make a real error, add [Correction: wrong -> correct] at the end. "
+            "Keep replies to 2-3 short lines. Plain text with 1 emoji."
+        ),
+        "starter": "Hi there! Welcome to our store. Are you looking for something specific today?"
+    },
+    "doctor": {
+        "emoji": "🏥",
+        "title": {"bn": "ডাক্তার", "en": "Doctor Visit", "hi": "डॉक्टर"},
+        "desc": {
+            "bn": "ডাক্তারের সাথে কথা",
+            "en": "Talk to a doctor",
+            "hi": "डॉक्टर से बात",
+        },
+        "system": (
+            "You are a friendly doctor. The user is a patient describing symptoms. "
+            "Ask about their health, symptoms, duration. Stay in character. "
+            "If they make a real error, add [Correction: wrong -> correct] at the end. "
+            "Keep replies to 2-3 short lines. Plain text with 1 emoji."
+        ),
+        "starter": "Good morning. Please sit down. What brings you in today? How are you feeling?"
+    },
+    "hotel": {
+        "emoji": "🏨",
+        "title": {"bn": "হোটেল", "en": "Hotel Check-in", "hi": "होटल"},
+        "desc": {
+            "bn": "হোটেলে চেক-ইন",
+            "en": "Hotel check-in",
+            "hi": "होटल चेक-इन",
+        },
+        "system": (
+            "You are a hotel receptionist. The user is a guest checking in. "
+            "Ask for reservation, ID, room preference. Stay in character. "
+            "If they make a real error, add [Correction: wrong -> correct] at the end. "
+            "Keep replies to 2-3 short lines. Plain text with 1 emoji."
+        ),
+        "starter": "Welcome to our hotel! Do you have a reservation with us?"
+    },
+}
+
 
 T = {
     "welcome": {
-        "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI - আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 অনুবাদ\n• ✍️ Writing\n• 🗣 Speaking\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 নিচের বাটন থেকে বেছে নিন।",
-        "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI - your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 Translation\n• ✍️ Writing\n• 🗣 Speaking\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 Choose from below.",
-        "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ - आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 अनुवाद\n• ✍️ Writing\n• 🗣 Speaking\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 नीचे से चुनें।",
+        "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI - আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 অনুবাদ\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 ছবি বিশ্লেষণ\n• 🎤 ভয়েস সাপোর্ট\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 নিচের বাটন থেকে বেছে নিন।",
+        "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI - your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 Translation\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 Photo analysis\n• 🎤 Voice support\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 Choose from below.",
+        "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ - आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 अनुवाद\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 फोटो विश्लेषण\n• 🎤 वॉइस सपोर्ट\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 नीचे से चुनें।",
     },
     "main_menu": {"bn": "🏠 মেইন মেনু:", "en": "🏠 Main Menu:", "hi": "🏠 मुख्य मेनू:"},
     "menu_btn": {"bn": "🏠 মেইন মেনু", "en": "🏠 Main Menu", "hi": "🏠 मुख्य मेनू"},
@@ -123,7 +246,7 @@ T = {
     "premium_title": {"bn": "💎 Premium Membership", "en": "💎 Premium Membership", "hi": "💎 Premium Membership"},
     "premium_buy": {"bn": "⭐ কিনুন ({n} Stars)", "en": "⭐ Buy ({n} Stars)", "hi": "⭐ खरीदें ({n} Stars)"},
     "premium_already": {"bn": "💎 আপনি ইতিমধ্যে Premium!", "en": "💎 You are already Premium!", "hi": "💎 आप पहले से Premium हैं!"},
-    "premium_success": {"bn": "🎉 অভিনন্দন! আপনি Premium হয়েছেন!\n✅ {days} দিনের জন্য সক্রিয়।", "en": "🎉 Congratulations! You are now Premium!\n✅ Active for {days} days.", "hi": "🎉 बधाई! आप अब Premium हैं!\n✅ {days} दिनों के लिए सक्रिय।"},
+    "premium_success": {"bn": "🎉 অভিনন্দন! আপনি Premium হয়েছেন!\n✅ {days} দিনের জন্য সক্রিয়।\n\n🎁 এখন পাবেন:\n• আনলিমিটেড ছবি\n• আনলিমিটেড ভয়েস\n• Voice reply", "en": "🎉 Congratulations! You are now Premium!\n✅ Active for {days} days.\n\n🎁 Now you get:\n• Unlimited photos\n• Unlimited voice\n• Voice replies", "hi": "🎉 बधाई! आप अब Premium हैं!\n✅ {days} दिनों के लिए सक्रिय।"},
     "achievements_title": {"bn": "🏅 Achievements", "en": "🏅 Achievements", "hi": "🏅 Achievements"},
     "mistakes_title": {"bn": "📚 সাম্প্রতিক ভুল", "en": "📚 Recent Mistakes", "hi": "📚 हाल की गलतियाँ"},
     "mistakes_none": {"bn": "✅ কোনো ভুল নেই!", "en": "✅ No mistakes!", "hi": "✅ कोई गलती नहीं!"},
@@ -156,6 +279,34 @@ T = {
         "en": "✅ Thank you! You can now use the bot.",
         "hi": "✅ धन्यवाद! अब आप बॉट का उपयोग कर सकते हैं।",
     },
+    "voice_limit": {
+        "bn": "🎤 ফ্রি ইউজাররা দিনে {n}টি ভয়েস পাঠাতে পারেন।\n\n⭐ Premium নিলে আনলিমিটেড + Voice Reply পাবেন।",
+        "en": "🎤 Free users can send {n} voice messages per day.\n\n⭐ Get Premium for unlimited + voice replies.",
+        "hi": "🎤 फ्री यूज़र्स दिन में {n} वॉइस भेज सकते हैं।\n\n⭐ Premium लें unlimited के लिए।",
+    },
+    "img_limit": {
+        "bn": "📸 ফ্রি ইউজাররা দিনে {n}টি ছবি পাঠাতে পারেন।\n\n⭐ Premium নিলে আনলিমিটেড পাবেন।",
+        "en": "📸 Free users can send {n} photos per day.\n\n⭐ Get Premium for unlimited.",
+        "hi": "📸 फ्री यूज़र्स दिन में {n} फोटो भेज सकते हैं।\n\n⭐ Premium लें।",
+    },
+    "processing_voice": {"bn": "🎤 ভয়েস প্রসেস হচ্ছে...", "en": "🎤 Processing voice...", "hi": "🎤 वॉइस प्रोसेस हो रही है..."},
+    "processing_img": {"bn": "📸 ছবি বিশ্লেষণ হচ্ছে...", "en": "📸 Analyzing image...", "hi": "📸 फोटो विश्लेषण हो रहा है..."},
+    "voice_heard": {"bn": "📝 আপনি বলেছেন: {text}", "en": "📝 You said: {text}", "hi": "📝 आपने कहा: {text}"},
+    "voice_fail": {"bn": "❌ ভয়েস বুঝতে পারিনি। আবার পাঠান।", "en": "❌ Could not understand voice.", "hi": "❌ वॉइस समझ नहीं आई।"},
+    "img_fail": {"bn": "❌ ছবি বুঝতে পারিনি। আবার পাঠান।", "en": "❌ Could not analyze image.", "hi": "❌ फोटो समझ नहीं आई।"},
+    "feedback_thanks": {"bn": "🙏 ধন্যবাদ আপনার মতামতের জন্য!", "en": "🙏 Thanks for your feedback!", "hi": "🙏 फीडबैक के लिए धन्यवाद!"},
+    "practice_title": {"bn": "🎭 Role-Play Practice", "en": "🎭 Role-Play Practice", "hi": "🎭 Role-Play अभ्यास"},
+    "practice_desc": {"bn": "একটা পরিস্থিতি বেছে নিন:", "en": "Choose a scenario:", "hi": "एक परिस्थिति चुनें:"},
+    "rp_started": {"bn": "🎭 {title} শুরু হয়েছে!\n\nবন্ধ করতে /endroleplay দিন।", "en": "🎭 {title} started!\n\nSend /endroleplay to stop.", "hi": "🎭 {title} शुरू!\n\nरोकने के लिए /endroleplay भेजें।"},
+    "rp_ended": {"bn": "🎭 Role-Play শেষ। আবার শুরু করতে /practice দিন।", "en": "🎭 Role-Play ended. Send /practice to start again.", "hi": "🎭 Role-Play खत्म। फिर से /practice भेजें।"},
+    "rp_active": {"bn": "⚠️ আপনি এখনো Role-Play মোডে আছেন। /endroleplay দিয়ে বন্ধ করুন।", "en": "⚠️ You're in Role-Play mode. Send /endroleplay to stop.", "hi": "⚠️ आप Role-Play में हैं। /endroleplay भेजें।"},
+    "review_title": {"bn": "🔁 Spaced Review", "en": "🔁 Spaced Review", "hi": "🔁 Spaced Review"},
+    "review_none": {"bn": "✅ আজ কোনো রিভিউ নেই! আরও ভুল করতে থাকুন 😊", "en": "✅ No reviews today! Keep practicing.", "hi": "✅ आज कोई रिव्यू नहीं!"},
+    "review_prompt": {"bn": "🔁 মনে আছে?\n\n❌ আগের ভুল: {wrong}\n\n✅ সঠিকটা লিখুন:", "en": "🔁 Remember?\n\n❌ Old mistake: {wrong}\n\n✅ Write the correct version:", "hi": "🔁 याद है?\n\n❌ पुरानी गलती: {wrong}\n\n✅ सही लिखें:"},
+    "review_correct": {"bn": "🎉 একদম সঠিক! আজকের রিভিউ শেষ।", "en": "🎉 Perfect! Review complete for today.", "hi": "🎉 बिल्कुल सही! रिव्यू पूरा।"},
+    "review_wrong": {"bn": "❌ এটা ঠিক হয়নি।\n\n✅ সঠিক: {correct}\n\nআবার চেষ্টা করুন কাল।", "en": "❌ Not quite.\n\n✅ Correct: {correct}\n\nTry again tomorrow.", "hi": "❌ सही नहीं।\n\n✅ सही: {correct}\n\nकल फिर कोशिश करें।"},
+    "memory_title": {"bn": "🧠 আমি যা মনে রেখেছি", "en": "🧠 What I Remember", "hi": "🧠 मुझे याद है"},
+    "review_saved": {"bn": "✅ রিভিউ লিস্টে যোগ হয়েছে!", "en": "✅ Added to review list!", "hi": "✅ रिव्यू लिस्ट में जोड़ा गया!"},
 }
 
 
@@ -177,16 +328,16 @@ def t(key, lang="bn", **kwargs):
 # ==========================================================
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-SYSTEM_PROMPT = """
+BASE_SYSTEM_PROMPT = """
 You are EduMate AI - an expert English teacher and general assistant for South Asian students.
 
-LANGUAGE: Match the user's language (Bangla->Bangla, English->English, Hindi->Hindi, Azerbaijani->Azerbaijani).
+LANGUAGE: Match the user's language (Bangla->Bangla, English->English, Hindi->Hindi).
 
 RULES:
 1. NEVER use markdown tables.
 2. NEVER use asterisks (*), double asterisks (**), underscores, or backticks.
 3. Use PLAIN TEXT only with emojis.
-4. Use emojis as bullets: 🔷 👉 ✏️ 📝 ✅ ❌ 🎯 📚 💡 🔊 🔁 ⭐ 🔥
+4. Use emojis as bullets: 🔷 👉 ✏️ 📝 ✅ ❌ 🎯 📚 💡 🔊 🔁 ⭐ 🔥 🎭
 5. Separate each item with a BLANK LINE.
 6. Be accurate. Never invent facts.
 7. Be warm but not over-friendly. Never mock the user.
@@ -206,16 +357,38 @@ GRAMMAR FORMAT:
 ✅ Example: correct example
 ❌ Common Mistake: what learners do wrong
 
-SENTENCE CORRECTION FORMAT:
+SENTENCE CORRECTION FORMAT (when user's sentence has errors):
 ❌ Wrong: [user's sentence]
 ✅ Correct: [corrected]
-📝 Why: [brief reason]
+📝 Why: [brief reason in user's language]
 """
 
 
-def ask_groq(user_text, history=None):
+def build_user_context(user):
+    """Build a short context line about the user for the AI."""
+    if not user:
+        return ""
+    parts = []
+    if user.get("name"):
+        parts.append(f"User's name: {user['name']}")
+    if user.get("level"):
+        parts.append(f"Level: {user['level']}")
+    if user.get("streak"):
+        parts.append(f"Streak: {user['streak']} days")
+    if user.get("words_learned"):
+        parts.append(f"Words learned: {user['words_learned']}")
+    if user.get("looking_for"):
+        parts.append(f"Intent: {user['looking_for']}")
+    if not parts:
+        return ""
+    return "\nUSER CONTEXT: " + " | ".join(parts) + "\nUse this info naturally if relevant."
+
+
+def ask_groq(user_text, history=None, user=None, custom_system=None):
     try:
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        system = custom_system if custom_system else BASE_SYSTEM_PROMPT
+        system += build_user_context(user)
+        messages = [{"role": "system", "content": system}]
         if history:
             messages.extend(history[-8:])
         messages.append({"role": "user", "content": user_text})
@@ -232,12 +405,73 @@ def ask_groq(user_text, history=None):
         return None
 
 
+def analyze_image_sync(image_path, prompt):
+    try:
+        with open(image_path, "rb") as f:
+            img_data = base64.b64encode(f.read()).decode()
+        response = groq_client.chat.completions.create(
+            model=VISION_MODEL,
+            messages=[{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt or "Describe this image in English. Then give a Bangla translation. Use plain text with emojis only."},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_data}"}}
+                ]
+            }],
+            temperature=0.4,
+            max_tokens=800,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.error(f"Vision error: {e}")
+        return None
+
+
+def transcribe_sync(voice_path):
+    try:
+        with open(voice_path, "rb") as f:
+            response = groq_client.audio.transcriptions.create(
+                file=("voice.ogg", f.read()),
+                model=WHISPER_MODEL,
+            )
+        return response.text.strip()
+    except Exception as e:
+        logger.error(f"Whisper error: {e}")
+        return None
+
+
+async def text_to_voice(text, out_path):
+    if not HAS_TTS:
+        return False
+    try:
+        comm = edge_tts.Communicate(text, TTS_VOICE)
+        await comm.save(out_path)
+        return os.path.exists(out_path)
+    except Exception as e:
+        logger.error(f"TTS error: {e}")
+        return False
+
+
+def extract_correction(answer):
+    """Extract ❌ Wrong / ✅ Correct from AI response."""
+    try:
+        if "❌ Wrong:" in answer and "✅ Correct:" in answer:
+            wrong = answer.split("❌ Wrong:")[1].split("✅")[0].strip().split("\n")[0].strip()
+            correct = answer.split("✅ Correct:")[1].split("📝")[0].split("\n")[0].strip()
+            if wrong and correct and len(wrong) < 250 and len(correct) < 250:
+                return wrong, correct
+    except Exception:
+        pass
+    return None
+
+
 # ==========================================================
 # DATABASE
 # ==========================================================
 db_pool = None
 _mem_users = {}
 _mem_history = {}
+_mem_review = []
 
 
 async def init_db():
@@ -261,14 +495,14 @@ async def init_db():
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
 
-    logger.info(f"Attempting DB connect with URL prefix: {url[:30]}...")
+    logger.info(f"Attempting DB connect...")
 
     try:
         db_pool = await asyncio.wait_for(
             asyncpg.create_pool(url, min_size=1, max_size=5),
             timeout=25.0
         )
-        logger.info("*** DB POOL CREATED SUCCESSFULLY ***")
+        logger.info("*** DB POOL CREATED ***")
     except asyncio.TimeoutError:
         logger.error("*** DB TIMEOUT ***")
         db_pool = None
@@ -297,6 +531,14 @@ async def init_db():
                     referred_by BIGINT,
                     achievements TEXT DEFAULT '',
                     remind_at VARCHAR(5),
+                    voice_count_today INTEGER DEFAULT 0,
+                    img_count_today INTEGER DEFAULT 0,
+                    last_voice_date DATE,
+                    last_img_date DATE,
+                    photos_sent INTEGER DEFAULT 0,
+                    voices_sent INTEGER DEFAULT 0,
+                    roleplay_count INTEGER DEFAULT 0,
+                    review_count INTEGER DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -320,6 +562,27 @@ async def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS s_feedback (
+                    id SERIAL PRIMARY KEY,
+                    user_id BIGINT,
+                    message_id BIGINT,
+                    rating VARCHAR(10),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS s_review (
+                    id SERIAL PRIMARY KEY,
+                    user_id BIGINT,
+                    wrong_text TEXT,
+                    corrected_text TEXT,
+                    review_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    reviewed_at TIMESTAMP
+                )
+            """)
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_sr_user ON s_review(user_id)")
         logger.info("*** ALL TABLES CREATED ***")
     except Exception as e:
         logger.error(f"*** TABLE CREATE FAILED: {e} ***")
@@ -356,7 +619,10 @@ async def create_user(uid, name):
                 "quizzes_taken": 0, "quiz_score": 0,
                 "is_premium": False, "premium_until": None,
                 "referred_by": None, "achievements": "",
-                "remind_at": None,
+                "remind_at": None, "voice_count_today": 0,
+                "img_count_today": 0, "last_voice_date": None,
+                "last_img_date": None, "photos_sent": 0, "voices_sent": 0,
+                "roleplay_count": 0, "review_count": 0,
             }
         return
     try:
@@ -443,6 +709,58 @@ async def get_user_lang(uid):
     return (u or {}).get("language") or "bn"
 
 
+async def save_review(uid, wrong, correct):
+    """Save a mistake for spaced repetition. Next review in 1 day."""
+    next_review = datetime.now() + timedelta(days=1)
+    if db_pool is None:
+        _mem_review.append({
+            "user_id": uid, "wrong": wrong, "correct": correct,
+            "review_at": next_review, "reviewed": False
+        })
+        return
+    try:
+        async with db_pool.acquire() as conn:
+            await conn.execute(
+                "INSERT INTO s_review (user_id, wrong_text, corrected_text, review_at) "
+                "VALUES ($1, $2, $3, $4)",
+                uid, wrong, correct, next_review,
+            )
+    except Exception as e:
+        logger.error(f"save_review: {e}")
+
+
+async def get_due_reviews(uid, limit=3):
+    if db_pool is None:
+        now = datetime.now()
+        due = [r for r in _mem_review
+               if r["user_id"] == uid and not r["reviewed"] and r["review_at"] <= now]
+        return due[:limit]
+    try:
+        async with db_pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT id, wrong_text, corrected_text FROM s_review "
+                "WHERE user_id = $1 AND reviewed_at IS NULL AND review_at <= NOW() "
+                "ORDER BY review_at ASC LIMIT $2",
+                uid, limit
+            )
+            return [dict(r) for r in rows]
+    except Exception:
+        return []
+
+
+async def mark_reviewed(review_id):
+    if db_pool is None:
+        return
+    try:
+        async with db_pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE s_review SET reviewed_at = NOW() WHERE id = $1",
+                review_id,
+            )
+    except Exception:
+        pass
+
+
 # ==========================================================
 # FORCE SUBSCRIBE
 # ==========================================================
@@ -507,6 +825,8 @@ def main_menu_kb():
          InlineKeyboardButton("⏱ Tenses", callback_data="student_tenses")],
         [InlineKeyboardButton("🗣 Speaking", callback_data="student_speaking"),
          InlineKeyboardButton("✍️ Writing", callback_data="student_writing")],
+        [InlineKeyboardButton("🎭 Role-Play", callback_data="rp_menu"),
+         InlineKeyboardButton("🔁 Review", callback_data="m_review")],
         [InlineKeyboardButton("🎯 Quiz", callback_data="m_quiz"),
          InlineKeyboardButton("💬 Translate", callback_data="m_translate")],
         [InlineKeyboardButton("🔥 Daily Lesson", callback_data="m_daily"),
@@ -517,7 +837,7 @@ def main_menu_kb():
          InlineKeyboardButton("⭐ Premium", callback_data="m_premium")],
         [InlineKeyboardButton("📚 My Mistakes", callback_data="m_mistakes"),
          InlineKeyboardButton("🏅 Achievements", callback_data="m_achievements")],
-        [InlineKeyboardButton("🔔 Reminder", callback_data="m_reminder"),
+        [InlineKeyboardButton("🧠 Memory", callback_data="m_memory"),
          InlineKeyboardButton("🌍 Language", callback_data="m_lang")],
         [InlineKeyboardButton("ℹ️ Help", callback_data="m_help")],
     ])
@@ -537,6 +857,22 @@ def lang_kb():
     ])
 
 
+def feedback_kb(message_id):
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("👍", callback_data=f"fb_good_{message_id}"),
+         InlineKeyboardButton("👎", callback_data=f"fb_bad_{message_id}")]
+    ])
+
+
+def practice_menu_kb(lang="bn"):
+    rows = []
+    for key, sc in ROLEPLAY_SCENARIOS.items():
+        title = sc["title"].get(lang) or sc["title"].get("en")
+        rows.append([InlineKeyboardButton(f"{sc['emoji']} {title}", callback_data=f"rp_{key}")])
+    rows.append([InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")])
+    return InlineKeyboardMarkup(rows)
+
+
 # ==========================================================
 # SAFE EDIT / REPLY
 # ==========================================================
@@ -547,8 +883,22 @@ async def safe_reply(message, text):
         text = text[:4000]
     try:
         await message.reply_text(text)
+        return True
     except Exception as e:
         logger.error(f"reply fail: {e}")
+        return False
+
+
+async def safe_reply_feedback(message, text, msg_id):
+    if not text:
+        text = "⚠️"
+    if len(text) > 4000:
+        text = text[:4000]
+    try:
+        await message.reply_text(text, reply_markup=feedback_kb(msg_id))
+        return True
+    except Exception:
+        return await safe_reply(message, text)
 
 
 async def safe_edit(query, text, reply_markup=None):
@@ -564,7 +914,6 @@ async def safe_edit(query, text, reply_markup=None):
             return True
     except Exception as e:
         logger.error(f"edit fail: {e}")
-
     try:
         if query.message:
             await query.message.reply_text(text, reply_markup=reply_markup)
@@ -614,6 +963,10 @@ async def check_achievements(uid):
         "streak_30": lambda u: (u.get("streak") or 0) >= 30,
         "premium": lambda u: u.get("is_premium"),
         "referrer": lambda u: u.get("referred_by") is not None,
+        "photo_5": lambda u: (u.get("photos_sent") or 0) >= 5,
+        "voice_10": lambda u: (u.get("voices_sent") or 0) >= 10,
+        "roleplay_5": lambda u: (u.get("roleplay_count") or 0) >= 5,
+        "review_10": lambda u: (u.get("review_count") or 0) >= 10,
     }
     for key, fn in checks.items():
         if key not in earned:
@@ -645,6 +998,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     u = update.effective_user
     if not u or u.is_bot:
         return
+
+    context.user_data.pop("roleplay", None)
 
     if not await is_user_joined(context.bot, u.id):
         existing = await get_user(u.id)
@@ -690,8 +1045,74 @@ async def menu_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
         return
+    context.user_data.pop("roleplay", None)
     lang = await get_user_lang(update.effective_user.id)
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
+
+
+async def practice_command(update, context):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
+    lang = await get_user_lang(update.effective_user.id)
+    await update.message.reply_text(
+        f"{t('practice_title', lang)}\n\n{t('practice_desc', lang)}",
+        reply_markup=practice_menu_kb(lang),
+    )
+
+
+async def end_roleplay_command(update, context):
+    if context.user_data.get("roleplay"):
+        context.user_data.pop("roleplay", None)
+        lang = await get_user_lang(update.effective_user.id)
+        await update.message.reply_text(t("rp_ended", lang))
+    else:
+        await update.message.reply_text("⚠️ আপনি Role-Play মোডে নেই।")
+
+
+async def review_command(update, context):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
+    uid = update.effective_user.id
+    lang = await get_user_lang(uid)
+    due = await get_due_reviews(uid, limit=3)
+    if not due:
+        await update.message.reply_text(t("review_none", lang))
+        return
+    context.user_data["review_queue"] = due
+    context.user_data["review_index"] = 0
+    first = due[0]
+    await update.message.reply_text(
+        t("review_prompt", lang, wrong=first["wrong_text"])
+    )
+
+
+async def memory_command(update, context):
+    if not await is_user_joined(context.bot, update.effective_user.id):
+        await send_force_sub_message(update.message, "bn")
+        return
+    uid = update.effective_user.id
+    lang = await get_user_lang(uid)
+    user = await get_user(uid)
+    if not user:
+        await update.message.reply_text(t("start_first", lang))
+        return
+    text = (
+        f"{t('memory_title', lang)}\n\n"
+        f"📛 {t('name', lang)}: {user.get('name')}\n"
+        f"🎓 {t('level', lang)}: {user.get('level')}\n"
+        f"🪙 {t('coins', lang)}: {user.get('coins') or 0}\n"
+        f"🔥 {t('streak', lang)}: {user.get('streak') or 0} {t('days', lang)}\n"
+        f"📚 {t('words_learned', lang)}: {user.get('words_learned') or 0}\n"
+        f"🎯 {t('quizzes', lang)}: {user.get('quizzes_taken') or 0}\n"
+        f"📸 Photos sent: {user.get('photos_sent') or 0}\n"
+        f"🎤 Voices sent: {user.get('voices_sent') or 0}\n"
+        f"🎭 Role-plays: {user.get('roleplay_count') or 0}\n"
+        f"🔁 Reviews: {user.get('review_count') or 0}\n"
+        f"🌍 Language: {user.get('language') or 'bn'}"
+    )
+    await update.message.reply_text(text)
 
 
 async def help_command(update, context):
@@ -700,20 +1121,43 @@ async def help_command(update, context):
         return
     lang = await get_user_lang(update.effective_user.id)
     if lang == "en":
-        text = ("📖 Help\n\n/start Main\n/menu Menu\n/profile Profile\n"
-                "/daily Lesson\n/leaderboard Leaderboard\n/coins Balance\n"
-                "/invite Invite link\n/mistakes Mistakes\n/achievements Badges\n"
-                "/level Set level\n/reminder Set reminder\n/language Change lang\n/reset Clear chat")
+        text = (
+            "📖 Help\n\n"
+            "/start - Main menu\n/menu - Menu\n/profile - Profile\n"
+            "/practice - 🎭 Role-Play\n/review - 🔁 Spaced review\n"
+            "/memory - 🧠 What I remember\n/endroleplay - End role-play\n"
+            "/daily - Daily lesson\n/leaderboard - Leaderboard\n"
+            "/coins - Balance\n/invite - Invite link\n"
+            "/mistakes - Mistakes\n/achievements - Badges\n"
+            "/level - Set level\n/reminder - Reminder\n"
+            "/language - Change language\n/reset - Clear chat\n\n"
+            "📸 Send photo, 🎤 voice, 👍👎 rate replies"
+        )
     elif lang == "hi":
-        text = ("📖 सहायता\n\n/start मुख्य\n/menu मेनू\n/profile प्रोफ़ाइल\n"
-                "/daily पाठ\n/leaderboard लीडरबोर्ड\n/coins सिक्के\n"
-                "/invite आमंत्रण\n/mistakes गलतियाँ\n/achievements बैज\n"
-                "/level स्तर\n/reminder रिमाइंडर\n/language भाषा\n/reset चैट साफ़")
+        text = (
+            "📖 सहायता\n\n"
+            "/start - मुख्य\n/menu - मेनू\n/profile - प्रोफ़ाइल\n"
+            "/practice - 🎭 Role-Play\n/review - 🔁 रिव्यू\n"
+            "/memory - 🧠 मुझे याद है\n/endroleplay - रोकें\n"
+            "/daily - पाठ\n/leaderboard - लीडरबोर्ड\n"
+            "/coins - सिक्के\n/invite - आमंत्रण\n"
+            "/mistakes - गलतियाँ\n/achievements - बैज\n"
+            "/level - स्तर\n/reminder - रिमाइंडर\n"
+            "/language - भाषा\n/reset - चैट साफ़"
+        )
     else:
-        text = ("📖 সাহায্য\n\n/start মেইন\n/menu মেনু\n/profile প্রোফাইল\n"
-                "/daily পাঠ\n/leaderboard লিডারবোর্ড\n/coins কয়েন\n"
-                "/invite ইনভাইট\n/mistakes ভুল\n/achievements ব্যাজ\n"
-                "/level লেভেল\n/reminder রিমাইন্ডার\n/language ভাষা\n/reset চ্যাট ক্লিয়ার")
+        text = (
+            "📖 সাহায্য\n\n"
+            "/start - মেইন মেনু\n/menu - মেনু\n/profile - প্রোফাইল\n"
+            "/practice - 🎭 Role-Play\n/review - 🔁 Spaced Review\n"
+            "/memory - 🧠 আমি যা মনে রেখেছি\n/endroleplay - Role-Play বন্ধ\n"
+            "/daily - Daily Lesson\n/leaderboard - লিডারবোর্ড\n"
+            "/coins - কয়েন\n/invite - ইনভাইট\n"
+            "/mistakes - ভুল\n/achievements - ব্যাজ\n"
+            "/level - লেভেল\n/reminder - রিমাইন্ডার\n"
+            "/language - ভাষা\n/reset - চ্যাট ক্লিয়ার\n\n"
+            "📸 ছবি, 🎤 ভয়েস পাঠান, 👍👎 রেটিং দিন"
+        )
     await update.message.reply_text(text)
 
 
@@ -737,6 +1181,10 @@ async def profile_command(update, context):
         f"{t('words_learned', lang)}: {user.get('words_learned') or 0}\n"
         f"{t('quizzes', lang)}: {user.get('quizzes_taken') or 0}\n"
         f"{t('score', lang)}: {user.get('quiz_score') or 0}\n"
+        f"📸 Photos: {user.get('photos_sent') or 0}\n"
+        f"🎤 Voices: {user.get('voices_sent') or 0}\n"
+        f"🎭 Role-plays: {user.get('roleplay_count') or 0}\n"
+        f"🔁 Reviews: {user.get('review_count') or 0}\n"
         f"{t('premium_status', lang)}: {status}"
     )
 
@@ -750,11 +1198,13 @@ async def daily_command(update, context):
     streak = await check_streak(uid)
     bonus = DAILY_BONUS + (streak * STREAK_BONUS)
     await add_coins(uid, bonus)
+    user = await get_user(uid)
     await update.message.chat.send_action("typing")
     answer = await asyncio.to_thread(
         ask_groq,
         "Give today's short English lesson: 1 new word (with meaning + pronunciation + example), "
-        "1 grammar tip with 2 examples, 1 practice question. Plain text."
+        "1 grammar tip with 2 examples, 1 practice question. Plain text.",
+        None, user
     )
     if not answer:
         answer = "📚 Word: Persistent - Meaning: continuing firmly\nExample: Be persistent."
@@ -841,7 +1291,7 @@ async def mistakes_command(update, context):
     try:
         async with db_pool.acquire() as conn:
             rows = await conn.fetch(
-                "SELECT wrong_text, corrected_text FROM s_mistakes "
+                "SELECT wrong_text, corrected_text FROM s_review "
                 "WHERE user_id=$1 ORDER BY id DESC LIMIT 10", uid
             )
     except Exception:
@@ -914,6 +1364,8 @@ async def reset_command(update, context):
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
     await clear_history(uid)
+    context.user_data.pop("roleplay", None)
+    context.user_data.pop("review_queue", None)
     await update.message.reply_text(t("reset_done", lang))
 
 
@@ -939,15 +1391,51 @@ async def adminstats_command(update, context):
             premium = await conn.fetchval("SELECT COUNT(*) FROM s_users WHERE is_premium = TRUE")
             total_coins = await conn.fetchval("SELECT COALESCE(SUM(coins),0) FROM s_users")
             total_msgs = await conn.fetchval("SELECT COUNT(*) FROM s_history")
+            total_reviews = await conn.fetchval("SELECT COUNT(*) FROM s_review")
         await safe_reply(
             update.message,
             f"📊 Admin Dashboard\n\n"
             f"👥 Total Users: {total}\n🟢 24h Active: {today}\n📅 7d Active: {week}\n"
-            f"💎 Premium: {premium}\n🪙 Total Coins: {total_coins}\n💬 Messages: {total_msgs}\n\n"
+            f"💎 Premium: {premium}\n🪙 Total Coins: {total_coins}\n💬 Messages: {total_msgs}\n"
+            f"🔁 Reviews saved: {total_reviews}\n\n"
             f"💾 Mode: PostgreSQL ✅"
         )
     except Exception as e:
         await update.message.reply_text(f"❌ DB error: {e}")
+
+
+async def feedback_command(update, context):
+    uid = update.effective_user.id
+    if uid not in ADMIN_IDS:
+        await update.message.reply_text("⛔ Admin only.")
+        return
+    if db_pool is None:
+        await update.message.reply_text("❌ DB নেই।")
+        return
+    try:
+        async with db_pool.acquire() as conn:
+            rows = await conn.fetch("""
+                SELECT rating, COUNT(*) as cnt 
+                FROM s_feedback 
+                WHERE created_at > NOW() - INTERVAL '7 days'
+                GROUP BY rating
+            """)
+        good = 0
+        bad = 0
+        for r in rows:
+            if r["rating"] == "good":
+                good = r["cnt"]
+            elif r["rating"] == "bad":
+                bad = r["cnt"]
+        total = good + bad
+        rate = (good / total * 100) if total > 0 else 0
+        await update.message.reply_text(
+            f"📊 Last 7 days Feedback\n\n"
+            f"👍 Good: {good}\n👎 Bad: {bad}\n"
+            f"📈 Satisfaction: {rate:.1f}%\n📝 Total: {total}"
+        )
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
 
 
 async def broadcast_command(update, context):
@@ -1036,6 +1524,34 @@ async def cb_forcesub_check(update, context):
         await q.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
 
+async def cb_feedback(update, context):
+    q = update.callback_query
+    await q.answer("🙏 ধন্যবাদ!")
+    data = q.data
+    parts = data.split("_")
+    rating = parts[1]
+    msg_id = parts[2] if len(parts) > 2 else "0"
+    uid = q.from_user.id
+
+    if db_pool:
+        try:
+            async with db_pool.acquire() as conn:
+                await conn.execute(
+                    "INSERT INTO s_feedback (user_id, message_id, rating) VALUES ($1, $2, $3)",
+                    uid, int(msg_id), rating
+                )
+        except Exception as e:
+            logger.error(f"Feedback save: {e}")
+
+    try:
+        await q.edit_message_reply_markup(reply_markup=None)
+    except Exception:
+        pass
+    lang = await get_user_lang(uid)
+    emoji = "👍" if rating == "good" else "👎"
+    await q.message.reply_text(f"{emoji} {t('feedback_thanks', lang)}")
+
+
 async def cb_set_language(update, context):
     q = update.callback_query
     await q.answer()
@@ -1066,59 +1582,52 @@ async def cb_set_language(update, context):
         logger.error(f"lang reply fail: {e}")
 
 
-async def student_menu_callback(update, context):
+async def cb_practice_menu(update, context):
+    q = update.callback_query
+    await q.answer()
+    lang = await get_user_lang(q.from_user.id)
+    if not await is_user_joined(context.bot, q.from_user.id):
+        return
+    await safe_edit(
+        q,
+        f"{t('practice_title', lang)}\n\n{t('practice_desc', lang)}",
+        reply_markup=practice_menu_kb(lang),
+    )
+
+
+async def cb_rp_start(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
-
     if not await is_user_joined(context.bot, uid):
-        await q.edit_message_text(
-            f"{t('force_sub_title', lang)}\n\n{t('force_sub_desc', lang)}",
-            reply_markup=force_sub_kb(lang),
-        )
         return
 
-    await update_user(uid, last_active=datetime.now())
-
-    data = q.data
-    if data == "student_speaking":
-        last_q = context.user_data.get("last_speaking_question")
-        avail = [x for x in SPEAKING_QUESTIONS if x != last_q]
-        question = random.choice(avail)
-        context.user_data["last_speaking_question"] = question
-        prompt = f"Start English speaking practice. Ask this exact question:\n\n{question}\n\nWait for the answer. Plain text."
-    else:
-        prompt = STUDENT_PROMPTS.get(data)
-
-    if not prompt:
-        await q.answer("Unknown option", show_alert=False)
+    key = q.data.replace("rp_", "")
+    scenario = ROLEPLAY_SCENARIOS.get(key)
+    if not scenario:
+        await q.answer("Unknown scenario", show_alert=True)
         return
 
-    try:
-        await q.edit_message_text(t("loading", lang))
-    except Exception:
-        pass
+    context.user_data["roleplay"] = {
+        "key": key,
+        "system": scenario["system"],
+        "history": [],
+    }
 
-    answer = await asyncio.to_thread(ask_groq, prompt)
-    if not answer:
-        answer = t("ai_error", lang)
+    title = scenario["title"].get(lang) or scenario["title"].get("en")
+    starter = scenario["starter"]
 
-    if data == "student_vocab":
-        user = await get_user(uid)
-        words = (user.get("words_learned") or 0) + 1 if user else 1
-        await update_user(uid, words_learned=words)
-        new = await check_achievements(uid)
-        if new:
-            try:
-                await q.message.reply_text(
-                    t("new_achievement", lang) + "\n" +
-                    "\n".join(f"{ACHIEVEMENTS[k][0]} {ACHIEVEMENTS[k][1].get(lang, k)}" for k in new)
-                )
-            except Exception:
-                pass
+    user = await get_user(uid)
+    count = (user.get("roleplay_count") or 0) + 1 if user else 1
+    await update_user(uid, roleplay_count=count)
 
-    await safe_edit(q, answer, reply_markup=back_kb(lang))
+    await safe_edit(
+        q,
+        f"{t('rp_started', lang, title=title)}\n\n"
+        f"{scenario['emoji']} {starter}"
+    )
+    await save_history(uid, "assistant", f"[RP:{key}] {starter}")
 
 
 async def cb_menu(update, context):
@@ -1132,6 +1641,7 @@ async def cb_menu(update, context):
             reply_markup=force_sub_kb(lang),
         )
         return
+    context.user_data.pop("roleplay", None)
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -1156,6 +1666,10 @@ async def cb_profile(update, context):
         f"{t('words_learned', lang)}: {user.get('words_learned') or 0}\n"
         f"{t('quizzes', lang)}: {user.get('quizzes_taken') or 0}\n"
         f"{t('score', lang)}: {user.get('quiz_score') or 0}\n"
+        f"📸 Photos: {user.get('photos_sent') or 0}\n"
+        f"🎤 Voices: {user.get('voices_sent') or 0}\n"
+        f"🎭 Role-plays: {user.get('roleplay_count') or 0}\n"
+        f"🔁 Reviews: {user.get('review_count') or 0}\n"
         f"{t('premium_status', lang)}: {status}"
     )
     await safe_edit(q, text, reply_markup=back_kb(lang))
@@ -1175,10 +1689,12 @@ async def cb_daily(update, context):
     streak = await check_streak(uid)
     bonus = DAILY_BONUS + (streak * STREAK_BONUS)
     await add_coins(uid, bonus)
+    user = await get_user(uid)
     await q.edit_message_text(t("loading", lang))
     answer = await asyncio.to_thread(
         ask_groq,
-        "Give today's short English lesson: 1 new word + meaning + example, 1 grammar tip, 1 practice question. Plain text."
+        "Give today's short English lesson: 1 new word + meaning + example, 1 grammar tip, 1 practice question. Plain text.",
+        None, user
     )
     if not answer:
         answer = "📚 Word: Diligent - hardworking\nExample: She is a diligent student."
@@ -1197,10 +1713,12 @@ async def cb_word_of_day(update, context):
     lang = await get_user_lang(uid)
     if not await is_user_joined(context.bot, uid):
         return
+    user = await get_user(uid)
     await q.edit_message_text(t("loading", lang))
     answer = await asyncio.to_thread(
         ask_groq,
-        "Give ONE advanced English word of the day. Include: word, meaning, pronunciation, part of speech, 2 examples, 2 synonyms. Plain text."
+        "Give ONE advanced English word of the day. Include: word, meaning, pronunciation, part of speech, 2 examples, 2 synonyms. Plain text.",
+        None, user
     )
     if not answer:
         answer = "🔤 Word: Resilient\n📖 Meaning: able to recover quickly\n🔊 /riˈziliənt/"
@@ -1224,7 +1742,8 @@ async def cb_quiz(update, context):
     await q.edit_message_text(t("loading", lang))
     answer = await asyncio.to_thread(
         ask_groq,
-        "Create ONE English multiple-choice quiz with 4 options. Format:\nQuestion: ...\nA) ...\nB) ...\nC) ...\nD) ...\nAnswer: X) ...\nPlain text."
+        "Create ONE English multiple-choice quiz with 4 options. Format:\nQuestion: ...\nA) ...\nB) ...\nC) ...\nD) ...\nAnswer: X) ...\nPlain text.",
+        None, user
     )
     if not answer:
         answer = "Question: Past tense of 'go'?\nA) goed\nB) went\nC) gone\nD) going\nAnswer: B) went"
@@ -1235,6 +1754,27 @@ async def cb_quiz(update, context):
             [InlineKeyboardButton(t("quiz_more", lang), callback_data="m_quiz")],
             [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")],
         ]),
+    )
+
+
+async def cb_review(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
+    due = await get_due_reviews(uid, limit=3)
+    if not due:
+        await safe_edit(q, t("review_none", lang), reply_markup=back_kb(lang))
+        return
+    context.user_data["review_queue"] = due
+    context.user_data["review_index"] = 0
+    first = due[0]
+    await safe_edit(
+        q,
+        t("review_prompt", lang, wrong=first["wrong_text"]),
+        reply_markup=back_kb(lang),
     )
 
 
@@ -1278,7 +1818,13 @@ async def cb_premium(update, context):
         q,
         f"{t('premium_title', lang)}\n\n"
         f"⭐ {PREMIUM_STARS} Telegram Stars → {PREMIUM_DAYS} {t('days', lang)}\n\n"
-        f"🎁 Benefits:\n• Unlimited AI\n• Detailed Lessons\n• Priority Response",
+        f"🎁 Benefits:\n"
+        f"• Unlimited AI\n"
+        f"• 📸 Unlimited photos\n"
+        f"• 🎤 Unlimited voices + Voice replies\n"
+        f"• 🎭 Unlimited role-plays\n"
+        f"• Detailed Lessons\n"
+        f"• Priority Response",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton(t("premium_buy", lang, n=PREMIUM_STARS), callback_data="buy_premium")],
             [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")],
@@ -1354,7 +1900,7 @@ async def cb_mistakes(update, context):
     try:
         async with db_pool.acquire() as conn:
             rows = await conn.fetch(
-                "SELECT wrong_text, corrected_text FROM s_mistakes "
+                "SELECT wrong_text, corrected_text FROM s_review "
                 "WHERE user_id=$1 ORDER BY id DESC LIMIT 8", uid
             )
     except Exception:
@@ -1381,6 +1927,32 @@ async def cb_achievements(update, context):
         return
     await safe_edit(q, f"{t('achievements_title', lang)}\n\n{achievements_text(user, lang)}",
                     reply_markup=back_kb(lang))
+
+
+async def cb_memory(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
+    user = await get_user(uid)
+    if not user:
+        await safe_edit(q, t("start_first", lang), reply_markup=back_kb(lang))
+        return
+    text = (
+        f"{t('memory_title', lang)}\n\n"
+        f"📛 {t('name', lang)}: {user.get('name')}\n"
+        f"🎓 {t('level', lang)}: {user.get('level')}\n"
+        f"🪙 {t('coins', lang)}: {user.get('coins') or 0}\n"
+        f"🔥 {t('streak', lang)}: {user.get('streak') or 0} {t('days', lang)}\n"
+        f"📚 {t('words_learned', lang)}: {user.get('words_learned') or 0}\n"
+        f"🎯 {t('quizzes', lang)}: {user.get('quizzes_taken') or 0}\n"
+        f"🎭 Role-plays: {user.get('roleplay_count') or 0}\n"
+        f"🔁 Reviews: {user.get('review_count') or 0}\n"
+        f"🌍 Language: {user.get('language') or 'bn'}"
+    )
+    await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
 async def cb_reminder(update, context):
@@ -1443,21 +2015,27 @@ async def cb_help(update, context):
     if lang == "en":
         text = ("ℹ️ Help\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
-                "🎯 Quiz, 💬 Translate, 🔥 Daily, 📖 Word of Day\n"
-                "📊 Progress, 🏆 Leaderboard, 🎁 Invite, ⭐ Premium\n"
-                "📚 Mistakes, 🏅 Achievements, 🔔 Reminder, 🌍 Language")
+                "🎭 Role-Play, 🔁 Review, 🎯 Quiz, 💬 Translate\n"
+                "🔥 Daily, 📖 Word of Day, 📊 Progress, 🏆 Leaderboard\n"
+                "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
+                "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
+                "📸 Send photos, 🎤 voice, 👍👎 rate replies")
     elif lang == "hi":
         text = ("ℹ️ सहायता\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
-                "🎯 Quiz, 💬 Translate, 🔥 Daily, 📖 Word of Day\n"
-                "📊 Progress, 🏆 Leaderboard, 🎁 Invite, ⭐ Premium\n"
-                "📚 Mistakes, 🏅 Achievements, 🔔 Reminder, 🌍 Language")
+                "🎭 Role-Play, 🔁 Review, 🎯 Quiz, 💬 Translate\n"
+                "🔥 Daily, 📖 Word of Day, 📊 Progress, 🏆 Leaderboard\n"
+                "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
+                "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
+                "📸 फोटो, 🎤 वॉइस, 👍👎 रेटिंग")
     else:
         text = ("ℹ️ সাহায্য\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
-                "🎯 Quiz, 💬 Translate, 🔥 Daily, 📖 Word of Day\n"
-                "📊 Progress, 🏆 Leaderboard, 🎁 Invite, ⭐ Premium\n"
-                "📚 Mistakes, 🏅 Achievements, 🔔 Reminder, 🌍 Language")
+                "🎭 Role-Play, 🔁 Review, 🎯 Quiz, 💬 Translate\n"
+                "🔥 Daily, 📖 Word of Day, 📊 Progress, 🏆 Leaderboard\n"
+                "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
+                "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
+                "📸 ছবি, 🎤 ভয়েস, 👍👎 রেটিং")
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
@@ -1468,11 +2046,11 @@ async def cb_fallback(update, context):
 
 
 # ==========================================================
-# TEXT HANDLER
+# TEXT / PHOTO / VOICE HANDLER
 # ==========================================================
 async def handle_message(update, context):
     message = update.effective_message
-    if not message or not message.text:
+    if not message:
         return
     chat = update.effective_chat
     if not chat:
@@ -1489,10 +2067,212 @@ async def handle_message(update, context):
     user = await get_user(uid)
     if not user:
         await create_user(uid, update.effective_user.full_name or "Student")
+        user = await get_user(uid)
         await message.reply_text(t("choose_lang", "bn"), reply_markup=lang_kb())
         return
 
     lang = user.get("language") or "bn"
+    today = datetime.now().date()
+
+    # ================= ROLE-PLAY MODE =================
+    rp = context.user_data.get("roleplay")
+    if rp and message.text and not message.text.startswith("/"):
+        user_text = message.text.strip()
+        rp["history"].append({"role": "user", "content": user_text})
+        await save_history(uid, "user", f"[RP] {user_text}")
+        try:
+            await message.chat.send_action("typing")
+        except Exception:
+            pass
+        answer = await asyncio.to_thread(
+            ask_groq, user_text, rp["history"], user, rp["system"]
+        )
+        if not answer:
+            answer = t("ai_error", lang)
+        rp["history"].append({"role": "assistant", "content": answer})
+        await save_history(uid, "assistant", answer)
+
+        # Extract correction if present
+        corr = extract_correction(answer)
+        if corr:
+            await save_review(uid, corr[0], corr[1])
+
+        await safe_reply_feedback(message, answer, message.message_id)
+
+        if user.get("is_premium") and HAS_TTS and len(answer) < 400:
+            try:
+                tts_path = f"/tmp/tts_{uid}.mp3"
+                ok = await text_to_voice(answer[:400], tts_path)
+                if ok:
+                    with open(tts_path, "rb") as vf:
+                        await message.reply_voice(voice=vf)
+                    try:
+                        os.remove(tts_path)
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+        return
+
+    # ================= REVIEW MODE =================
+    rq = context.user_data.get("review_queue")
+    if rq and message.text and not message.text.startswith("/"):
+        idx = context.user_data.get("review_index", 0)
+        if idx >= len(rq):
+            context.user_data.pop("review_queue", None)
+            context.user_data.pop("review_index", None)
+            await message.reply_text(t("review_none", lang))
+            return
+        current = rq[idx]
+        user_ans = message.text.strip().lower()
+        correct = current["corrected_text"].lower()
+        # Simple check: user's answer must contain most keywords
+        correct_words = set(w for w in correct.split() if len(w) > 3)
+        user_words = set(w for w in user_ans.split() if len(w) > 3)
+        match = len(correct_words & user_words) / max(len(correct_words), 1) if correct_words else 0
+
+        if match >= 0.6:
+            await message.reply_text(t("review_correct", lang))
+            await add_coins(uid, 3)
+        else:
+            await message.reply_text(
+                t("review_wrong", lang, correct=current["corrected_text"])
+            )
+        if db_pool and "id" in current:
+            await mark_reviewed(current["id"])
+        # Update review count
+        rc = (user.get("review_count") or 0) + 1
+        await update_user(uid, review_count=rc)
+        await check_achievements(uid)
+
+        # Next review
+        idx += 1
+        context.user_data["review_index"] = idx
+        if idx < len(rq):
+            nxt = rq[idx]
+            await message.reply_text(
+                t("review_prompt", lang, wrong=nxt["wrong_text"])
+            )
+        else:
+            context.user_data.pop("review_queue", None)
+            context.user_data.pop("review_index", None)
+            await message.reply_text(t("review_none", lang))
+        return
+
+    # ================= VOICE =================
+    if message.voice or message.audio:
+        if not user.get("is_premium"):
+            last_date = user.get("last_voice_date")
+            count = user.get("voice_count_today") or 0
+            if last_date != today:
+                count = 0
+                await update_user(uid, voice_count_today=0, last_voice_date=today)
+            if count >= FREE_VOICE_PER_DAY:
+                await message.reply_text(t("voice_limit", lang, n=FREE_VOICE_PER_DAY))
+                return
+            await update_user(uid, voice_count_today=count + 1)
+
+        msg = await message.reply_text(t("processing_voice", lang))
+        path = f"/tmp/voice_{uid}.ogg"
+        try:
+            voice = message.voice or message.audio
+            f = await context.bot.get_file(voice.file_id)
+            await f.download_to_drive(path)
+            text = await asyncio.to_thread(transcribe_sync, path)
+            try:
+                os.remove(path)
+            except Exception:
+                pass
+            if not text:
+                await msg.edit_text(t("voice_fail", lang))
+                return
+            await msg.edit_text(t("voice_heard", lang, text=text) + "\n\n⏳")
+            history = await get_history(uid)
+            answer = await asyncio.to_thread(ask_groq, text, history, user)
+            if not answer:
+                answer = t("ai_error", lang)
+            await save_history(uid, "user", text)
+            await save_history(uid, "assistant", answer)
+            await update_user(uid,
+                              last_active=datetime.now(),
+                              voices_sent=(user.get("voices_sent") or 0) + 1)
+            await safe_reply_feedback(message, answer, message.message_id)
+
+            corr = extract_correction(answer)
+            if corr:
+                await save_review(uid, corr[0], corr[1])
+
+            if user.get("is_premium") and HAS_TTS:
+                try:
+                    tts_path = f"/tmp/tts_{uid}.mp3"
+                    ok = await text_to_voice(answer[:500], tts_path)
+                    if ok:
+                        with open(tts_path, "rb") as vf:
+                            await message.reply_voice(voice=vf)
+                        try:
+                            os.remove(tts_path)
+                        except Exception:
+                            pass
+                except Exception as e:
+                    logger.error(f"Voice reply: {e}")
+
+            try:
+                await msg.delete()
+            except Exception:
+                pass
+            await check_achievements(uid)
+        except Exception as e:
+            logger.error(f"Voice handler: {e}")
+            await msg.edit_text("❌ Error processing voice.")
+        return
+
+    # ================= PHOTO =================
+    if message.photo:
+        if not user.get("is_premium"):
+            last_date = user.get("last_img_date")
+            count = user.get("img_count_today") or 0
+            if last_date != today:
+                count = 0
+                await update_user(uid, img_count_today=0, last_img_date=today)
+            if count >= FREE_IMG_PER_DAY:
+                await message.reply_text(t("img_limit", lang, n=FREE_IMG_PER_DAY))
+                return
+            await update_user(uid, img_count_today=count + 1)
+
+        msg = await message.reply_text(t("processing_img", lang))
+        path = f"/tmp/img_{uid}.jpg"
+        try:
+            photo = message.photo[-1]
+            f = await context.bot.get_file(photo.file_id)
+            await f.download_to_drive(path)
+            caption = message.caption or "Describe this image in English. Then give a Bangla translation. Use plain text with emojis only."
+            answer = await asyncio.to_thread(analyze_image_sync, path, caption)
+            try:
+                os.remove(path)
+            except Exception:
+                pass
+            if not answer:
+                await msg.edit_text(t("img_fail", lang))
+                return
+            await save_history(uid, "user", f"[Photo] {caption}")
+            await save_history(uid, "assistant", answer)
+            await update_user(uid,
+                              last_active=datetime.now(),
+                              photos_sent=(user.get("photos_sent") or 0) + 1)
+            await safe_reply_feedback(message, answer, message.message_id)
+            try:
+                await msg.delete()
+            except Exception:
+                pass
+            await check_achievements(uid)
+        except Exception as e:
+            logger.error(f"Photo handler: {e}")
+            await msg.edit_text("❌ Error processing photo.")
+        return
+
+    # ================= TEXT =================
+    if not message.text:
+        return
 
     if chat.type == "private":
         user_text = message.text.strip()
@@ -1524,12 +2304,30 @@ async def handle_message(update, context):
     except Exception:
         pass
 
-    answer = await asyncio.to_thread(ask_groq, user_text, history)
+    answer = await asyncio.to_thread(ask_groq, user_text, history, user)
     if not answer:
         answer = t("ai_error", lang)
 
     await save_history(uid, "assistant", answer)
-    await safe_reply(message, answer)
+    await safe_reply_feedback(message, answer, message.message_id)
+
+    corr = extract_correction(answer)
+    if corr:
+        await save_review(uid, corr[0], corr[1])
+
+    if user.get("is_premium") and HAS_TTS and len(answer) < 400:
+        try:
+            tts_path = f"/tmp/tts_{uid}.mp3"
+            ok = await text_to_voice(answer[:400], tts_path)
+            if ok:
+                with open(tts_path, "rb") as vf:
+                    await message.reply_voice(voice=vf)
+                try:
+                    os.remove(tts_path)
+                except Exception:
+                    pass
+        except Exception as e:
+            logger.error(f"TTS send: {e}")
 
     new = await check_achievements(uid)
     if new:
@@ -1543,6 +2341,40 @@ async def handle_message(update, context):
 
 
 # ==========================================================
+# DAILY REVIEW JOB
+# ==========================================================
+async def daily_review_job(context: ContextTypes.DEFAULT_TYPE):
+    """Send due reviews to users once a day."""
+    try:
+        if db_pool is None:
+            return
+        async with db_pool.acquire() as conn:
+            rows = await conn.fetch("""
+                SELECT DISTINCT user_id FROM s_review
+                WHERE reviewed_at IS NULL AND review_at <= NOW()
+                LIMIT 200
+            """)
+        for r in rows:
+            uid = r["user_id"]
+            try:
+                due = await get_due_reviews(uid, limit=3)
+                if not due:
+                    continue
+                lang = await get_user_lang(uid)
+                first = due[0]
+                await context.bot.send_message(
+                    uid,
+                    f"🔔 {t('review_title', lang)}\n\n{t('review_prompt', lang, wrong=first['wrong_text'])}"
+                )
+                await asyncio.sleep(0.1)
+            except Exception as e:
+                logger.error(f"Review notify {uid}: {e}")
+        logger.info(f"Daily review sent to {len(rows)} users.")
+    except Exception as e:
+        logger.error(f"daily_review_job: {e}")
+
+
+# ==========================================================
 # BOT SETUP
 # ==========================================================
 async def post_init(app):
@@ -1550,6 +2382,14 @@ async def post_init(app):
         await init_db()
     except Exception as e:
         logger.error(f"post_init exception: {e}")
+    try:
+        app.job_queue.run_daily(
+            daily_review_job,
+            time=datetime.strptime("14:00", "%H:%M").time(),
+        )
+        logger.info("Daily review job scheduled at 14:00 UTC.")
+    except Exception as e:
+        logger.error(f"Job schedule error: {e}")
     logger.info("Init done.")
 
 
@@ -1579,20 +2419,31 @@ def run_bot():
             ("mistakes", mistakes_command), ("achievements", achievements_command),
             ("level", level_command), ("reminder", reminder_command),
             ("language", language_command), ("reset", reset_command),
-            ("adminstats", adminstats_command), ("broadcast", broadcast_command),
+            ("adminstats", adminstats_command), ("feedback", feedback_command),
+            ("broadcast", broadcast_command),
+            ("practice", practice_command),
+            ("endroleplay", end_roleplay_command),
+            ("review", review_command),
+            ("memory", memory_command),
         ]:
             application.add_handler(CommandHandler(cmd, fn))
 
         application.add_handler(CallbackQueryHandler(cb_forcesub_check, pattern="^forcesub_check$"))
+        application.add_handler(CallbackQueryHandler(cb_feedback, pattern="^fb_"))
         application.add_handler(CallbackQueryHandler(cb_set_language, pattern="^setlang_"))
         application.add_handler(CallbackQueryHandler(cb_lang_menu, pattern="^m_lang$"))
         application.add_handler(CallbackQueryHandler(student_menu_callback, pattern="^student_"))
+
+        application.add_handler(CallbackQueryHandler(cb_practice_menu, pattern="^rp_menu$"))
+        application.add_handler(CallbackQueryHandler(cb_rp_start, pattern="^rp_(?!menu$)[a-z]+$"))
 
         application.add_handler(CallbackQueryHandler(cb_menu, pattern="^m_menu$"))
         application.add_handler(CallbackQueryHandler(cb_profile, pattern="^m_profile$"))
         application.add_handler(CallbackQueryHandler(cb_daily, pattern="^m_daily$"))
         application.add_handler(CallbackQueryHandler(cb_word_of_day, pattern="^m_word$"))
         application.add_handler(CallbackQueryHandler(cb_quiz, pattern="^m_quiz$"))
+        application.add_handler(CallbackQueryHandler(cb_review, pattern="^m_review$"))
+        application.add_handler(CallbackQueryHandler(cb_memory, pattern="^m_memory$"))
         application.add_handler(CallbackQueryHandler(cb_translate, pattern="^m_translate$"))
         application.add_handler(CallbackQueryHandler(cb_invite, pattern="^m_invite$"))
         application.add_handler(CallbackQueryHandler(cb_premium, pattern="^m_premium$"))
@@ -1610,7 +2461,13 @@ def run_bot():
         application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_cb))
 
         application.add_handler(CallbackQueryHandler(cb_fallback))
-        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+        application.add_handler(
+            MessageHandler(
+                (filters.TEXT | filters.PHOTO | filters.VOICE | filters.AUDIO) & ~filters.COMMAND,
+                handle_message
+            )
+        )
 
         try:
             await application.initialize()
@@ -1647,6 +2504,9 @@ def run_bot():
     asyncio.run(_run())
 
 
+# ==========================================================
+# MAIN
+# ==========================================================
 if __name__ == "__main__":
     logger.info("Starting EduMate AI...")
     threading.Thread(target=run_flask, daemon=True).start()
