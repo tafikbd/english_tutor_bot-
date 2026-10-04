@@ -2553,9 +2553,9 @@ def run_bot():
 
         try:
             await application.initialize()
-            await application.bot.delete_webhook(drop_pending_updates=False)
+            await application.bot.delete_webhook(drop_pending_updates=True)
             await application.start()
-            await application.updater.start_polling(drop_pending_updates=False)
+            await application.updater.start_polling(drop_pending_updates=True )
             logger.info("Bot started.")
             bot_info = await application.bot.get_me()
             logger.info(f"Bot: @{bot_info.username} | Model: {GROQ_MODEL}")
