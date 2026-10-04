@@ -404,6 +404,18 @@ def ask_groq(user_text, history=None, user=None, custom_system=None):
         logger.error(f"Groq error: {e}")
         return None
 
+def extract_correction(answer):
+    """Extract ❌ Wrong / ✅ Correct from AI response."""
+    try:
+        if "❌ Wrong:" in answer and "✅ Correct:" in answer:
+            wrong = answer.split("❌ Wrong:")[1].split("✅")[0].strip().split("\n")[0].strip()
+            correct = answer.split("✅ Correct:")[1].split("📝")[0].split("\n")[0].strip()
+            if wrong and correct and len(wrong) < 250 and len(correct) < 250:
+                return wrong, correct
+    except Exception:
+        pass
+    return None
+
 
 def analyze_image_sync(image_path, prompt):
     try:
