@@ -414,6 +414,18 @@ def extract_correction(answer):
         pass
     return None
 
+def transcribe_sync(voice_path):
+    try:
+        with open(voice_path, "rb") as f:
+            response = groq_client.audio.transcriptions.create(
+                file=("voice.ogg", f.read()),
+                model=WHISPER_MODEL,
+            )
+        return response.text.strip()
+    except Exception as e:
+        logger.error(f"Whisper error: {e}")
+        return None
+
 
 def analyze_image_sync(image_path, prompt):
     try:
