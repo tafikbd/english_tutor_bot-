@@ -601,6 +601,20 @@ async def init_db():
     logger.info(f"========== DB INIT END (db_pool={'OK' if db_pool else 'NONE'}) ==========")
 
 
+async def keep_alive_db():
+    """Run a dummy query every 3 minutes to keep Neon DB awake."""
+    while True:
+        try:
+            if db_pool:
+                async with db_pool.acquire() as conn:
+                    await conn.execute("SELECT 1")
+                logger.info("DB Keep-Alive: Success")
+            await asyncio.sleep(180)  # 3 minutes
+        except Exception as e:
+            logger.error(f"DB Keep-Alive error: {e}")
+            await asyncio.sleep(60)
+
+
 async def close_db():
     if db_pool:
         try:
@@ -2447,6 +2461,7 @@ async def daily_review_job(context: ContextTypes.DEFAULT_TYPE):
 async def post_init(app):
     try:
         await init_db()
+        asyncio.create_task(keep_alive_db())  # <--- এটি ডাটাবেসকে জাগিয়ে রাখবে
     except Exception as e:
         logger.error(f"post_init exception: {e}")
     try:
