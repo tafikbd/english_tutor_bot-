@@ -364,12 +364,12 @@ SENTENCE CORRECTION FORMAT (when user's sentence has errors):
 """
 
 
-def build_user_context(user):
+def build_user_context(user, include_name=True):
     """Build a short context line about the user for the AI."""
     if not user:
         return ""
     parts = []
-    if user.get("name"):
+    if include_name and user.get("name"):
         parts.append(f"User's name: {user['name']}")
     if user.get("level"):
         parts.append(f"Level: {user['level']}")
@@ -377,17 +377,15 @@ def build_user_context(user):
         parts.append(f"Streak: {user['streak']} days")
     if user.get("words_learned"):
         parts.append(f"Words learned: {user['words_learned']}")
-    if user.get("looking_for"):
-        parts.append(f"Intent: {user['looking_for']}")
     if not parts:
         return ""
     return "\nUSER CONTEXT: " + " | ".join(parts) + "\nUse this info naturally if relevant."
 
-
 def ask_groq(user_text, history=None, user=None, custom_system=None):
     try:
         system = custom_system if custom_system else BASE_SYSTEM_PROMPT
-        system += build_user_context(user)
+        include_name = custom_system is None
+        system += build_user_context(user, include_name=include_name)
         messages = [{"role": "system", "content": system}]
         if history:
             messages.extend(history[-8:])
