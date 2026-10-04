@@ -2554,6 +2554,7 @@ def run_bot():
         try:
             await application.initialize()
             await application.bot.delete_webhook(drop_pending_updates=True)
+            await asyncio.sleep(5)   # টেলিগ্রামের পুরনো কানেকশন মুছতে ৫ সেকেন্ড সময় দিন
             await application.start()
             await application.updater.start_polling(drop_pending_updates=True )
             logger.info("Bot started.")
