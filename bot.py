@@ -491,11 +491,6 @@ async def init_db():
     logger.info("========== DB INIT START ==========")
     logger.info(f"DATABASE_URL present? {bool(DATABASE_URL)}")
     logger.info(f"HAS_ASYNCPG? {HAS_ASYNCPG}")
-logger.info("========== DB FUNCTION CALLED ==========")
-print("========== DB INIT START ==========")
-logger.info("========== DB INIT START ==========")
-logger.info(f"DATABASE_URL present? {bool(DATABASE_URL)}")
-logger.info(f"HAS_ASYNCPG? {HAS_ASYNCPG}")
 
     if not DATABASE_URL:
         logger.warning("DB DISABLED: DATABASE_URL is empty")
@@ -2562,7 +2557,7 @@ def run_bot():
             await application.bot.delete_webhook(drop_pending_updates=True)
             await asyncio.sleep(5)   # টেলিগ্রামের পুরনো কানেকশন মুছতে ৫ সেকেন্ড সময় দিন
             await application.start()
-            await application.updater.start_polling(drop_pending_updates=True )
+            await application.updater.start_polling(drop_pending_updates=True)
             logger.info("Bot started.")
             bot_info = await application.bot.get_me()
             logger.info(f"Bot: @{bot_info.username} | Model: {GROQ_MODEL}")
