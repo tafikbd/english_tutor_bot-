@@ -157,7 +157,7 @@ ROLEPLAY_SCENARIOS = {
     "hotel": {
         "emoji": "🏨",
         "title": {"bn": "হোটেল", "en": "Hotel Check-in", "hi": "होटल"},
-        "desc": {"bn": "হোটেলে চেক-ইন", "en": "Hotel check-in", "hi": "होटल चेक-ইन"},
+        "desc": {"bn": "হোটেলে চেক-ইন", "en": "Hotel check-in", "hi": "होटल चेक-इन"},
         "system": (
             "You are a hotel receptionist. The user is a guest checking in. "
             "Ask for reservation, ID, room preference. Stay in character. "
@@ -197,7 +197,7 @@ T = {
     "language_set": {"bn": "✅ ভাষা সেট হয়েছে: বাংলা", "en": "✅ Language set: English", "hi": "✅ भाषा सेट: हिन्दी"},
     "choose_lang": {
         "bn": "🌍 ভাষা নির্বাচন করুন:\n\nChoose your language:\n\nअपनी भाषा चुनें:",
-        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा चुनें:",
+        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा চুনें:",
         "hi": "🌍 अपनी भाषा चुनें:\n\nChoose your language:\n\nআপনার ভাষা নির্বাচন করুন:",
     },
     "reset_done": {"bn": "🔄 চ্যাট ক্লিয়ার হয়েছে। /start দিন।", "en": "🔄 Chat cleared. Send /start.", "hi": "🔄 चैट साफ। /start भेजें।"},
@@ -993,6 +993,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not u or u.is_bot:
         return
     context.user_data.pop("roleplay", None)
+    context.user_data.pop("awaiting_payment", None)  # <-- Cancel payment mode
+    context.user_data.pop("payment_method", None)    # <-- Cancel payment method
     if not await is_user_joined(context.bot, u.id):
         existing = await get_user(u.id)
         lang = (existing or {}).get("language") or "bn"
@@ -1035,6 +1037,8 @@ async def menu_command(update, context):
         await send_force_sub_message(update.message, "bn")
         return
     context.user_data.pop("roleplay", None)
+    context.user_data.pop("awaiting_payment", None)  # <-- Cancel payment mode
+    context.user_data.pop("payment_method", None)    # <-- Cancel payment method
     lang = await get_user_lang(update.effective_user.id)
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
@@ -1688,6 +1692,8 @@ async def cb_menu(update, context):
         )
         return
     context.user_data.pop("roleplay", None)
+    context.user_data.pop("awaiting_payment", None)  # <-- Cancel payment mode
+    context.user_data.pop("payment_method", None)    # <-- Cancel payment method
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -1860,6 +1866,8 @@ async def cb_premium(update, context):
     if user and user.get("is_premium"):
         await safe_edit(q, t("premium_already", lang), reply_markup=back_kb(lang))
         return
+    context.user_data.pop("awaiting_payment", None) # Reset payment mode when entering premium
+    context.user_data.pop("payment_method", None)
     await safe_edit(
         q,
         f"{t('premium_title', lang)}\n\n"
@@ -1904,7 +1912,7 @@ async def cb_buy_premium(update, context):
 
 
 # ==========================================================
-# MANUAL PAYMENT CALLBACKS (with awaiting_payment flag)
+# MANUAL PAYMENT CALLBACKS (with Cancel button)
 # ==========================================================
 async def cb_pay_bkash(update, context):
     q = update.callback_query
@@ -1919,7 +1927,11 @@ async def cb_pay_bkash(update, context):
         "৪. টাকা পাঠানোর পর **Transaction ID (TrxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
         "✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
     )
-    await safe_edit(q, text, reply_markup=back_kb("bn"))
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ Cancel Payment", callback_data="cancel_payment")],
+        [InlineKeyboardButton(t("menu_btn", "bn"), callback_data="m_menu")]
+    ])
+    await safe_edit(q, text, reply_markup=markup)
 
 
 async def cb_pay_rocket(update, context):
@@ -1935,7 +1947,11 @@ async def cb_pay_rocket(update, context):
         "৪. টাকা পাঠানোর পর **Transaction ID (TrxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
         "✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
     )
-    await safe_edit(q, text, reply_markup=back_kb("bn"))
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ Cancel Payment", callback_data="cancel_payment")],
+        [InlineKeyboardButton(t("menu_btn", "bn"), callback_data="m_menu")]
+    ])
+    await safe_edit(q, text, reply_markup=markup)
 
 
 async def cb_pay_trc20(update, context):
@@ -1950,7 +1966,11 @@ async def cb_pay_trc20(update, context):
         "৩. টাকা পাঠানোর পর **Transaction Hash (TxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
         "✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
     )
-    await safe_edit(q, text, reply_markup=back_kb("bn"))
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ Cancel Payment", callback_data="cancel_payment")],
+        [InlineKeyboardButton(t("menu_btn", "bn"), callback_data="m_menu")]
+    ])
+    await safe_edit(q, text, reply_markup=markup)
 
 
 async def cb_pay_bsc20(update, context):
@@ -1965,7 +1985,20 @@ async def cb_pay_bsc20(update, context):
         "৩. টাকা পাঠানোর পর **Transaction Hash (TxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
         "✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
     )
-    await safe_edit(q, text, reply_markup=back_kb("bn"))
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ Cancel Payment", callback_data="cancel_payment")],
+        [InlineKeyboardButton(t("menu_btn", "bn"), callback_data="m_menu")]
+    ])
+    await safe_edit(q, text, reply_markup=markup)
+
+
+async def cb_cancel_payment(update, context):
+    q = update.callback_query
+    await q.answer("Payment cancelled.")
+    context.user_data.pop("awaiting_payment", None)
+    context.user_data.pop("payment_method", None)
+    lang = await get_user_lang(q.from_user.id)
+    await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
 async def precheckout_cb(update, context):
@@ -2332,10 +2365,9 @@ async def handle_message(update, context):
 
     # ================= PHOTO =================
     if message.photo:
-        # ============ PAYMENT PROOF HANDLING (NEW) ============
+        # ============ PAYMENT PROOF HANDLING ============
         if context.user_data.get('awaiting_payment'):
             method = context.user_data.get('payment_method', 'Unknown')
-            # Forward to all admins
             for admin_id in ADMIN_IDS:
                 try:
                     await context.bot.forward_message(
@@ -2621,6 +2653,7 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_pay_rocket, pattern="^pay_rocket$"))
         application.add_handler(CallbackQueryHandler(cb_pay_trc20, pattern="^pay_trc20$"))
         application.add_handler(CallbackQueryHandler(cb_pay_bsc20, pattern="^pay_bsc20$"))
+        application.add_handler(CallbackQueryHandler(cb_cancel_payment, pattern="^cancel_payment$")) # <-- New Handler
         application.add_handler(CallbackQueryHandler(cb_reminder_set, pattern="^rem_"))
         application.add_handler(CallbackQueryHandler(cb_set_level, pattern="^setlvl_"))
 
