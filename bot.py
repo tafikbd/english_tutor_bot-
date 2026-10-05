@@ -281,6 +281,38 @@ T = {
     "review_wrong": {"bn": "❌ এটা ঠিক হয়নি।\n\n✅ সঠিক: {correct}\n\nআবার চেষ্টা করুন কাল।", "en": "❌ Not quite.\n\n✅ Correct: {correct}\n\nTry again tomorrow.", "hi": "❌ सही नहीं।\n\n✅ सही: {correct}\n\nकल फिर कोशिश करें।"},
     "memory_title": {"bn": "🧠 আমি যা মনে রেখেছি", "en": "🧠 What I Remember", "hi": "🧠 मुझे याद है"},
     "review_saved": {"bn": "✅ রিভিউ লিস্টে যোগ হয়েছে!", "en": "✅ Added to review list!", "hi": "✅ रिव्यू लिस्ट में जोड़ा गया!"},
+    
+    # ===== NEW PAYMENT LOCALIZATION =====
+    "cancel_payment_btn": {"bn": "❌ পেমেন্ট বাতিল করুন", "en": "❌ Cancel Payment", "hi": "❌ भुगतान रद्द करें"},
+    "copy_btn": {"bn": "📋 কপি করুন", "en": "📋 Copy", "hi": "📋 कॉपी करें"},
+    
+    "pay_bkash_title": {"bn": "💳 bKash পেমেন্ট", "en": "💳 bKash Payment", "hi": "💳 bKash भुगतान"},
+    "pay_bkash_desc": {
+        "bn": "১. আপনার bKash এপ থেকে Send Money করুন।\n২. নাম্বার: `{number}`\n৩. এমাউন্ট: `{amount}` টাকা\n৪. টাকা পাঠানোর পর Transaction ID (TrxID) এবং স্ক্রিনশট এই চ্যাটে পাঠান।\n\n✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।",
+        "en": "1. Send Money from your bKash app.\n2. Number: `{number}`\n3. Amount: `{amount}` BDT\n4. After sending, send the Transaction ID (TrxID) and screenshot to this chat.\n\n✅ Admin will verify and activate your premium within 5 minutes.",
+        "hi": "1. अपने bKash ऐप से Send Money करें।\n2. नंबर: `{number}`\n3. राशि: `{amount}` BDT\n4. भेजने के बाद Transaction ID (TrxID) और स्क्रीनशॉट इस चैट में भेजें।\n\n✅ एडमिन 5 मिनट के भीतर आपका प्रीमियम एक्टिवेट कर देगा।"
+    },
+    
+    "pay_rocket_title": {"bn": "💳 Rocket পেমেন্ট", "en": "💳 Rocket Payment", "hi": "💳 Rocket भुगतान"},
+    "pay_rocket_desc": {
+        "bn": "১. আপনার Rocket এপ থেকে Send Money করুন।\n২. নাম্বার: `{number}`\n৩. এমাউন্ট: `{amount}` টাকা\n৪. টাকা পাঠানোর পর Transaction ID (TrxID) এবং স্ক্রিনশট এই চ্যাটে পাঠান।\n\n✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।",
+        "en": "1. Send Money from your Rocket app.\n2. Number: `{number}`\n3. Amount: `{amount}` BDT\n4. After sending, send the Transaction ID (TrxID) and screenshot to this chat.\n\n✅ Admin will verify and activate your premium within 5 minutes.",
+        "hi": "1. अपने Rocket ऐप से Send Money करें।\n2. नंबर: `{number}`\n3. राशि: `{amount}` BDT\n4. भेजने के बाद Transaction ID (TrxID) और स्क्रीनशॉट इस चैट में भेजें।\n\n✅ एडमिन 5 मिनट के भीतर आपका प्रीमियम एक्टिवेट कर देगा।"
+    },
+    
+    "pay_trc20_title": {"bn": "🪙 ক্রিপ্টো পেমেন্ট (USDT TRC20)", "en": "🪙 Crypto Payment (USDT TRC20)", "hi": "🪙 क्रिप्टो भुगतान (USDT TRC20)"},
+    "pay_trc20_desc": {
+        "bn": "১. আপনার ওয়ালেট থেকে `{amount}` USDT (TRC20) পাঠান।\n২. TRC20 অ্যাড্রেস: `{address}`\n৩. টাকা পাঠানোর পর Transaction Hash (TxID) এবং স্ক্রিনশট এই চ্যাটে পাঠান।\n\n✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।",
+        "en": "1. Send `{amount}` USDT (TRC20) from your wallet.\n2. TRC20 Address: `{address}`\n3. After sending, send the Transaction Hash (TxID) and screenshot to this chat.\n\n✅ Admin will verify and activate your premium within 10 minutes.",
+        "hi": "1. अपने वॉलेट से `{amount}` USDT (TRC20) भेजें।\n2. TRC20 एड्रेस: `{address}`\n3. भेजने के बाद Transaction Hash (TxID) और स्क्रीनशॉट इस चैट में भेजें।\n\n✅ एडमिन 10 मिनट के भीतर आपका प्रीमियम एक्टिवेट कर देगा।"
+    },
+    
+    "pay_bsc20_title": {"bn": "🪙 ক্রিপ্টো পেমেন্ট (USDT BSC20)", "en": "🪙 Crypto Payment (USDT BSC20)", "hi": "🪙 क्रिप्टो भुगतान (USDT BSC20)"},
+    "pay_bsc20_desc": {
+        "bn": "১. আপনার ওয়ালেট থেকে `{amount}` USDT (BSC20) পাঠান।\n২. BSC20 অ্যাড্রেস: `{address}`\n৩. টাকা পাঠানোর পর Transaction Hash (TxID) এবং স্ক্রিনশট এই চ্যাটে পাঠান।\n\n✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।",
+        "en": "1. Send `{amount}` USDT (BSC20) from your wallet.\n2. BSC20 Address: `{address}`\n3. After sending, send the Transaction Hash (TxID) and screenshot to this chat.\n\n✅ Admin will verify and activate your premium within 10 minutes.",
+        "hi": "1. अपने वॉलेट से `{amount}` USDT (BSC20) भेजें।\n2. BSC20 एड्रेस: `{address}`\n3. भेजने के बाद Transaction Hash (TxID) और स्क्रीनशॉट इस चैट में भेजें।\n\n✅ एडमिन 10 मिनट के भीतर आपका प्रीमियम एक्टिवेट कर देगा।"
+    },
 }
 
 
@@ -993,8 +1025,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not u or u.is_bot:
         return
     context.user_data.pop("roleplay", None)
-    context.user_data.pop("awaiting_payment", None)  # <-- Cancel payment mode
-    context.user_data.pop("payment_method", None)    # <-- Cancel payment method
+    context.user_data.pop("awaiting_payment", None)
+    context.user_data.pop("payment_method", None)
     if not await is_user_joined(context.bot, u.id):
         existing = await get_user(u.id)
         lang = (existing or {}).get("language") or "bn"
@@ -1037,8 +1069,8 @@ async def menu_command(update, context):
         await send_force_sub_message(update.message, "bn")
         return
     context.user_data.pop("roleplay", None)
-    context.user_data.pop("awaiting_payment", None)  # <-- Cancel payment mode
-    context.user_data.pop("payment_method", None)    # <-- Cancel payment method
+    context.user_data.pop("awaiting_payment", None)
+    context.user_data.pop("payment_method", None)
     lang = await get_user_lang(update.effective_user.id)
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
@@ -1692,8 +1724,8 @@ async def cb_menu(update, context):
         )
         return
     context.user_data.pop("roleplay", None)
-    context.user_data.pop("awaiting_payment", None)  # <-- Cancel payment mode
-    context.user_data.pop("payment_method", None)    # <-- Cancel payment method
+    context.user_data.pop("awaiting_payment", None)
+    context.user_data.pop("payment_method", None)
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -1866,7 +1898,7 @@ async def cb_premium(update, context):
     if user and user.get("is_premium"):
         await safe_edit(q, t("premium_already", lang), reply_markup=back_kb(lang))
         return
-    context.user_data.pop("awaiting_payment", None) # Reset payment mode when entering premium
+    context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
     await safe_edit(
         q,
@@ -1912,24 +1944,24 @@ async def cb_buy_premium(update, context):
 
 
 # ==========================================================
-# MANUAL PAYMENT CALLBACKS (with Cancel button)
+# MANUAL PAYMENT CALLBACKS (with Cancel & Copy button)
 # ==========================================================
 async def cb_pay_bkash(update, context):
     q = update.callback_query
     await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
     context.user_data['awaiting_payment'] = True
     context.user_data['payment_method'] = 'bKash'
+    
     text = (
-        "💳 **bKash Payment**\n\n"
-        f"১. আপনার bKash এপ থেকে **Send Money** করুন।\n"
-        f"২. নাম্বার: `{BKASH_NUMBER}`\n"
-        f"৩. এমাউন্ট: `{PREMIUM_PRICE_BDT}` টাকা\n"
-        "৪. টাকা পাঠানোর পর **Transaction ID (TrxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
-        "✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
+        f"{t('pay_bkash_title', lang)}\n\n"
+        f"{t('pay_bkash_desc', lang, number=BKASH_NUMBER, amount=PREMIUM_PRICE_BDT)}"
     )
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("❌ Cancel Payment", callback_data="cancel_payment")],
-        [InlineKeyboardButton(t("menu_btn", "bn"), callback_data="m_menu")]
+        [InlineKeyboardButton(t("copy_btn", lang), callback_data="copy_bkash")],
+        [InlineKeyboardButton(t("cancel_payment_btn", lang), callback_data="cancel_payment")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -1937,19 +1969,19 @@ async def cb_pay_bkash(update, context):
 async def cb_pay_rocket(update, context):
     q = update.callback_query
     await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
     context.user_data['awaiting_payment'] = True
     context.user_data['payment_method'] = 'Rocket'
+    
     text = (
-        "💳 **Rocket Payment**\n\n"
-        f"১. আপনার Rocket এপ থেকে **Send Money** করুন।\n"
-        f"২. নাম্বার: `{ROCKET_NUMBER}`\n"
-        f"৩. এমাউন্ট: `{PREMIUM_PRICE_BDT}` টাকা\n"
-        "৪. টাকা পাঠানোর পর **Transaction ID (TrxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
-        "✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
+        f"{t('pay_rocket_title', lang)}\n\n"
+        f"{t('pay_rocket_desc', lang, number=ROCKET_NUMBER, amount=PREMIUM_PRICE_BDT)}"
     )
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("❌ Cancel Payment", callback_data="cancel_payment")],
-        [InlineKeyboardButton(t("menu_btn", "bn"), callback_data="m_menu")]
+        [InlineKeyboardButton(t("copy_btn", lang), callback_data="copy_rocket")],
+        [InlineKeyboardButton(t("cancel_payment_btn", lang), callback_data="cancel_payment")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -1957,18 +1989,19 @@ async def cb_pay_rocket(update, context):
 async def cb_pay_trc20(update, context):
     q = update.callback_query
     await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
     context.user_data['awaiting_payment'] = True
     context.user_data['payment_method'] = 'USDT (TRC20)'
+    
     text = (
-        "🪙 **Crypto Payment (USDT TRC20)**\n\n"
-        f"১. আপনার ওয়ালেট থেকে **{USDT_AMOUNT} USDT (TRC20)** পাঠান।\n"
-        f"২. TRC20 অ্যাড্রেস: `{TRC20_ADDRESS}`\n"
-        "৩. টাকা পাঠানোর পর **Transaction Hash (TxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
-        "✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
+        f"{t('pay_trc20_title', lang)}\n\n"
+        f"{t('pay_trc20_desc', lang, amount=USDT_AMOUNT, address=TRC20_ADDRESS)}"
     )
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("❌ Cancel Payment", callback_data="cancel_payment")],
-        [InlineKeyboardButton(t("menu_btn", "bn"), callback_data="m_menu")]
+        [InlineKeyboardButton(t("copy_btn", lang), callback_data="copy_trc20")],
+        [InlineKeyboardButton(t("cancel_payment_btn", lang), callback_data="cancel_payment")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -1976,20 +2009,45 @@ async def cb_pay_trc20(update, context):
 async def cb_pay_bsc20(update, context):
     q = update.callback_query
     await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
     context.user_data['awaiting_payment'] = True
     context.user_data['payment_method'] = 'USDT (BSC20)'
+    
     text = (
-        "🪙 **Crypto Payment (USDT BSC20/BEP20)**\n\n"
-        f"১. আপনার ওয়ালেট থেকে **{USDT_AMOUNT} USDT (BSC20)** পাঠান।\n"
-        f"২. BSC20 অ্যাড্রেস: `{BSC20_ADDRESS}`\n"
-        "৩. টাকা পাঠানোর পর **Transaction Hash (TxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
-        "✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
+        f"{t('pay_bsc20_title', lang)}\n\n"
+        f"{t('pay_bsc20_desc', lang, amount=USDT_AMOUNT, address=BSC20_ADDRESS)}"
     )
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("❌ Cancel Payment", callback_data="cancel_payment")],
-        [InlineKeyboardButton(t("menu_btn", "bn"), callback_data="m_menu")]
+        [InlineKeyboardButton(t("copy_btn", lang), callback_data="copy_bsc20")],
+        [InlineKeyboardButton(t("cancel_payment_btn", lang), callback_data="cancel_payment")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
+
+
+# ==========================================================
+# COPY CALLBACKS
+# ==========================================================
+async def cb_copy_bkash(update, context):
+    q = update.callback_query
+    await q.answer()
+    await q.message.reply_text(f"`{BKASH_NUMBER}`\n\n👇 ট্যাপ করে কপি করুন। / Tap to copy.")
+
+async def cb_copy_rocket(update, context):
+    q = update.callback_query
+    await q.answer()
+    await q.message.reply_text(f"`{ROCKET_NUMBER}`\n\n👇 ট্যাপ করে কপি করুন। / Tap to copy.")
+
+async def cb_copy_trc20(update, context):
+    q = update.callback_query
+    await q.answer()
+    await q.message.reply_text(f"`{TRC20_ADDRESS}`\n\n👇 ট্যাপ করে কপি করুন। / Tap to copy.")
+
+async def cb_copy_bsc20(update, context):
+    q = update.callback_query
+    await q.answer()
+    await q.message.reply_text(f"`{BSC20_ADDRESS}`\n\n👇 ট্যাপ করে কপি করুন। / Tap to copy.")
 
 
 async def cb_cancel_payment(update, context):
@@ -2653,7 +2711,14 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_pay_rocket, pattern="^pay_rocket$"))
         application.add_handler(CallbackQueryHandler(cb_pay_trc20, pattern="^pay_trc20$"))
         application.add_handler(CallbackQueryHandler(cb_pay_bsc20, pattern="^pay_bsc20$"))
-        application.add_handler(CallbackQueryHandler(cb_cancel_payment, pattern="^cancel_payment$")) # <-- New Handler
+        application.add_handler(CallbackQueryHandler(cb_cancel_payment, pattern="^cancel_payment$"))
+        
+        # New Copy Handlers
+        application.add_handler(CallbackQueryHandler(cb_copy_bkash, pattern="^copy_bkash$"))
+        application.add_handler(CallbackQueryHandler(cb_copy_rocket, pattern="^copy_rocket$"))
+        application.add_handler(CallbackQueryHandler(cb_copy_trc20, pattern="^copy_trc20$"))
+        application.add_handler(CallbackQueryHandler(cb_copy_bsc20, pattern="^copy_bsc20$"))
+        
         application.add_handler(CallbackQueryHandler(cb_reminder_set, pattern="^rem_"))
         application.add_handler(CallbackQueryHandler(cb_set_level, pattern="^setlvl_"))
 
