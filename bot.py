@@ -72,6 +72,7 @@ BKASH_NUMBER = "01608364088"
 ROCKET_NUMBER = "01608364088"
 TRC20_ADDRESS = "TKeEd3wuTqHse2rdzAg3rqYeRfQD1NC7tq"
 BSC20_ADDRESS = "0xb83a03d9ded3ac7a4908aa87cfdfe1df9e05f719"
+SUPPORT_CONTACT = "@RohanVerse"
 
 ACHIEVEMENTS = {
     "first_chat": ("🥇", {"bn": "প্রথম চ্যাট", "en": "First Chat", "hi": "पहला चैट"}),
@@ -313,6 +314,22 @@ T = {
         "en": "1. Send `{amount}` USDT (BSC20) from your wallet.\n2. BSC20 Address: `{address}`\n3. After sending, send the Transaction Hash (TxID) and screenshot to this chat.\n\n✅ Admin will verify and activate your premium within 10 minutes.",
         "hi": "1. अपने वॉलेट से `{amount}` USDT (BSC20) भेजें।\n2. BSC20 एड्रेस: `{address}`\n3. भेजने के बाद Transaction Hash (TxID) और स्क्रीनशॉट इस चैट में भेजें।\n\n✅ एडमिन 10 मिनट के भीतर आपका प्रीमियम एक्टिवेट कर देगा।"
     },
+
+    # ===== SUPPORT LOCALIZATION =====
+    "support_title": {"bn": "🆘 সাপোর্ট", "en": "🆘 Support", "hi": "🆘 सहायता"},
+    "support_desc": {
+        "bn": "আপনার কোনো সমস্যা, প্রশ্ন বা সাজেশন থাকলে নিচে লিখে পাঠান।\n\n📩 আপনার মেসেজটি সরাসরি অ্যাডমিনের কাছে পাঠানো হবে এবং শীঘ্রই উত্তর দেওয়া হবে।\n\n📞 বিকল্প যোগাযোগ: @RohanVerse",
+        "en": "If you have any problem, question, or suggestion, write it below.\n\n📩 Your message will be sent directly to the admin and you will get a reply soon.\n\n📞 Alternative contact: @RohanVerse",
+        "hi": "यदि आपको कोई समस्या, प्रश्न या सुझाव है तो नीचे लिखें।\n\n📩 आपका संदेश सीधे एडमिन को भेजा जाएगा और जल्द ही उत्तर दिया जाएगा।\n\n📞 वैकल्पिक संपर्क: @RohanVerse"
+    },
+    "support_sent": {
+        "bn": "✅ আপনার মেসেজ অ্যাডমিনের কাছে পাঠানো হয়েছে। শীঘ্রই উত্তর পাবেন।",
+        "en": "✅ Your message has been sent to the admin. You will get a reply soon.",
+        "hi": "✅ आपका संदेश एडमिन को भेज दिया गया है। जल्द ही उत्तर मिलेगा।"
+    },
+    "support_btn": {"bn": "🆘 সাপোর্ট", "en": "🆘 Support", "hi": "🆘 सहायता"},
+    "support_cancel": {"bn": "❌ বাতিল করুন", "en": "❌ Cancel", "hi": "❌ रद्द करें"},
+    "support_cancelled": {"bn": "✅ সাপোর্ট মোড বাতিল করা হয়েছে।", "en": "✅ Support mode cancelled.", "hi": "✅ सहायता मोड रद्द कर दिया गया।"},
 }
 
 
@@ -865,7 +882,8 @@ def main_menu_kb():
          InlineKeyboardButton("🏅 Achievements", callback_data="m_achievements")],
         [InlineKeyboardButton("🧠 Memory", callback_data="m_memory"),
          InlineKeyboardButton("🌍 Language", callback_data="m_lang")],
-        [InlineKeyboardButton("ℹ️ Help", callback_data="m_help")],
+        [InlineKeyboardButton("🆘 Support", callback_data="m_support"),
+         InlineKeyboardButton("ℹ️ Help", callback_data="m_help")],
     ])
 
 
@@ -1027,6 +1045,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.pop("roleplay", None)
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
+    context.user_data.pop("awaiting_support", None)
     if not await is_user_joined(context.bot, u.id):
         existing = await get_user(u.id)
         lang = (existing or {}).get("language") or "bn"
@@ -1071,6 +1090,7 @@ async def menu_command(update, context):
     context.user_data.pop("roleplay", None)
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
+    context.user_data.pop("awaiting_support", None)
     lang = await get_user_lang(update.effective_user.id)
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
@@ -1156,7 +1176,8 @@ async def help_command(update, context):
             "/mistakes - Mistakes\n/achievements - Badges\n"
             "/level - Set level\n/reminder - Reminder\n"
             "/language - Change language\n/reset - Clear chat\n\n"
-            "📸 Send photo, 🎤 voice, 👍👎 rate replies"
+            "📸 Send photo, 🎤 voice, 👍👎 rate replies\n"
+            "🆘 Need help? Use the Support button or contact @RohanVerse"
         )
     elif lang == "hi":
         text = (
@@ -1168,7 +1189,8 @@ async def help_command(update, context):
             "/coins - सिक्के\n/invite - आमंत्रण\n"
             "/mistakes - गलतियाँ\n/achievements - बैज\n"
             "/level - स्तर\n/reminder - रिमाइंडर\n"
-            "/language - भाषा\n/reset - चैट साफ़"
+            "/language - भाषा\n/reset - चैट साफ़\n"
+            "🆘 सहायता के लिए Support बटन दबाएं या @RohanVerse पर संपर्क करें"
         )
     else:
         text = (
@@ -1181,7 +1203,8 @@ async def help_command(update, context):
             "/mistakes - ভুল\n/achievements - ব্যাজ\n"
             "/level - লেভেল\n/reminder - রিমাইন্ডার\n"
             "/language - ভাষা\n/reset - চ্যাট ক্লিয়ার\n\n"
-            "📸 ছবি, 🎤 ভয়েস পাঠান, 👍👎 রেটিং দিন"
+            "📸 ছবি, 🎤 ভয়েস পাঠান, 👍👎 রেটিং দিন\n"
+            "🆘 যেকোনো সমস্যায় Support বাটনে ক্লিক করুন অথবা @RohanVerse তে মেসেজ দিন"
         )
     await update.message.reply_text(text)
 
@@ -1391,6 +1414,9 @@ async def reset_command(update, context):
     await clear_history(uid)
     context.user_data.pop("roleplay", None)
     context.user_data.pop("review_queue", None)
+    context.user_data.pop("awaiting_payment", None)
+    context.user_data.pop("payment_method", None)
+    context.user_data.pop("awaiting_support", None)
     await update.message.reply_text(t("reset_done", lang))
 
 
@@ -1509,6 +1535,26 @@ async def approve_command(update, context):
             await context.bot.send_message(target_uid, "🎉 আপনার পেমেন্ট ভেরিফাই হয়েছে! আপনি এখন Premium সদস্য।")
         except Exception:
             pass
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
+
+async def reply_command(update, context):
+    uid = update.effective_user.id
+    if uid not in ADMIN_IDS:
+        await update.message.reply_text("⛔ Admin only.")
+        return
+    if not context.args or len(context.args) < 2:
+        await update.message.reply_text("Usage: /reply <user_id> <your_message>")
+        return
+    try:
+        target_uid = int(context.args[0])
+        reply_text = " ".join(context.args[1:])
+        await context.bot.send_message(
+            target_uid,
+            f"📩 **অ্যাডমিনের উত্তর:**\n\n{reply_text}"
+        )
+        await update.message.reply_text(f"✅ Reply sent to {target_uid}")
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -1726,6 +1772,7 @@ async def cb_menu(update, context):
     context.user_data.pop("roleplay", None)
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
+    context.user_data.pop("awaiting_support", None)
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -1900,6 +1947,7 @@ async def cb_premium(update, context):
         return
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
+    context.user_data.pop("awaiting_support", None)
     await safe_edit(
         q,
         f"{t('premium_title', lang)}\n\n"
@@ -1944,7 +1992,7 @@ async def cb_buy_premium(update, context):
 
 
 # ==========================================================
-# MANUAL PAYMENT CALLBACKS (with Cancel & Copy button)
+# MANUAL PAYMENT CALLBACKS
 # ==========================================================
 async def cb_pay_bkash(update, context):
     q = update.callback_query
@@ -2057,6 +2105,35 @@ async def cb_cancel_payment(update, context):
     context.user_data.pop("payment_method", None)
     lang = await get_user_lang(q.from_user.id)
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
+
+
+# ==========================================================
+# SUPPORT CALLBACKS
+# ==========================================================
+async def cb_support(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
+    
+    context.user_data['awaiting_support'] = True
+    
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton(t("support_cancel", lang), callback_data="cancel_support")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
+    ])
+    await safe_edit(q, f"{t('support_title', lang)}\n\n{t('support_desc', lang)}", reply_markup=markup)
+
+
+async def cb_cancel_support(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    context.user_data.pop("awaiting_support", None)
+    await safe_edit(q, t("support_cancelled", lang), reply_markup=back_kb(lang))
 
 
 async def precheckout_cb(update, context):
@@ -2227,7 +2304,8 @@ async def cb_help(update, context):
                 "🔥 Daily, 📖 Word of Day, 📊 Progress, 🏆 Leaderboard\n"
                 "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
                 "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
-                "📸 Send photos, 🎤 voice, 👍👎 rate replies")
+                "📸 Send photos, 🎤 voice, 👍👎 rate replies\n"
+                "🆘 Need help? Use the Support button or contact @RohanVerse")
     elif lang == "hi":
         text = ("ℹ️ सहायता\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
@@ -2235,7 +2313,8 @@ async def cb_help(update, context):
                 "🔥 Daily, 📖 Word of Day, 📊 Progress, 🏆 Leaderboard\n"
                 "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
                 "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
-                "📸 फोटो, 🎤 वॉइस, 👍👎 रेटिंग")
+                "📸 फोटो, 🎤 वॉइस, 👍👎 रेटिंग\n"
+                "🆘 सहायता के लिए Support बटन दबाएं या @RohanVerse पर संपर्क करें")
     else:
         text = ("ℹ️ সাহায্য\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
@@ -2243,7 +2322,8 @@ async def cb_help(update, context):
                 "🔥 Daily, 📖 Word of Day, 📊 Progress, 🏆 Leaderboard\n"
                 "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
                 "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
-                "📸 ছবি, 🎤 ভয়েস, 👍👎 রেটিং")
+                "📸 ছবি, 🎤 ভয়েস, 👍👎 রেটিং\n"
+                "🆘 যেকোনো সমস্যায় Support বাটনে ক্লিক করুন অথবা @RohanVerse তে মেসেজ দিন")
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
@@ -2499,6 +2579,30 @@ async def handle_message(update, context):
     if not message.text:
         return
 
+    # ============ SUPPORT MESSAGE HANDLING ============
+    if context.user_data.get('awaiting_support') and message.text and not message.text.startswith("/"):
+        for admin_id in ADMIN_IDS:
+            try:
+                await context.bot.forward_message(
+                    chat_id=admin_id,
+                    from_chat_id=message.chat_id,
+                    message_id=message.message_id
+                )
+                await context.bot.send_message(
+                    admin_id,
+                    f"📩 সাপোর্ট মেসেজ!\n\n"
+                    f"👤 ইউজারের নাম: {message.from_user.full_name}\n"
+                    f"🆔 ইউজার আইডি: `{uid}`\n\n"
+                    f"ইউজারকে উত্তর দিতে চাইলে এই কমান্ড দিন:\n"
+                    f"`/reply {uid} আপনার_উত্তর`"
+                )
+            except Exception as e:
+                logger.error(f"Support forward fail for admin {admin_id}: {e}")
+        
+        await message.reply_text(t("support_sent", lang))
+        context.user_data.pop('awaiting_support', None)
+        return
+
     # If user is in payment mode and sends text (TrxID), forward to admin too
     if context.user_data.get('awaiting_payment') and message.text and not message.text.startswith("/"):
         method = context.user_data.get('payment_method', 'Unknown')
@@ -2674,6 +2778,7 @@ def run_bot():
             ("language", language_command), ("reset", reset_command),
             ("adminstats", adminstats_command), ("feedback", feedback_command),
             ("broadcast", broadcast_command), ("approve", approve_command),
+            ("reply", reply_command),
             ("practice", practice_command),
             ("endroleplay", end_roleplay_command),
             ("review", review_command),
@@ -2713,11 +2818,15 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_pay_bsc20, pattern="^pay_bsc20$"))
         application.add_handler(CallbackQueryHandler(cb_cancel_payment, pattern="^cancel_payment$"))
         
-        # New Copy Handlers
+        # Copy Handlers
         application.add_handler(CallbackQueryHandler(cb_copy_bkash, pattern="^copy_bkash$"))
         application.add_handler(CallbackQueryHandler(cb_copy_rocket, pattern="^copy_rocket$"))
         application.add_handler(CallbackQueryHandler(cb_copy_trc20, pattern="^copy_trc20$"))
         application.add_handler(CallbackQueryHandler(cb_copy_bsc20, pattern="^copy_bsc20$"))
+        
+        # Support Handlers
+        application.add_handler(CallbackQueryHandler(cb_support, pattern="^m_support$"))
+        application.add_handler(CallbackQueryHandler(cb_cancel_support, pattern="^cancel_support$"))
         
         application.add_handler(CallbackQueryHandler(cb_reminder_set, pattern="^rem_"))
         application.add_handler(CallbackQueryHandler(cb_set_level, pattern="^setlvl_"))
