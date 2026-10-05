@@ -198,7 +198,7 @@ T = {
     "language_set": {"bn": "✅ ভাষা সেট হয়েছে: বাংলা", "en": "✅ Language set: English", "hi": "✅ भाषा सेट: हिन्दी"},
     "choose_lang": {
         "bn": "🌍 ভাষা নির্বাচন করুন:\n\nChoose your language:\n\nअपनी भाषा चुनें:",
-        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा চুনें:",
+        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषা চুনें:",
         "hi": "🌍 अपनी भाषा चुनें:\n\nChoose your language:\n\nআপনার ভাষা নির্বাচন করুন:",
     },
     "reset_done": {"bn": "🔄 চ্যাট ক্লিয়ার হয়েছে। /start দিন।", "en": "🔄 Chat cleared. Send /start.", "hi": "🔄 चैट साफ। /start भेजें।"},
@@ -367,6 +367,7 @@ RULES:
 8. Keep responses under 3500 characters.
 9. Match the user's level (beginner/intermediate/advanced).
 10. Focus on what the user asks NOW.
+11. AFTER your main response, ALWAYS add 2 or 3 short follow-up questions the user might want to ask next, formatted EXACTLY like this: [SUGGESTIONS] Question 1 | Question 2 | Question 3
 
 VOCABULARY FORMAT:
 🔷 word - /pronunciation/ - Part of Speech
@@ -419,11 +420,21 @@ def ask_groq(user_text, history=None, user=None, custom_system=None):
             temperature=0.4,
             max_tokens=1200,
         )
-        text = response.choices[0].message.content.strip()
-        return text if text else None
+        raw_text = response.choices[0].message.content.strip()
+        if not raw_text:
+            return "", []
+        
+        suggestions = []
+        if "[SUGGESTIONS]" in raw_text:
+            parts = raw_text.split("[SUGGESTIONS]")
+            answer = parts[0].strip()
+            sug_raw = parts[1].strip()
+            suggestions = [s.strip() for s in sug_raw.split("|") if s.strip()]
+            return answer, suggestions
+        return raw_text, []
     except Exception as e:
         logger.error(f"Groq error: {e}")
-        return None
+        return None, []
 
 
 async def text_to_voice(text, output_path):
@@ -917,29 +928,48 @@ def practice_menu_kb(lang="bn"):
     return InlineKeyboardMarkup(rows)
 
 
+def merge_keyboards(kb1, kb2):
+    if not kb1: return kb2
+    if not kb2: return kb1
+    return InlineKeyboardMarkup(kb1.inline_keyboard + kb2.inline_keyboard)
+
+
+def suggestions_kb(suggestions, context):
+    if not suggestions:
+        return None
+    context.user_data['cached_suggestions'] = suggestions
+    rows = []
+    for i, s in enumerate(suggestions[:3]): # Max 3 suggestions
+        display_text = s if len(s) < 35 else s[:32] + "..."
+        rows.append([InlineKeyboardButton(f"👉 {display_text}", callback_data=f"sg_{i}")])
+    return InlineKeyboardMarkup(rows)
+
+
 # ==========================================================
 # SAFE EDIT / REPLY
 # ==========================================================
-async def safe_reply(message, text):
+async def safe_reply(message, text, reply_markup=None):
     if not text:
         text = "⚠️"
     if len(text) > 4000:
         text = text[:4000]
     try:
-        await message.reply_text(text)
+        await message.reply_text(text, reply_markup=reply_markup)
         return True
     except Exception as e:
         logger.error(f"reply fail: {e}")
         return False
 
 
-async def safe_reply_feedback(message, text, msg_id):
+async def safe_reply_feedback(message, text, msg_id, extra_kb=None):
     if not text:
         text = "⚠️"
     if len(text) > 4000:
         text = text[:4000]
     try:
-        await message.reply_text(text, reply_markup=feedback_kb(msg_id))
+        fb_markup = feedback_kb(msg_id)
+        final_markup = merge_keyboards(extra_kb, fb_markup) if extra_kb else fb_markup
+        await message.reply_text(text, reply_markup=final_markup)
         return True
     except Exception:
         return await safe_reply(message, text)
@@ -1248,7 +1278,7 @@ async def daily_command(update, context):
     await add_coins(uid, bonus)
     user = await get_user(uid)
     await update.message.chat.send_action("typing")
-    answer = await asyncio.to_thread(
+    answer, suggestions = await asyncio.to_thread(
         ask_groq,
         "Give today's short English lesson: 1 new word (with meaning + pronunciation + example), "
         "1 grammar tip with 2 examples, 1 practice question. Plain text.",
@@ -1256,10 +1286,12 @@ async def daily_command(update, context):
     )
     if not answer:
         answer = "📚 Word: Persistent - Meaning: continuing firmly\nExample: Be persistent."
+    kb = suggestions_kb(suggestions, context)
     await safe_reply(
         update.message,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
-        f"{t('bonus_coins', lang)}: +{bonus}\n\n{answer}"
+        f"{t('bonus_coins', lang)}: +{bonus}\n\n{answer}",
+        reply_markup=kb
     )
 
 
@@ -1562,11 +1594,16 @@ async def reply_command(update, context):
 # ==========================================================
 # STUDENT PROMPTS
 # ==========================================================
+TENSES_LIST = [
+    "Simple Present", "Present Continuous", "Present Perfect", "Present Perfect Continuous",
+    "Simple Past", "Past Continuous", "Past Perfect", "Past Perfect Continuous",
+    "Simple Future", "Future Continuous", "Future Perfect", "Future Perfect Continuous"
+]
+
 STUDENT_PROMPTS = {
     "student_learn": "Start a short English lesson. Choose one useful topic. Explain simply, give 2 examples, then ONE practice question. Plain text.",
     "student_vocab": "Teach ONE English word: meaning, pronunciation, part of speech, example. Then ONE practice question. Plain text.",
     "student_grammar": "Teach ONE English grammar point: rule, explanation, 2 examples, common mistake, 1 practice question. Plain text.",
-    "student_tenses": "Teach ONE English tense: usage, structure, 2 examples, common mistake, 1 practice question. Plain text.",
     "student_writing": "Give ONE short English writing task. Wait for the student's answer. Plain text.",
 }
 
@@ -1640,6 +1677,44 @@ async def cb_feedback(update, context):
     await q.message.reply_text(f"{emoji} {t('feedback_thanks', lang)}")
 
 
+async def cb_suggestion_click(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    idx = int(q.data.split("_")[1])
+    suggestions = context.user_data.get('cached_suggestions', [])
+    if idx >= len(suggestions):
+        await q.message.reply_text("⚠️ এক্সপায়ার হয়ে গেছে। আবার চেষ্টা করুন।")
+        return
+    user_text = suggestions[idx]
+    
+    # Remove old keyboard
+    try:
+        await q.edit_message_reply_markup(reply_markup=None)
+    except Exception:
+        pass
+        
+    lang = await get_user_lang(uid)
+    user = await get_user(uid)
+    
+    try:
+        await q.message.chat.send_action("typing")
+    except Exception:
+        pass
+
+    history = await get_history(uid)
+    answer, suggestions = await asyncio.to_thread(ask_groq, user_text, history, user)
+    
+    if not answer:
+        answer = t("ai_error", lang)
+
+    await save_history(uid, "user", user_text)
+    await save_history(uid, "assistant", answer)
+    
+    kb = suggestions_kb(suggestions, context)
+    await safe_reply_feedback(q.message, answer, q.message.message_id, kb)
+
+
 async def cb_set_language(update, context):
     q = update.callback_query
     await q.answer()
@@ -1687,6 +1762,9 @@ async def student_menu_callback(update, context):
         question = random.choice(avail)
         context.user_data["last_speaking_question"] = question
         prompt = f"Start English speaking practice. Ask this exact question:\n\n{question}\n\nWait for the answer. Plain text."
+    elif data == "student_tenses":
+        tense = random.choice(TENSES_LIST)
+        prompt = f"Teach ONE English tense: {tense}. Explain usage, structure, 2 examples, common mistake, 1 practice question. Plain text."
     else:
         prompt = STUDENT_PROMPTS.get(data)
     if not prompt:
@@ -1697,7 +1775,7 @@ async def student_menu_callback(update, context):
         await q.edit_message_text(t("loading", lang))
     except Exception:
         pass
-    answer = await asyncio.to_thread(ask_groq, prompt, None, user)
+    answer, suggestions = await asyncio.to_thread(ask_groq, prompt, None, user)
     if not answer:
         answer = t("ai_error", lang)
     if data == "student_vocab":
@@ -1712,7 +1790,8 @@ async def student_menu_callback(update, context):
                 )
             except Exception:
                 pass
-    await safe_edit(q, answer, reply_markup=back_kb(lang))
+    kb = suggestions_kb(suggestions, context)
+    await safe_edit(q, answer, reply_markup=merge_keyboards(kb, back_kb(lang)))
 
 
 async def cb_practice_menu(update, context):
@@ -1822,18 +1901,19 @@ async def cb_daily(update, context):
     await add_coins(uid, bonus)
     user = await get_user(uid)
     await q.edit_message_text(t("loading", lang))
-    answer = await asyncio.to_thread(
+    answer, suggestions = await asyncio.to_thread(
         ask_groq,
         "Give today's short English lesson: 1 new word + meaning + example, 1 grammar tip, 1 practice question. Plain text.",
         None, user
     )
     if not answer:
         answer = "📚 Word: Diligent - hardworking\nExample: She is a diligent student."
+    kb = suggestions_kb(suggestions, context)
     await safe_edit(
         q,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
         f"{t('bonus_coins', lang)}: +{bonus}\n\n{answer}",
-        reply_markup=back_kb(lang),
+        reply_markup=merge_keyboards(kb, back_kb(lang)),
     )
 
 
@@ -1846,14 +1926,15 @@ async def cb_word_of_day(update, context):
         return
     user = await get_user(uid)
     await q.edit_message_text(t("loading", lang))
-    answer = await asyncio.to_thread(
+    answer, suggestions = await asyncio.to_thread(
         ask_groq,
         "Give ONE advanced English word of the day. Include: word, meaning, pronunciation, part of speech, 2 examples, 2 synonyms. Plain text.",
         None, user
     )
     if not answer:
         answer = "🔤 Word: Resilient\n📖 Meaning: able to recover quickly\n🔊 /riˈziliənt/"
-    await safe_edit(q, f"{t('word_title', lang)}\n\n{answer}", reply_markup=back_kb(lang))
+    kb = suggestions_kb(suggestions, context)
+    await safe_edit(q, f"{t('word_title', lang)}\n\n{answer}", reply_markup=merge_keyboards(kb, back_kb(lang)))
 
 
 async def cb_quiz(update, context):
@@ -1871,21 +1952,19 @@ async def cb_quiz(update, context):
     quizzes = (user.get("quizzes_taken") or 0) + 1 if user else 1
     await update_user(uid, quizzes_taken=quizzes)
     await q.edit_message_text(t("loading", lang))
-    answer = await asyncio.to_thread(
+    answer, suggestions = await asyncio.to_thread(
         ask_groq,
         "Create ONE English multiple-choice quiz with 4 options. Format:\nQuestion: ...\nA) ...\nB) ...\nC) ...\nD) ...\nAnswer: X) ...\nPlain text.",
         None, user
     )
     if not answer:
         answer = "Question: Past tense of 'go'?\nA) goed\nB) went\nC) gone\nD) going\nAnswer: B) went"
-    await safe_edit(
-        q,
-        f"{t('quiz_title', lang)}\n\n{answer}",
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton(t("quiz_more", lang), callback_data="m_quiz")],
-            [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")],
-        ]),
-    )
+    kb = suggestions_kb(suggestions, context)
+    base_markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton(t("quiz_more", lang), callback_data="m_quiz")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")],
+    ])
+    await safe_edit(q, f"{t('quiz_title', lang)}\n\n{answer}", reply_markup=merge_keyboards(kb, base_markup))
 
 
 async def cb_review(update, context):
@@ -2372,7 +2451,7 @@ async def handle_message(update, context):
             await message.chat.send_action("typing")
         except Exception:
             pass
-        answer = await asyncio.to_thread(
+        answer, _ = await asyncio.to_thread(
             ask_groq, user_text, rp["history"], user, rp["system"]
         )
         if not answer:
@@ -2466,7 +2545,7 @@ async def handle_message(update, context):
                 return
             await msg.edit_text(t("voice_heard", lang, text=text) + "\n\n⏳")
             history = await get_history(uid)
-            answer = await asyncio.to_thread(ask_groq, text, history, user)
+            answer, suggestions = await asyncio.to_thread(ask_groq, text, history, user)
             if not answer:
                 answer = t("ai_error", lang)
             await save_history(uid, "user", text)
@@ -2474,7 +2553,10 @@ async def handle_message(update, context):
             await update_user(uid,
                               last_active=datetime.now(),
                               voices_sent=(user.get("voices_sent") or 0) + 1)
-            await safe_reply_feedback(message, answer, message.message_id)
+            
+            kb = suggestions_kb(suggestions, context)
+            await safe_reply_feedback(message, answer, message.message_id, kb)
+            
             corr = extract_correction(answer)
             if corr:
                 await save_review(uid, corr[0], corr[1])
@@ -2660,12 +2742,14 @@ async def handle_message(update, context):
     except Exception:
         pass
 
-    answer = await asyncio.to_thread(ask_groq, user_text, history, user)
+    answer, suggestions = await asyncio.to_thread(ask_groq, user_text, history, user)
     if not answer:
         answer = t("ai_error", lang)
 
     await save_history(uid, "assistant", answer)
-    await safe_reply_feedback(message, answer, message.message_id)
+    
+    kb = suggestions_kb(suggestions, context)
+    await safe_reply_feedback(message, answer, message.message_id, kb)
 
     corr = extract_correction(answer)
     if corr:
@@ -2788,6 +2872,7 @@ def run_bot():
 
         application.add_handler(CallbackQueryHandler(cb_forcesub_check, pattern="^forcesub_check$"))
         application.add_handler(CallbackQueryHandler(cb_feedback, pattern="^fb_"))
+        application.add_handler(CallbackQueryHandler(cb_suggestion_click, pattern="^sg_"))
         application.add_handler(CallbackQueryHandler(cb_set_language, pattern="^setlang_"))
         application.add_handler(CallbackQueryHandler(cb_lang_menu, pattern="^m_lang$"))
         application.add_handler(CallbackQueryHandler(student_menu_callback, pattern="^student_"))
