@@ -59,13 +59,13 @@ logger = logging.getLogger(__name__)
 REFERRAL_REWARD = 10
 DAILY_BONUS = 5
 STREAK_BONUS = 2
-PREMIUM_STARS = 100  # আপডেট করা হয়েছে
+PREMIUM_STARS = 100
 PREMIUM_DAYS = 30
 FREE_IMG_PER_DAY = 5
 FREE_VOICE_PER_DAY = 10
 MAX_REVIEW_PER_DAY = 5
 
-# নতুন পেমেন্ট কনফিগারেশন
+# Payment configuration
 PREMIUM_PRICE_BDT = 200
 USDT_AMOUNT = 2
 BKASH_NUMBER = "01608364088"
@@ -96,11 +96,7 @@ ROLEPLAY_SCENARIOS = {
     "restaurant": {
         "emoji": "🍽️",
         "title": {"bn": "রেস্টুরেন্ট", "en": "Restaurant", "hi": "रेस्टोरेंट"},
-        "desc": {
-            "bn": "খাবার অর্ডার করা শিখুন",
-            "en": "Learn to order food",
-            "hi": "खाना ऑर्डर करना सीखें",
-        },
+        "desc": {"bn": "খাবার অর্ডার করা শিখুন", "en": "Learn to order food", "hi": "खाना ऑर्डर करना सीखें"},
         "system": (
             "You are a friendly waiter at a restaurant. The user is a customer. "
             "Start by greeting them and offering the menu. Stay in character at all times. "
@@ -113,11 +109,7 @@ ROLEPLAY_SCENARIOS = {
     "airport": {
         "emoji": "✈️",
         "title": {"bn": "এয়ারপোর্ট", "en": "Airport Check-in", "hi": "एयरपोर्ट"},
-        "desc": {
-            "bn": "চেক-ইন শেখা",
-            "en": "Learn check-in English",
-            "hi": "चेक-इन सीखें",
-        },
+        "desc": {"bn": "চেক-ইন শেখা", "en": "Learn check-in English", "hi": "चेक-इन सीखें"},
         "system": (
             "You are an airport check-in agent. The user is a passenger. "
             "Ask for passport, ticket, luggage details one by one. Stay in character. "
@@ -129,11 +121,7 @@ ROLEPLAY_SCENARIOS = {
     "interview": {
         "emoji": "💼",
         "title": {"bn": "চাকরির ইন্টারভিউ", "en": "Job Interview", "hi": "जॉब इंटरव्यू"},
-        "desc": {
-            "bn": "ইন্টারভিউ প্র্যাকটিস",
-            "en": "Practice job interviews",
-            "hi": "इंटरव्यू अभ्यास",
-        },
+        "desc": {"bn": "ইন্টারভিউ প্র্যাকটিস", "en": "Practice job interviews", "hi": "इंटरव्यू अभ्यास"},
         "system": (
             "You are a hiring manager conducting a job interview. The user is a candidate. "
             "Ask one interview question at a time. Give 1-line feedback after each answer. "
@@ -145,11 +133,7 @@ ROLEPLAY_SCENARIOS = {
     "shopping": {
         "emoji": "🛒",
         "title": {"bn": "শপিং", "en": "Shopping", "hi": "शॉपिंग"},
-        "desc": {
-            "bn": "দোকানে কেনাকাটা",
-            "en": "Shopping at a store",
-            "hi": "दुकान में खरीदारी",
-        },
+        "desc": {"bn": "দোকানে কেনাকাটা", "en": "Shopping at a store", "hi": "दुकान में खरीदारी"},
         "system": (
             "You are a friendly shop assistant. The user is a customer. "
             "Help them find items, discuss prices, sizes. Stay in character. "
@@ -161,11 +145,7 @@ ROLEPLAY_SCENARIOS = {
     "doctor": {
         "emoji": "🏥",
         "title": {"bn": "ডাক্তার", "en": "Doctor Visit", "hi": "डॉक्टर"},
-        "desc": {
-            "bn": "ডাক্তারের সাথে কথা",
-            "en": "Talk to a doctor",
-            "hi": "डॉक्टर से बात",
-        },
+        "desc": {"bn": "ডাক্তারের সাথে কথা", "en": "Talk to a doctor", "hi": "डॉक्टर से बात"},
         "system": (
             "You are a friendly doctor. The user is a patient describing symptoms. "
             "Ask about their health, symptoms, duration. Stay in character. "
@@ -177,11 +157,7 @@ ROLEPLAY_SCENARIOS = {
     "hotel": {
         "emoji": "🏨",
         "title": {"bn": "হোটেল", "en": "Hotel Check-in", "hi": "होटल"},
-        "desc": {
-            "bn": "হোটেলে চেক-ইন",
-            "en": "Hotel check-in",
-            "hi": "होटल चेक-इन",
-        },
+        "desc": {"bn": "হোটেলে চেক-ইন", "en": "Hotel check-in", "hi": "होटल चेक-ইन"},
         "system": (
             "You are a hotel receptionist. The user is a guest checking in. "
             "Ask for reservation, ID, room preference. Stay in character. "
@@ -218,24 +194,14 @@ T = {
     "premium_status": {"bn": "💎 Premium", "en": "💎 Premium", "hi": "💎 Premium"},
     "active": {"bn": "✅ সক্রিয়", "en": "✅ Active", "hi": "✅ सक्रिय"},
     "inactive": {"bn": "❌ নিষ্ক্রিয়", "en": "❌ Inactive", "hi": "❌ निष्क्रिय"},
-    "language_set": {
-        "bn": "✅ ভাষা সেট হয়েছে: বাংলা",
-        "en": "✅ Language set: English",
-        "hi": "✅ भाषा सेट: हिन्दी",
-    },
+    "language_set": {"bn": "✅ ভাষা সেট হয়েছে: বাংলা", "en": "✅ Language set: English", "hi": "✅ भाषा सेट: हिन्दी"},
     "choose_lang": {
         "bn": "🌍 ভাষা নির্বাচন করুন:\n\nChoose your language:\n\nअपनी भाषा चुनें:",
-        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा চुनें:",
+        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा चुनें:",
         "hi": "🌍 अपनी भाषा चुनें:\n\nChoose your language:\n\nআপনার ভাষা নির্বাচন করুন:",
     },
-    "reset_done": {
-        "bn": "🔄 চ্যাট ক্লিয়ার হয়েছে। /start দিন।",
-        "en": "🔄 Chat cleared. Send /start.",
-        "hi": "🔄 चैट साफ। /start भेजें।",
-    },
-    "start_first": {
-        "bn": "❌ আগে /start দিন।", "en": "❌ Please /start first.", "hi": "❌ पहले /start करें।",
-    },
+    "reset_done": {"bn": "🔄 চ্যাট ক্লিয়ার হয়েছে। /start দিন।", "en": "🔄 Chat cleared. Send /start.", "hi": "🔄 चैट साफ। /start भेजें।"},
+    "start_first": {"bn": "❌ আগে /start দিন।", "en": "❌ Please /start first.", "hi": "❌ पहले /start करें।"},
     "daily_title": {"bn": "🔥 Daily Lesson", "en": "🔥 Daily Lesson", "hi": "🔥 Daily Lesson"},
     "bonus_coins": {"bn": "🎁 বোনাস", "en": "🎁 Bonus", "hi": "🎁 बोनस"},
     "days": {"bn": "দিন", "en": "days", "hi": "दिन"},
@@ -373,7 +339,6 @@ SENTENCE CORRECTION FORMAT (when user's sentence has errors):
 
 
 def build_user_context(user, include_name=True):
-    """Build a short context line about the user for the AI."""
     if not user:
         return ""
     parts = []
@@ -388,6 +353,7 @@ def build_user_context(user, include_name=True):
     if not parts:
         return ""
     return "\nUSER CONTEXT: " + " | ".join(parts) + "\nUse this info naturally if relevant."
+
 
 def ask_groq(user_text, history=None, user=None, custom_system=None):
     try:
@@ -412,7 +378,6 @@ def ask_groq(user_text, history=None, user=None, custom_system=None):
 
 
 async def text_to_voice(text, output_path):
-    """Convert text to speech using edge_tts."""
     try:
         import edge_tts
         communicate = edge_tts.Communicate(text, TTS_VOICE)
@@ -424,7 +389,6 @@ async def text_to_voice(text, output_path):
 
 
 def extract_correction(answer):
-    """Extract ❌ Wrong / ✅ Correct from AI response."""
     try:
         if "❌ Wrong:" in answer and "✅ Correct:" in answer:
             wrong = answer.split("❌ Wrong:")[1].split("✅")[0].strip().split("\n")[0].strip()
@@ -495,7 +459,6 @@ _mem_review = []
 
 async def init_db():
     global db_pool
-
     logger.info("========== DB INIT START ==========")
     logger.info(f"DATABASE_URL present? {bool(DATABASE_URL)}")
     logger.info(f"HAS_ASYNCPG? {HAS_ASYNCPG}")
@@ -610,14 +573,13 @@ async def init_db():
 
 
 async def keep_alive_db():
-    """Run a dummy query every 3 minutes to keep Neon DB awake."""
     while True:
         try:
             if db_pool:
                 async with db_pool.acquire() as conn:
                     await conn.execute("SELECT 1")
                 logger.info("DB Keep-Alive: Success")
-            await asyncio.sleep(180)  # 3 minutes
+            await asyncio.sleep(180)
         except Exception as e:
             logger.error(f"DB Keep-Alive error: {e}")
             await asyncio.sleep(60)
@@ -743,7 +705,6 @@ async def get_user_lang(uid):
 
 
 async def save_review(uid, wrong, correct):
-    """Save a mistake for spaced repetition. Next review in 1 day."""
     next_review = datetime.now() + timedelta(days=1)
     if db_pool is None:
         _mem_review.append({
@@ -1031,15 +992,12 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     u = update.effective_user
     if not u or u.is_bot:
         return
-
     context.user_data.pop("roleplay", None)
-
     if not await is_user_joined(context.bot, u.id):
         existing = await get_user(u.id)
         lang = (existing or {}).get("language") or "bn"
         await send_force_sub_message(update.message, lang)
         return
-
     existing = await get_user(u.id)
     if not existing:
         await create_user(u.id, u.full_name or "Student")
@@ -1051,7 +1009,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception:
                 pass
         return
-
     args = context.args or []
     if args and args[0].startswith("ref_"):
         try:
@@ -1068,7 +1025,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     pass
         except Exception:
             pass
-
     lang = existing.get("language") or "bn"
     await safe_reply(update.message, t("welcome", lang, name=u.first_name or "Student"))
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
@@ -1500,6 +1456,27 @@ async def broadcast_command(update, context):
     await update.message.reply_text(f"✅ Sent: {sent} | ❌ Failed: {failed}")
 
 
+async def approve_command(update, context):
+    uid = update.effective_user.id
+    if uid not in ADMIN_IDS:
+        await update.message.reply_text("⛔ Admin only.")
+        return
+    if not context.args:
+        await update.message.reply_text("Usage: /approve <user_id>")
+        return
+    try:
+        target_uid = int(context.args[0])
+        until = datetime.now() + timedelta(days=PREMIUM_DAYS)
+        await update_user(target_uid, is_premium=True, premium_until=until)
+        await update.message.reply_text(f"✅ User {target_uid} has been granted Premium!")
+        try:
+            await context.bot.send_message(target_uid, "🎉 আপনার পেমেন্ট ভেরিফাই হয়েছে! আপনি এখন Premium সদস্য।")
+        except Exception:
+            pass
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
+
 # ==========================================================
 # STUDENT PROMPTS
 # ==========================================================
@@ -1551,9 +1528,7 @@ async def cb_forcesub_check(update, context):
         await create_user(uid, q.from_user.full_name or "Student")
         await q.message.reply_text(t("choose_lang", "bn"), reply_markup=lang_kb())
     else:
-        await q.message.reply_text(
-            t("welcome", lang, name=q.from_user.first_name or "Student")
-        )
+        await q.message.reply_text(t("welcome", lang, name=q.from_user.first_name or "Student"))
         await q.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -1565,7 +1540,6 @@ async def cb_feedback(update, context):
     rating = parts[1]
     msg_id = parts[2] if len(parts) > 2 else "0"
     uid = q.from_user.id
-
     if db_pool:
         try:
             async with db_pool.acquire() as conn:
@@ -1575,7 +1549,6 @@ async def cb_feedback(update, context):
                 )
         except Exception as e:
             logger.error(f"Feedback save: {e}")
-
     try:
         await q.edit_message_reply_markup(reply_markup=None)
     except Exception:
@@ -1592,7 +1565,6 @@ async def cb_set_language(update, context):
     uid = q.from_user.id
     await create_user(uid, q.from_user.full_name or "Student")
     await update_user(uid, language=lang)
-
     ref_id = context.user_data.pop("pending_ref", None)
     if ref_id and ref_id != uid:
         user = await get_user(uid)
@@ -1606,7 +1578,6 @@ async def cb_set_language(update, context):
                 )
             except Exception:
                 pass
-
     await safe_edit(q, t("language_set", lang))
     try:
         await q.message.reply_text(t("welcome", lang, name=q.from_user.first_name or "Student"))
@@ -1620,16 +1591,13 @@ async def student_menu_callback(update, context):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
-
     if not await is_user_joined(context.bot, uid):
         await q.edit_message_text(
             f"{t('force_sub_title', lang)}\n\n{t('force_sub_desc', lang)}",
             reply_markup=force_sub_kb(lang),
         )
         return
-
     await update_user(uid, last_active=datetime.now())
-
     data = q.data
     if data == "student_speaking":
         last_q = context.user_data.get("last_speaking_question")
@@ -1639,22 +1607,17 @@ async def student_menu_callback(update, context):
         prompt = f"Start English speaking practice. Ask this exact question:\n\n{question}\n\nWait for the answer. Plain text."
     else:
         prompt = STUDENT_PROMPTS.get(data)
-
     if not prompt:
         await q.answer("Unknown option", show_alert=False)
         return
-
     user = await get_user(uid)
-
     try:
         await q.edit_message_text(t("loading", lang))
     except Exception:
         pass
-
     answer = await asyncio.to_thread(ask_groq, prompt, None, user)
     if not answer:
         answer = t("ai_error", lang)
-
     if data == "student_vocab":
         words = (user.get("words_learned") or 0) + 1 if user else 1
         await update_user(uid, words_learned=words)
@@ -1667,7 +1630,6 @@ async def student_menu_callback(update, context):
                 )
             except Exception:
                 pass
-
     await safe_edit(q, answer, reply_markup=back_kb(lang))
 
 
@@ -1691,26 +1653,21 @@ async def cb_rp_start(update, context):
     lang = await get_user_lang(uid)
     if not await is_user_joined(context.bot, uid):
         return
-
     key = q.data.replace("rp_", "")
     scenario = ROLEPLAY_SCENARIOS.get(key)
     if not scenario:
         await q.answer("Unknown scenario", show_alert=True)
         return
-
     context.user_data["roleplay"] = {
         "key": key,
         "system": scenario["system"],
         "history": [],
     }
-
     title = scenario["title"].get(lang) or scenario["title"].get("en")
     starter = scenario["starter"]
-
     user = await get_user(uid)
     count = (user.get("roleplay_count") or 0) + 1 if user else 1
     await update_user(uid, roleplay_count=count)
-
     await safe_edit(
         q,
         f"{t('rp_started', lang, title=title)}\n\n"
@@ -1947,11 +1904,13 @@ async def cb_buy_premium(update, context):
 
 
 # ==========================================================
-# MANUAL PAYMENT CALLBACKS
+# MANUAL PAYMENT CALLBACKS (with awaiting_payment flag)
 # ==========================================================
 async def cb_pay_bkash(update, context):
     q = update.callback_query
     await q.answer()
+    context.user_data['awaiting_payment'] = True
+    context.user_data['payment_method'] = 'bKash'
     text = (
         "💳 **bKash Payment**\n\n"
         f"১. আপনার bKash এপ থেকে **Send Money** করুন।\n"
@@ -1962,9 +1921,12 @@ async def cb_pay_bkash(update, context):
     )
     await safe_edit(q, text, reply_markup=back_kb("bn"))
 
+
 async def cb_pay_rocket(update, context):
     q = update.callback_query
     await q.answer()
+    context.user_data['awaiting_payment'] = True
+    context.user_data['payment_method'] = 'Rocket'
     text = (
         "💳 **Rocket Payment**\n\n"
         f"১. আপনার Rocket এপ থেকে **Send Money** করুন।\n"
@@ -1975,21 +1937,27 @@ async def cb_pay_rocket(update, context):
     )
     await safe_edit(q, text, reply_markup=back_kb("bn"))
 
+
 async def cb_pay_trc20(update, context):
     q = update.callback_query
     await q.answer()
+    context.user_data['awaiting_payment'] = True
+    context.user_data['payment_method'] = 'USDT (TRC20)'
     text = (
         "🪙 **Crypto Payment (USDT TRC20)**\n\n"
-        f"১. আপনার ওয়ালেট থেকে **{USDT_AMOUNT} USDT (TRC20)** পাঠান।\n"
+        f"১. আপনার ওয়ালেট থেকে **{USDT_AMOUNT} USDT (TRC20)** পাঠান।\n"
         f"২. TRC20 অ্যাড্রেস: `{TRC20_ADDRESS}`\n"
         "৩. টাকা পাঠানোর পর **Transaction Hash (TxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
         "✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
     )
     await safe_edit(q, text, reply_markup=back_kb("bn"))
 
+
 async def cb_pay_bsc20(update, context):
     q = update.callback_query
     await q.answer()
+    context.user_data['awaiting_payment'] = True
+    context.user_data['payment_method'] = 'USDT (BSC20)'
     text = (
         "🪙 **Crypto Payment (USDT BSC20/BEP20)**\n\n"
         f"১. আপনার ওয়ালেট থেকে **{USDT_AMOUNT} USDT (BSC20)** পাঠান।\n"
@@ -2016,30 +1984,6 @@ async def successful_payment_cb(update, context):
             t("new_achievement", lang) + "\n" +
             "\n".join(f"{ACHIEVEMENTS[k][0]} {ACHIEVEMENTS[k][1].get(lang, k)}" for k in new)
         )
-
-
-# ==========================================================
-# ADMIN APPROVE COMMAND
-# ==========================================================
-async def approve_command(update, context):
-    uid = update.effective_user.id
-    if uid not in ADMIN_IDS:
-        await update.message.reply_text("⛔ Admin only.")
-        return
-    if not context.args:
-        await update.message.reply_text("Usage: /approve <user_id>")
-        return
-    try:
-        target_uid = int(context.args[0])
-        until = datetime.now() + timedelta(days=PREMIUM_DAYS)
-        await update_user(target_uid, is_premium=True, premium_until=until)
-        await update.message.reply_text(f"✅ User {target_uid} has been granted Premium!")
-        try:
-            await context.bot.send_message(target_uid, "🎉 আপনার পেমেন্ট ভেরিফাই হয়েছে! আপনি এখন Premium সদস্য।")
-        except Exception:
-            pass
-    except Exception as e:
-        await update.message.reply_text(f"❌ Error: {e}")
 
 
 async def cb_leaderboard(update, context):
@@ -2264,14 +2208,10 @@ async def handle_message(update, context):
             answer = t("ai_error", lang)
         rp["history"].append({"role": "assistant", "content": answer})
         await save_history(uid, "assistant", answer)
-
-        # Extract correction if present
         corr = extract_correction(answer)
         if corr:
             await save_review(uid, corr[0], corr[1])
-
         await safe_reply_feedback(message, answer, message.message_id)
-
         if user.get("is_premium") and HAS_TTS and len(answer) < 400:
             try:
                 tts_path = f"/tmp/tts_{uid}.mp3"
@@ -2299,11 +2239,9 @@ async def handle_message(update, context):
         current = rq[idx]
         user_ans = message.text.strip().lower()
         correct = current["corrected_text"].lower()
-        # Simple check: user's answer must contain most keywords
         correct_words = set(w for w in correct.split() if len(w) > 3)
         user_words = set(w for w in user_ans.split() if len(w) > 3)
         match = len(correct_words & user_words) / max(len(correct_words), 1) if correct_words else 0
-
         if match >= 0.6:
             await message.reply_text(t("review_correct", lang))
             await add_coins(uid, 3)
@@ -2313,12 +2251,9 @@ async def handle_message(update, context):
             )
         if db_pool and "id" in current:
             await mark_reviewed(current["id"])
-        # Update review count
         rc = (user.get("review_count") or 0) + 1
         await update_user(uid, review_count=rc)
         await check_achievements(uid)
-
-        # Next review
         idx += 1
         context.user_data["review_index"] = idx
         if idx < len(rq):
@@ -2344,7 +2279,6 @@ async def handle_message(update, context):
                 await message.reply_text(t("voice_limit", lang, n=FREE_VOICE_PER_DAY))
                 return
             await update_user(uid, voice_count_today=count + 1)
-
         msg = await message.reply_text(t("processing_voice", lang))
         path = f"/tmp/voice_{uid}.ogg"
         try:
@@ -2370,11 +2304,9 @@ async def handle_message(update, context):
                               last_active=datetime.now(),
                               voices_sent=(user.get("voices_sent") or 0) + 1)
             await safe_reply_feedback(message, answer, message.message_id)
-
             corr = extract_correction(answer)
             if corr:
                 await save_review(uid, corr[0], corr[1])
-
             if user.get("is_premium") and HAS_TTS:
                 try:
                     tts_path = f"/tmp/tts_{uid}.mp3"
@@ -2388,7 +2320,6 @@ async def handle_message(update, context):
                             pass
                 except Exception as e:
                     logger.error(f"Voice reply: {e}")
-
             try:
                 await msg.delete()
             except Exception:
@@ -2401,6 +2332,37 @@ async def handle_message(update, context):
 
     # ================= PHOTO =================
     if message.photo:
+        # ============ PAYMENT PROOF HANDLING (NEW) ============
+        if context.user_data.get('awaiting_payment'):
+            method = context.user_data.get('payment_method', 'Unknown')
+            # Forward to all admins
+            for admin_id in ADMIN_IDS:
+                try:
+                    await context.bot.forward_message(
+                        chat_id=admin_id,
+                        from_chat_id=message.chat_id,
+                        message_id=message.message_id
+                    )
+                    await context.bot.send_message(
+                        admin_id,
+                        f"💰 {method} পেমেন্ট প্রুফ পাওয়া গেছে!\n\n"
+                        f"👤 ইউজারের নাম: {message.from_user.full_name}\n"
+                        f"🆔 ইউজার আইডি: `{uid}`\n\n"
+                        f"ভেরিফাই করে অ্যাপ্রুভ করতে এই কমান্ডটি কপি করুন:\n"
+                        f"`/approve {uid}`"
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to forward payment proof to admin {admin_id}: {e}")
+
+            await message.reply_text(
+                "✅ আপনার পেমেন্ট প্রুফ অ্যাডমিনের কাছে পাঠানো হয়েছে।\n"
+                "ভেরিফিকেশন শেষ হলে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেওয়া হবে।"
+            )
+            context.user_data.pop('awaiting_payment', None)
+            context.user_data.pop('payment_method', None)
+            return
+
+        # ============ NORMAL IMAGE ANALYSIS ============
         if not user.get("is_premium"):
             last_date = user.get("last_img_date")
             count = user.get("img_count_today") or 0
@@ -2445,6 +2407,33 @@ async def handle_message(update, context):
 
     # ================= TEXT =================
     if not message.text:
+        return
+
+    # If user is in payment mode and sends text (TrxID), forward to admin too
+    if context.user_data.get('awaiting_payment') and message.text and not message.text.startswith("/"):
+        method = context.user_data.get('payment_method', 'Unknown')
+        for admin_id in ADMIN_IDS:
+            try:
+                await context.bot.forward_message(
+                    chat_id=admin_id,
+                    from_chat_id=message.chat_id,
+                    message_id=message.message_id
+                )
+                await context.bot.send_message(
+                    admin_id,
+                    f"💰 {method} পেমেন্ট ইনফো (টেক্সট)!\n\n"
+                    f"👤 ইউজারের নাম: {message.from_user.full_name}\n"
+                    f"🆔 ইউজার আইডি: `{uid}`\n\n"
+                    f"অ্যাপ্রুভ করতে: `/approve {uid}`"
+                )
+            except Exception as e:
+                logger.error(f"Failed to forward text to admin: {e}")
+        await message.reply_text(
+            "✅ আপনার পেমেন্ট ইনফো অ্যাডমিনের কাছে পাঠানো হয়েছে।\n"
+            "ভেরিফিকেশন শেষ হলে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেওয়া হবে।"
+        )
+        context.user_data.pop('awaiting_payment', None)
+        context.user_data.pop('payment_method', None)
         return
 
     if chat.type == "private":
@@ -2517,7 +2506,6 @@ async def handle_message(update, context):
 # DAILY REVIEW JOB
 # ==========================================================
 async def daily_review_job(context: ContextTypes.DEFAULT_TYPE):
-    """Send due reviews to users once a day."""
     try:
         if db_pool is None:
             return
@@ -2651,7 +2639,7 @@ def run_bot():
         try:
             await application.initialize()
             await application.bot.delete_webhook(drop_pending_updates=True)
-            await asyncio.sleep(5)   # টেলিগ্রামের পুরনো কানেকশন মুছতে ৫ সেকেন্ড সময় দিন
+            await asyncio.sleep(5)
             await application.start()
             await application.updater.start_polling(drop_pending_updates=True)
             logger.info("Bot started.")
