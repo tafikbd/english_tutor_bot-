@@ -59,11 +59,19 @@ logger = logging.getLogger(__name__)
 REFERRAL_REWARD = 10
 DAILY_BONUS = 5
 STREAK_BONUS = 2
-PREMIUM_STARS = 50
+PREMIUM_STARS = 100  # আপডেট করা হয়েছে
 PREMIUM_DAYS = 30
 FREE_IMG_PER_DAY = 5
 FREE_VOICE_PER_DAY = 10
 MAX_REVIEW_PER_DAY = 5
+
+# নতুন পেমেন্ট কনফিগারেশন
+PREMIUM_PRICE_BDT = 200
+USDT_AMOUNT = 2
+BKASH_NUMBER = "01608364088"
+ROCKET_NUMBER = "01608364088"
+TRC20_ADDRESS = "TKeEd3wuTqHse2rdzAg3rqYeRfQD1NC7tq"
+BSC20_ADDRESS = "0xb83a03d9ded3ac7a4908aa87cfdfe1df9e05f719"
 
 ACHIEVEMENTS = {
     "first_chat": ("🥇", {"bn": "প্রথম চ্যাট", "en": "First Chat", "hi": "पहला चैट"}),
@@ -217,7 +225,7 @@ T = {
     },
     "choose_lang": {
         "bn": "🌍 ভাষা নির্বাচন করুন:\n\nChoose your language:\n\nअपनी भाषा चुनें:",
-        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा चुनें:",
+        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा চुनें:",
         "hi": "🌍 अपनी भाषा चुनें:\n\nChoose your language:\n\nআপনার ভাষা নির্বাচন করুন:",
     },
     "reset_done": {
@@ -1898,7 +1906,9 @@ async def cb_premium(update, context):
     await safe_edit(
         q,
         f"{t('premium_title', lang)}\n\n"
-        f"⭐ {PREMIUM_STARS} Telegram Stars → {PREMIUM_DAYS} {t('days', lang)}\n\n"
+        f"⭐ {PREMIUM_STARS} Telegram Stars → {PREMIUM_DAYS} {t('days', lang)}\n"
+        f"💳 bKash/Rocket: {PREMIUM_PRICE_BDT} BDT → {PREMIUM_DAYS} {t('days', lang)}\n"
+        f"🪙 Crypto: {USDT_AMOUNT} USDT → {PREMIUM_DAYS} {t('days', lang)}\n\n"
         f"🎁 Benefits:\n"
         f"• Unlimited AI\n"
         f"• 📸 Unlimited photos\n"
@@ -1908,6 +1918,10 @@ async def cb_premium(update, context):
         f"• Priority Response",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton(t("premium_buy", lang, n=PREMIUM_STARS), callback_data="buy_premium")],
+            [InlineKeyboardButton(f"💳 bKash ({PREMIUM_PRICE_BDT}৳)", callback_data="pay_bkash")],
+            [InlineKeyboardButton(f"💳 Rocket ({PREMIUM_PRICE_BDT}৳)", callback_data="pay_rocket")],
+            [InlineKeyboardButton("🪙 USDT (TRC20)", callback_data="pay_trc20")],
+            [InlineKeyboardButton("🪙 USDT (BSC20)", callback_data="pay_bsc20")],
             [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")],
         ]),
     )
@@ -1932,6 +1946,60 @@ async def cb_buy_premium(update, context):
         await q.answer("❌ Payment failed", show_alert=True)
 
 
+# ==========================================================
+# MANUAL PAYMENT CALLBACKS
+# ==========================================================
+async def cb_pay_bkash(update, context):
+    q = update.callback_query
+    await q.answer()
+    text = (
+        "💳 **bKash Payment**\n\n"
+        f"১. আপনার bKash এপ থেকে **Send Money** করুন।\n"
+        f"২. নাম্বার: `{BKASH_NUMBER}`\n"
+        f"৩. এমাউন্ট: `{PREMIUM_PRICE_BDT}` টাকা\n"
+        "৪. টাকা পাঠানোর পর **Transaction ID (TrxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
+        "✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
+    )
+    await safe_edit(q, text, reply_markup=back_kb("bn"))
+
+async def cb_pay_rocket(update, context):
+    q = update.callback_query
+    await q.answer()
+    text = (
+        "💳 **Rocket Payment**\n\n"
+        f"১. আপনার Rocket এপ থেকে **Send Money** করুন।\n"
+        f"২. নাম্বার: `{ROCKET_NUMBER}`\n"
+        f"৩. এমাউন্ট: `{PREMIUM_PRICE_BDT}` টাকা\n"
+        "৪. টাকা পাঠানোর পর **Transaction ID (TrxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
+        "✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
+    )
+    await safe_edit(q, text, reply_markup=back_kb("bn"))
+
+async def cb_pay_trc20(update, context):
+    q = update.callback_query
+    await q.answer()
+    text = (
+        "🪙 **Crypto Payment (USDT TRC20)**\n\n"
+        f"১. আপনার ওয়ালেট থেকে **{USDT_AMOUNT} USDT (TRC20)** পাঠান।\n"
+        f"২. TRC20 অ্যাড্রেস: `{TRC20_ADDRESS}`\n"
+        "৩. টাকা পাঠানোর পর **Transaction Hash (TxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
+        "✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
+    )
+    await safe_edit(q, text, reply_markup=back_kb("bn"))
+
+async def cb_pay_bsc20(update, context):
+    q = update.callback_query
+    await q.answer()
+    text = (
+        "🪙 **Crypto Payment (USDT BSC20/BEP20)**\n\n"
+        f"১. আপনার ওয়ালেট থেকে **{USDT_AMOUNT} USDT (BSC20)** পাঠান।\n"
+        f"২. BSC20 অ্যাড্রেস: `{BSC20_ADDRESS}`\n"
+        "৩. টাকা পাঠানোর পর **Transaction Hash (TxID)** এবং **স্ক্রিনশট** এই চ্যাটে পাঠান।\n\n"
+        "✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।"
+    )
+    await safe_edit(q, text, reply_markup=back_kb("bn"))
+
+
 async def precheckout_cb(update, context):
     await update.pre_checkout_query.answer(ok=True)
 
@@ -1948,6 +2016,30 @@ async def successful_payment_cb(update, context):
             t("new_achievement", lang) + "\n" +
             "\n".join(f"{ACHIEVEMENTS[k][0]} {ACHIEVEMENTS[k][1].get(lang, k)}" for k in new)
         )
+
+
+# ==========================================================
+# ADMIN APPROVE COMMAND
+# ==========================================================
+async def approve_command(update, context):
+    uid = update.effective_user.id
+    if uid not in ADMIN_IDS:
+        await update.message.reply_text("⛔ Admin only.")
+        return
+    if not context.args:
+        await update.message.reply_text("Usage: /approve <user_id>")
+        return
+    try:
+        target_uid = int(context.args[0])
+        until = datetime.now() + timedelta(days=PREMIUM_DAYS)
+        await update_user(target_uid, is_premium=True, premium_until=until)
+        await update.message.reply_text(f"✅ User {target_uid} has been granted Premium!")
+        try:
+            await context.bot.send_message(target_uid, "🎉 আপনার পেমেন্ট ভেরিফাই হয়েছে! আপনি এখন Premium সদস্য।")
+        except Exception:
+            pass
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
 
 
 async def cb_leaderboard(update, context):
@@ -2461,7 +2553,7 @@ async def daily_review_job(context: ContextTypes.DEFAULT_TYPE):
 async def post_init(app):
     try:
         await init_db()
-        asyncio.create_task(keep_alive_db())  # <--- এটি ডাটাবেসকে জাগিয়ে রাখবে
+        asyncio.create_task(keep_alive_db())
     except Exception as e:
         logger.error(f"post_init exception: {e}")
     try:
@@ -2503,7 +2595,7 @@ def run_bot():
             ("level", level_command), ("reminder", reminder_command),
             ("language", language_command), ("reset", reset_command),
             ("adminstats", adminstats_command), ("feedback", feedback_command),
-            ("broadcast", broadcast_command),
+            ("broadcast", broadcast_command), ("approve", approve_command),
             ("practice", practice_command),
             ("endroleplay", end_roleplay_command),
             ("review", review_command),
@@ -2537,6 +2629,10 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_help, pattern="^m_help$"))
 
         application.add_handler(CallbackQueryHandler(cb_buy_premium, pattern="^buy_premium$"))
+        application.add_handler(CallbackQueryHandler(cb_pay_bkash, pattern="^pay_bkash$"))
+        application.add_handler(CallbackQueryHandler(cb_pay_rocket, pattern="^pay_rocket$"))
+        application.add_handler(CallbackQueryHandler(cb_pay_trc20, pattern="^pay_trc20$"))
+        application.add_handler(CallbackQueryHandler(cb_pay_bsc20, pattern="^pay_bsc20$"))
         application.add_handler(CallbackQueryHandler(cb_reminder_set, pattern="^rem_"))
         application.add_handler(CallbackQueryHandler(cb_set_level, pattern="^setlvl_"))
 
