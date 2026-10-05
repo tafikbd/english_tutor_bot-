@@ -1,4 +1,5 @@
 import os
+import re
 import asyncio
 import logging
 import threading
@@ -283,7 +284,7 @@ T = {
     "memory_title": {"bn": "🧠 আমি যা মনে রেখেছি", "en": "🧠 What I Remember", "hi": "🧠 मुझे याद है"},
     "review_saved": {"bn": "✅ রিভিউ লিস্টে যোগ হয়েছে!", "en": "✅ Added to review list!", "hi": "✅ रिव्यू लिस्ट में जोड़ा गया!"},
     
-    # ===== NEW PAYMENT LOCALIZATION =====
+    # ===== PAYMENT LOCALIZATION =====
     "cancel_payment_btn": {"bn": "❌ পেমেন্ট বাতিল করুন", "en": "❌ Cancel Payment", "hi": "❌ भुगतान रद्द करें"},
     "copy_btn": {"bn": "📋 কপি করুন", "en": "📋 Copy", "hi": "📋 कॉपी करें"},
     
@@ -347,48 +348,39 @@ def t(key, lang="bn", **kwargs):
 
 
 # ==========================================================
-# GROQ PROMPTS (LEVEL BASED)
+# GROQ PROMPTS (STRICT SUGGESTION RULE)
 # ==========================================================
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 PROMPT_BEGINNER = """
-You are EduMate AI, a very patient and friendly English teacher for absolute beginners.
+You are EduMate AI, a patient English teacher for beginners.
+1. Language Rule: Reply in the SAME language the user wrote in. If English -> very simple English. If Bangla -> simple Bangla. DO NOT just translate the user's message.
+2. Formatting Rule: Use ONLY plain text and emojis. NEVER use asterisks (*), bold (**), or markdown.
+3. Tone: Be highly encouraging. Keep responses short (under 1500 characters).
+4. Chat naturally. DO NOT turn the conversation into a dictionary.
 
-LANGUAGE: Detect the language of the user's CURRENT message. 
-- If the user writes in English, reply in VERY SIMPLE English (e.g., "Hello! I am good. How are you?"). Do not translate to Bangla unless asked.
-- If the user writes in Bangla, reply in Bangla but introduce simple English words.
-- If the user writes in Hindi, reply in Hindi.
-NEVER translate the user's message directly. Always talk to them naturally in their message's language.
-VOCABULARY FORMAT:
-🔷 English Word - Meaning in Bangla
-✏️ Example: Simple English sentence
-📝 Bangla Translation of the example
+⚠️ CRITICAL INSTRUCTION: You MUST ALWAYS end your response with exactly 3 follow-up questions.
+Format them EXACTLY like this at the very end: [SUGGESTIONS] Question 1 | Question 2 | Question 3
 """
 
 PROMPT_INTERMEDIATE = """
-You are EduMate AI, a balanced and helpful English teacher for intermediate learners.
+You are EduMate AI, an English tutor for intermediate learners.
+1. Language Rule: Reply in the user's language. If English -> 90% English. If Bangla -> 50% Bangla, 50% English. Chat naturally, DO NOT just translate.
+2. Formatting Rule: Use ONLY plain text and emojis. NEVER use asterisks (*), bold (**), or markdown.
+3. Style: Moderate length (under 2500 characters), engaging, correct mistakes gently.
 
-LANGUAGE: Detect the language of the user's CURRENT message.
-- If the user writes in English, reply mostly in English (90% English, 10% native if needed for explanation).
-- If the user writes in Bangla, mix English and Bangla naturally (50-50).
-- NEVER translate the user's message. Always reply based on the language they used.
-VOCABULARY FORMAT:
-🔷 word - /pronunciation/ - Part of Speech
-👉 Meaning: [meaning]
-✏️ Example: [English sentence]
-📝 Translation: [translation]
+⚠️ CRITICAL INSTRUCTION: You MUST ALWAYS end your response with exactly 3 follow-up questions.
+Format them EXACTLY like this at the very end: [SUGGESTIONS] Question 1 | Question 2 | Question 3
 """
 
 PROMPT_ADVANCED = """
-You are EduMate AI, a strict IELTS/TOEFL examiner and advanced English tutor.
+You are EduMate AI, a strict IELTS examiner.
+1. Language Rule: Reply ONLY in English, regardless of the user's language. If the user writes in Bangla, politely ask them to try English.
+2. Formatting Rule: Use ONLY plain text and emojis. NEVER use asterisks (*), bold (**), or markdown.
+3. Style: Advanced vocabulary (under 3500 characters), strict error correction.
 
-LANGUAGE: Reply ONLY in English, regardless of what language the user writes in. 
-If the user writes in Bangla or Hindi, politely tell them (in English) to try using English, and then answer their query in English.
-VOCABULARY FORMAT:
-🔷 word - /pronunciation/ - Part of Speech
-👉 Meaning: [meaning]
-✏️ Example: [English sentence]
-📝 Translation: (Leave empty for advanced users)
+⚠️ CRITICAL INSTRUCTION: You MUST ALWAYS end your response with exactly 3 follow-up questions.
+Format them EXACTLY like this at the very end: [SUGGESTIONS] Question 1 | Question 2 | Question 3
 """
 
 
@@ -411,7 +403,6 @@ def build_user_context(user, include_name=True):
 
 def ask_groq(user_text, history=None, user=None, custom_system=None):
     try:
-        # Select prompt based on level if custom_system is not provided
         if custom_system:
             system = custom_system
         else:
@@ -423,7 +414,6 @@ def ask_groq(user_text, history=None, user=None, custom_system=None):
             else:
                 system = PROMPT_BEGINNER
         
-        # Add user context
         system += build_user_context(user, include_name=True)
         
         messages = [{"role": "system", "content": system}]
@@ -446,7 +436,17 @@ def ask_groq(user_text, history=None, user=None, custom_system=None):
             parts = raw_text.split("[SUGGESTIONS]")
             answer = parts[0].strip()
             sug_raw = parts[1].strip()
-            suggestions = [s.strip() for s in sug_raw.split("|") if s.strip()]
+            
+            # Robust splitting: handle |, newlines, or commas
+            sug_clean = re.sub(r'[\|\n,]', '|||', sug_raw)
+            sug_list = [s.strip() for s in sug_clean.split("|||") if s.strip()]
+            
+            # Clean up any leading numbers, dashes, or bullets from each suggestion
+            for s in sug_list[:3]:
+                s = re.sub(r'^[\d\-\*\.\)\s]+', '', s).strip()
+                if s:
+                    suggestions.append(s)
+                    
             return answer, suggestions
         return raw_text, []
     except Exception as e:
@@ -1705,7 +1705,6 @@ async def cb_suggestion_click(update, context):
         return
     user_text = suggestions[idx]
     
-    # Remove old keyboard
     try:
         await q.edit_message_reply_markup(reply_markup=None)
     except Exception:
