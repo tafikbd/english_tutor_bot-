@@ -171,6 +171,55 @@ ROLEPLAY_SCENARIOS = {
 }
 
 
+# ==========================================================
+# FLASHCARDS VOCABULARY (Difficulty Based)
+# ==========================================================
+FLASHCARDS = {
+    "easy": [
+        {"word": "Apple", "pron": "/ˈæp.əl/", "meaning": "আপেল", "ex": "I eat an apple every day."},
+        {"word": "Book", "pron": "/bʊk/", "meaning": "বই", "ex": "This book is very interesting."},
+        {"word": "Happy", "pron": "/ˈhæp.i/", "meaning": "খুশি", "ex": "She is very happy today."},
+        {"word": "Water", "pron": "/ˈwɔː.tər/", "meaning": "পানি", "ex": "Please give me a glass of water."},
+        {"word": "Friend", "pron": "/frend/", "meaning": "বন্ধু", "ex": "He is my best friend."},
+        {"word": "Family", "pron": "/ˈfæm.əl.i/", "meaning": "পরিবার", "ex": "I love my family."},
+        {"word": "School", "pron": "/skuːl/", "meaning": "স্কুল", "ex": "I go to school every day."},
+        {"word": "Teacher", "pron": "/ˈtiː.tʃər/", "meaning": "শিক্ষক", "ex": "My teacher is very kind."},
+    ],
+    "medium": [
+        {"word": "Beautiful", "pron": "/ˈbjuː.tɪ.fəl/", "meaning": "সুন্দর", "ex": "The garden looks beautiful."},
+        {"word": "Knowledge", "pron": "/ˈnɒl.ɪdʒ/", "meaning": "জ্ঞান", "ex": "Knowledge is power."},
+        {"word": "Practice", "pron": "/ˈpræk.tɪs/", "meaning": "অনুশীলন", "ex": "Practice makes a man perfect."},
+        {"word": "Computer", "pron": "/kəmˈpjuː.tər/", "meaning": "কম্পিউটার", "ex": "I use a computer for work."},
+        {"word": "Journey", "pron": "/ˈdʒɜː.ni/", "meaning": "যাত্রা", "ex": "The journey was very long."},
+        {"word": "Hospital", "pron": "/ˈhɒs.pɪ.təl/", "meaning": "হাসপাতাল", "ex": "He is admitted to the hospital."},
+        {"word": "Culture", "pron": "/ˈkʌl.tʃər/", "meaning": "সংস্কৃতি", "ex": "Bangladesh has a rich culture."},
+        {"word": "Nature", "pron": "/ˈneɪ.tʃər/", "meaning": "প্রকৃতি", "ex": "We should protect nature."},
+    ],
+    "hard": [
+        {"word": "Confident", "pron": "/ˈkɒn.fɪ.dənt/", "meaning": "আত্মবিশ্বাসী", "ex": "She is confident about her success."},
+        {"word": "Vocabulary", "pron": "/vəˈkæb.jə.lər.i/", "meaning": "শব্দভাণ্ডার", "ex": "Reading books improves your vocabulary."},
+        {"word": "Pronunciation", "pron": "/prəˌnʌn.siˈeɪ.ʃən/", "meaning": "উচ্চারণ", "ex": "Your pronunciation is very good."},
+        {"word": "Opportunity", "pron": "/ˌɒp.əˈtʃuː.nə.ti/", "meaning": "সুযোগ", "ex": "Don't miss this golden opportunity."},
+        {"word": "Environment", "pron": "/ɪnˈvaɪ.rən.mənt/", "meaning": "পরিবেশ", "ex": "We must keep our environment clean."},
+        {"word": "Achievement", "pron": "/əˈtʃiːv.mənt/", "meaning": "অর্জন", "ex": "This is a great achievement for us."},
+        {"word": "Responsibility", "pron": "/rɪˌspɒn.sɪˈbɪl.ə.ti/", "meaning": "দায়িত্ব", "ex": "It is your responsibility to help the poor."},
+        {"word": "Experience", "pron": "/ɪkˈspɪə.ri.əns/", "meaning": "অভিজ্ঞতা", "ex": "He has 5 years of work experience."},
+    ]
+}
+
+# ==========================================================
+# WORD SCRAMBLE GAME
+# ==========================================================
+WORD_GAME_LIST = [
+    "apple", "banana", "orange", "school", "teacher", "student", "water", "happy",
+    "family", "friend", "garden", "money", "river", "mountain", "flower", "animal",
+    "doctor", "police", "market", "holiday", "science", "history", "music", "picture",
+    "library", "letter", "summer", "winter", "breakfast", "dinner", "country", "language",
+    "computer", "mobile", "internet", "office", "hospital", "journey", "culture", "nature",
+    "amazing", "beautiful", "confident", "knowledge", "practice", "sentence", "vocabulary", "grammar"
+]
+
+
 T = {
     "welcome": {
         "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI - আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 অনুবাদ\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 ছবি বিশ্লেষণ\n• 🎤 ভয়েস সাপোর্ট\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 নিচের বাটন থেকে বেছে নিন।",
@@ -437,11 +486,9 @@ def ask_groq(user_text, history=None, user=None, custom_system=None):
             answer = parts[0].strip()
             sug_raw = parts[1].strip()
             
-            # Robust splitting: handle |, newlines, or commas
             sug_clean = re.sub(r'[\|\n,]', '|||', sug_raw)
             sug_list = [s.strip() for s in sug_clean.split("|||") if s.strip()]
             
-            # Clean up any leading numbers, dashes, or bullets from each suggestion
             for s in sug_list[:3]:
                 s = re.sub(r'^[\d\-\*\.\)\s]+', '', s).strip()
                 if s:
@@ -457,11 +504,15 @@ def ask_groq(user_text, history=None, user=None, custom_system=None):
 async def text_to_voice(text, output_path):
     try:
         import edge_tts
-        communicate = edge_tts.Communicate(text, TTS_VOICE)
+        clean_text = text.replace("*", "").replace("_", "").replace("`", "").strip()
+        if not clean_text:
+            return False
+            
+        communicate = edge_tts.Communicate(clean_text, TTS_VOICE)
         await communicate.save(output_path)
         return True
     except Exception as e:
-        logger.error(f"TTS error: {e}")
+        logger.error(f"TTS generation failed: {e}")
         return False
 
 
@@ -902,6 +953,8 @@ def main_menu_kb():
          InlineKeyboardButton("💬 Translate", callback_data="m_translate")],
         [InlineKeyboardButton("🔥 Daily Lesson", callback_data="m_daily"),
          InlineKeyboardButton("📖 Word of Day", callback_data="m_word")],
+        [InlineKeyboardButton("📇 Flashcards", callback_data="m_flashcard"),
+         InlineKeyboardButton("🎮 Word Game", callback_data="m_game")],
         [InlineKeyboardButton("📊 My Progress", callback_data="m_profile"),
          InlineKeyboardButton("🏆 Leaderboard", callback_data="m_leaderboard")],
         [InlineKeyboardButton("🎁 Invite & Earn", callback_data="m_invite"),
@@ -956,7 +1009,7 @@ def suggestions_kb(suggestions, context):
         return None
     context.user_data['cached_suggestions'] = suggestions
     rows = []
-    for i, s in enumerate(suggestions[:3]): # Max 3 suggestions
+    for i, s in enumerate(suggestions[:3]):
         display_text = s if len(s) < 35 else s[:32] + "..."
         rows.append([InlineKeyboardButton(f"👉 {display_text}", callback_data=f"sg_{i}")])
     return InlineKeyboardMarkup(rows)
@@ -1093,6 +1146,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
     context.user_data.pop("awaiting_support", None)
+    context.user_data.pop("game_active", None)
     if not await is_user_joined(context.bot, u.id):
         existing = await get_user(u.id)
         lang = (existing or {}).get("language") or "bn"
@@ -1138,6 +1192,7 @@ async def menu_command(update, context):
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
     context.user_data.pop("awaiting_support", None)
+    context.user_data.pop("game_active", None)
     lang = await get_user_lang(update.effective_user.id)
     await update.message.reply_text(t("main_menu", lang), reply_markup=main_menu_kb())
 
@@ -1180,6 +1235,20 @@ async def review_command(update, context):
     )
 
 
+async def endgame_command(update, context):
+    if context.user_data.get('game_active'):
+        context.user_data['game_active'] = False
+        score = context.user_data.get('game_score', 0)
+        context.user_data['game_score'] = 0
+        await update.message.reply_text(
+            f"🎮 গেম শেষ!\n\n"
+            f"🏆 আপনার মোট স্কোর: {score}\n\n"
+            f"আবার খেলতে মেইন মেনু থেকে 🎮 Word Game এ ক্লিক করুন।"
+        )
+    else:
+        await update.message.reply_text("⚠️ আপনি এখন কোনো গেমে নেই।")
+
+
 async def memory_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
@@ -1218,6 +1287,7 @@ async def help_command(update, context):
             "/start - Main menu\n/menu - Menu\n/profile - Profile\n"
             "/practice - 🎭 Role-Play\n/review - 🔁 Spaced review\n"
             "/memory - 🧠 What I remember\n/endroleplay - End role-play\n"
+            "/endgame - Stop Word Game\n"
             "/daily - Daily lesson\n/leaderboard - Leaderboard\n"
             "/coins - Balance\n/invite - Invite link\n"
             "/mistakes - Mistakes\n/achievements - Badges\n"
@@ -1232,6 +1302,7 @@ async def help_command(update, context):
             "/start - मुख्य\n/menu - मेनू\n/profile - प्रोफ़ाइल\n"
             "/practice - 🎭 Role-Play\n/review - 🔁 रिव्यू\n"
             "/memory - 🧠 मुझे याद है\n/endroleplay - रोकें\n"
+            "/endgame - गेम बंद करें\n"
             "/daily - पाठ\n/leaderboard - लीडरबोर्ड\n"
             "/coins - सिक्के\n/invite - आमंत्रण\n"
             "/mistakes - गलतियाँ\n/achievements - बैज\n"
@@ -1245,6 +1316,7 @@ async def help_command(update, context):
             "/start - মেইন মেনু\n/menu - মেনু\n/profile - প্রোফাইল\n"
             "/practice - 🎭 Role-Play\n/review - 🔁 Spaced Review\n"
             "/memory - 🧠 আমি যা মনে রেখেছি\n/endroleplay - Role-Play বন্ধ\n"
+            "/endgame - Word Game বন্ধ\n"
             "/daily - Daily Lesson\n/leaderboard - লিডারবোর্ড\n"
             "/coins - কয়েন\n/invite - ইনভাইট\n"
             "/mistakes - ভুল\n/achievements - ব্যাজ\n"
@@ -1466,6 +1538,7 @@ async def reset_command(update, context):
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
     context.user_data.pop("awaiting_support", None)
+    context.user_data.pop("game_active", None)
     await update.message.reply_text(t("reset_done", lang))
 
 
@@ -1868,6 +1941,7 @@ async def cb_menu(update, context):
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
     context.user_data.pop("awaiting_support", None)
+    context.user_data.pop("game_active", None)
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -2084,6 +2158,139 @@ async def cb_buy_premium(update, context):
     except Exception as e:
         logger.error(f"Invoice error: {e}")
         await q.answer("❌ Payment failed", show_alert=True)
+
+
+# ==========================================================
+# WORD GAME & FLASHCARD CALLBACKS
+# ==========================================================
+async def cb_word_game(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
+    
+    word = random.choice(WORD_GAME_LIST).lower()
+    scrambled = list(word)
+    random.shuffle(scrambled)
+    scrambled_word = "".join(scrambled).upper()
+    
+    context.user_data['game_active'] = True
+    context.user_data['game_word'] = word
+    context.user_data['game_score'] = context.user_data.get('game_score', 0)
+    
+    text = (
+        f"🎮 Word Scramble Game\n\n"
+        f"🔤 এলোমেলো শব্দ: `{scrambled_word}`\n\n"
+        f"👉 সঠিক ইংরেজি শব্দটি চ্যাটে লিখে পাঠান।\n"
+        f"🏆 আপনার স্কোর: {context.user_data['game_score']}\n\n"
+        f"❌ খেলা বন্ধ করতে: /endgame"
+    )
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("⏭️ Skip / Next Word", callback_data="game_skip")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
+    ])
+    await safe_edit(q, text, reply_markup=markup)
+
+
+async def cb_game_skip(update, context):
+    q = update.callback_query
+    await q.answer("নতুন শব্দ আসছে...")
+    uid = q.from_user.id
+    
+    word = random.choice(WORD_GAME_LIST).lower()
+    scrambled = list(word)
+    random.shuffle(scrambled)
+    scrambled_word = "".join(scrambled).upper()
+    
+    context.user_data['game_active'] = True
+    context.user_data['game_word'] = word
+    
+    text = (
+        f"🎮 Word Scramble Game\n\n"
+        f"🔤 এলোমেলো শব্দ: `{scrambled_word}`\n\n"
+        f"👉 সঠিক ইংরেজি শব্দটি চ্যাটে লিখে পাঠান।\n"
+        f"🏆 আপনার স্কোর: {context.user_data.get('game_score', 0)}\n\n"
+        f"❌ খেলা বন্ধ করতে: /endgame"
+    )
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("⏭️ Skip / Next Word", callback_data="game_skip")],
+        [InlineKeyboardButton("🏠 মেইন মেনু", callback_data="m_menu")]
+    ])
+    await safe_edit(q, text, reply_markup=markup)
+
+
+async def cb_flashcard_menu(update, context):
+    q = update.callback_query
+    await q.answer()
+    lang = await get_user_lang(q.from_user.id)
+    text = (
+        "📇 **Daily Vocabulary Flashcards**\n\n"
+        "আপনি কোন লেভেলের শব্দ শিখতে চান?\n"
+        "নিচের বাটন থেকে বেছে নিন:\n\n"
+        "🟢 Easy - সহজ শব্দ\n"
+        "🟡 Medium - মাঝারি শব্দ\n"
+        "🔴 Hard - কঠিন শব্দ"
+    )
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🟢 Easy", callback_data="fc_easy"),
+         InlineKeyboardButton("🟡 Medium", callback_data="fc_medium")],
+        [InlineKeyboardButton("🔴 Hard", callback_data="fc_hard")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
+    ])
+    await safe_edit(q, text, reply_markup=markup)
+
+
+async def cb_flashcard_start(update, context):
+    q = update.callback_query
+    await q.answer()
+    level = q.data.replace("fc_", "")
+    uid = q.from_user.id
+    
+    if level not in FLASHCARDS:
+        level = "easy"
+        
+    card = random.choice(FLASHCARDS[level])
+    context.user_data['current_card'] = card
+    context.user_data['fc_level'] = level
+    
+    text = (
+        f"📇 **Word:** {card['word']}\n"
+        f"🔊 **Pronunciation:** {card['pron']}\n\n"
+        f"👉 আপনি কি শব্দটির অর্থ জানেন?\n"
+        f"নিচের বাটনে ক্লিক করে উত্তর দেখুন।"
+    )
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("✅ উত্তর দেখুন", callback_data="fc_show")],
+        [InlineKeyboardButton("⏭️ পরের শব্দ", callback_data=f"fc_{level}")]
+    ])
+    await safe_edit(q, text, reply_markup=markup)
+
+
+async def cb_flashcard_show(update, context):
+    q = update.callback_query
+    await q.answer()
+    card = context.user_data.get('current_card')
+    level = context.user_data.get('fc_level', 'easy')
+    
+    if not card:
+        await cb_flashcard_menu(update, context)
+        return
+        
+    text = (
+        f"📇 **Word:** {card['word']}\n"
+        f"🔊 **Pronunciation:** {card['pron']}\n"
+        f"📝 **Meaning:** {card['meaning']}\n\n"
+        f"✏️ **Example:** {card['ex']}\n\n"
+        f"🎯 এই শব্দটি মনে রাখার চেষ্টা করুন।"
+    )
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("⏭️ পরের শব্দ", callback_data=f"fc_{level}")],
+        [InlineKeyboardButton("🔙 লেভেল পরিবর্তন", callback_data="m_flashcard")],
+        [InlineKeyboardButton("🏠 মেইন মেনু", callback_data="m_menu")]
+    ])
+    await safe_edit(q, text, reply_markup=markup)
 
 
 # ==========================================================
@@ -2493,6 +2700,42 @@ async def handle_message(update, context):
                 pass
         return
 
+    # ================= WORD GAME MODE =================
+    if context.user_data.get('game_active') and message.text and not message.text.startswith("/"):
+        user_answer = message.text.strip().lower()
+        correct_word = context.user_data.get('game_word', '').lower()
+        
+        if user_answer == correct_word:
+            score = context.user_data.get('game_score', 0) + 5
+            context.user_data['game_score'] = score
+            await add_coins(uid, 5)
+            
+            word = random.choice(WORD_GAME_LIST).lower()
+            scrambled = list(word)
+            random.shuffle(scrambled)
+            scrambled_word = "".join(scrambled).upper()
+            context.user_data['game_word'] = word
+            
+            text = (
+                f"🎉 একদম সঠিক! আপনি ৫ কয়েন পেয়েছেন।\n\n"
+                f"🔤 পরের শব্দ: `{scrambled_word}`\n\n"
+                f"🏆 আপনার স্কোর: {score}\n\n"
+                f"❌ খেলা বন্ধ করতে: /endgame"
+            )
+            markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton("⏭️ Skip / Next Word", callback_data="game_skip")],
+                [InlineKeyboardButton("🏠 মেইন মেনু", callback_data="m_menu")]
+            ])
+            await message.reply_text(text, reply_markup=markup)
+        else:
+            hint = correct_word[0].upper() + "_" * (len(correct_word) - 1)
+            await message.reply_text(
+                f"❌ ভুল হয়েছে!\n\n"
+                f"💡 হিন্ট: প্রথম অক্ষর `{correct_word[0].upper()}`, শব্দটির {len(correct_word)}টি অক্ষর।\n"
+                f"👉 আবার চেষ্টা করুন।"
+            )
+        return
+
     # ================= REVIEW MODE =================
     rq = context.user_data.get("review_queue")
     if rq and message.text and not message.text.startswith("/"):
@@ -2881,6 +3124,7 @@ def run_bot():
             ("reply", reply_command),
             ("practice", practice_command),
             ("endroleplay", end_roleplay_command),
+            ("endgame", endgame_command),
             ("review", review_command),
             ("memory", memory_command),
         ]:
@@ -2928,6 +3172,13 @@ def run_bot():
         # Support Handlers
         application.add_handler(CallbackQueryHandler(cb_support, pattern="^m_support$"))
         application.add_handler(CallbackQueryHandler(cb_cancel_support, pattern="^cancel_support$"))
+        
+        # Game & Flashcard Handlers
+        application.add_handler(CallbackQueryHandler(cb_word_game, pattern="^m_game$"))
+        application.add_handler(CallbackQueryHandler(cb_game_skip, pattern="^game_skip$"))
+        application.add_handler(CallbackQueryHandler(cb_flashcard_menu, pattern="^m_flashcard$"))
+        application.add_handler(CallbackQueryHandler(cb_flashcard_start, pattern="^fc_(easy|medium|hard)$"))
+        application.add_handler(CallbackQueryHandler(cb_flashcard_show, pattern="^fc_show$"))
         
         application.add_handler(CallbackQueryHandler(cb_reminder_set, pattern="^rem_"))
         application.add_handler(CallbackQueryHandler(cb_set_level, pattern="^setlvl_"))
