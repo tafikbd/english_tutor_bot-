@@ -248,7 +248,7 @@ T = {
     "language_set": {"bn": "✅ ভাষা সেট হয়েছে: বাংলা", "en": "✅ Language set: English", "hi": "✅ भाषा सेट: हिन्दी"},
     "choose_lang": {
         "bn": "🌍 ভাষা নির্বাচন করুন:\n\nChoose your language:\n\nअपनी भाषा चुनें:",
-        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषা চুনें:",
+        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा चुनें:",
         "hi": "🌍 अपनी भाषा चुनें:\n\nChoose your language:\n\nআপনার ভাষা নির্বাচন করুন:",
     },
     "reset_done": {"bn": "🔄 চ্যাট ক্লিয়ার হয়েছে। /start দিন।", "en": "🔄 Chat cleared. Send /start.", "hi": "🔄 चैट साफ। /start भेजें।"},
@@ -325,6 +325,7 @@ T = {
     "rp_started": {"bn": "🎭 {title} শুরু হয়েছে!\n\nবন্ধ করতে /endroleplay দিন।", "en": "🎭 {title} started!\n\nSend /endroleplay to stop.", "hi": "🎭 {title} शुरू!\n\nरोकने के लिए /endroleplay भेजें।"},
     "rp_ended": {"bn": "🎭 Role-Play শেষ। আবার শুরু করতে /practice দিন।", "en": "🎭 Role-Play ended. Send /practice to start again.", "hi": "🎭 Role-Play खत्म। फिर से /practice भेजें।"},
     "rp_active": {"bn": "⚠️ আপনি এখনো Role-Play মোডে আছেন। /endroleplay দিয়ে বন্ধ করুন।", "en": "⚠️ You're in Role-Play mode. Send /endroleplay to stop.", "hi": "⚠️ आप Role-Play में हैं। /endroleplay भेजें।"},
+    "rp_not_in": {"bn": "⚠️ আপনি Role-Play মোডে নেই।", "en": "⚠️ You are not in Role-Play mode.", "hi": "⚠️ आप Role-Play मोड में नहीं हैं।"},
     "review_title": {"bn": "🔁 Spaced Review", "en": "🔁 Spaced Review", "hi": "🔁 Spaced Review"},
     "review_none": {"bn": "✅ আজ কোনো রিভিউ নেই! আরও ভুল করতে থাকুন 😊", "en": "✅ No reviews today! Keep practicing.", "hi": "✅ आज कोई रिव्यू नहीं!"},
     "review_prompt": {"bn": "🔁 মনে আছে?\n\n❌ আগের ভুল: {wrong}\n\n✅ সঠিকটা লিখুন:", "en": "🔁 Remember?\n\n❌ Old mistake: {wrong}\n\n✅ Write the correct version:", "hi": "🔁 याद है?\n\n❌ पुरानी गलती: {wrong}\n\n✅ सही लिखें:"},
@@ -336,6 +337,7 @@ T = {
     # ===== PAYMENT LOCALIZATION =====
     "cancel_payment_btn": {"bn": "❌ পেমেন্ট বাতিল করুন", "en": "❌ Cancel Payment", "hi": "❌ भुगतान रद्द करें"},
     "copy_btn": {"bn": "📋 কপি করুন", "en": "📋 Copy", "hi": "📋 कॉपी करें"},
+    "copy_hint": {"bn": "👇 ট্যাপ করে কপি করুন।", "en": "👇 Tap to copy.", "hi": "👇 टैप करके कॉपी करें।"},
     
     "pay_bkash_title": {"bn": "💳 bKash পেমেন্ট", "en": "💳 bKash Payment", "hi": "💳 bKash भुगतान"},
     "pay_bkash_desc": {
@@ -380,6 +382,137 @@ T = {
     "support_btn": {"bn": "🆘 সাপোর্ট", "en": "🆘 Support", "hi": "🆘 सहायता"},
     "support_cancel": {"bn": "❌ বাতিল করুন", "en": "❌ Cancel", "hi": "❌ रद्द करें"},
     "support_cancelled": {"bn": "✅ সাপোর্ট মোড বাতিল করা হয়েছে।", "en": "✅ Support mode cancelled.", "hi": "✅ सहायता मोड रद्द कर दिया गया।"},
+
+    # ===== PAYMENT PROOF / INFO =====
+    "payment_proof_sent": {
+        "bn": "✅ আপনার পেমেন্ট প্রুফ অ্যাডমিনের কাছে পাঠানো হয়েছে।\nভেরিফিকেশন শেষ হলে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেওয়া হবে।",
+        "en": "✅ Your payment proof has been sent to the admin.\nPremium will be activated within 5 minutes after verification.",
+        "hi": "✅ आपका भुगतान प्रमाण एडमिन को भेज दिया गया है।\nसत्यापन के बाद 5 मिनट के भीतर आपका प्रीमियम सक्रिय कर दिया जाएगा।"
+    },
+    "payment_info_sent": {
+        "bn": "✅ আপনার পেমেন্ট ইনফো অ্যাডমিনের কাছে পাঠানো হয়েছে।\nভেরিফিকেশন শেষ হলে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেওয়া হবে।",
+        "en": "✅ Your payment info has been sent to the admin.\nPremium will be activated within 5 minutes after verification.",
+        "hi": "✅ आपकी भुगतान जानकारी एडमिन को भेज दी गई है।\nसत्यापन के बाद 5 मिनट के भीतर आपका प्रीमियम सक्रिय कर दिया जाएगा।"
+    },
+
+    # ===== SUGGESTION EXPIRED =====
+    "suggestion_expired": {
+        "bn": "⚠️ এক্সপায়ার হয়ে গেছে। আবার চেষ্টা করুন।",
+        "en": "⚠️ This option has expired. Please try again.",
+        "hi": "⚠️ यह विकल्प समाप्त हो गया है। फिर प्रयास करें।"
+    },
+
+    # ===== WORD GAME LOCALIZATION =====
+    "game_title": {"bn": "🎮 Word Scramble Game", "en": "🎮 Word Scramble Game", "hi": "🎮 Word Scramble Game"},
+    "game_scrambled": {"bn": "🔤 এলোমেলো শব্দ: `{word}`", "en": "🔤 Scrambled word: `{word}`", "hi": "🔤 अव्यवस्थित शब्द: `{word}`"},
+    "game_prompt": {
+        "bn": "👉 সঠিক ইংরেজি শব্দটি চ্যাটে লিখে পাঠান।",
+        "en": "👉 Type the correct English word in chat.",
+        "hi": "👉 सही अंग्रेजी शब्द चैट में लिखें।"
+    },
+    "game_score": {"bn": "🏆 আপনার স্কোর: {score}", "en": "🏆 Your score: {score}", "hi": "🏆 आपका स्कोर: {score}"},
+    "game_stop_hint": {"bn": "❌ খেলা বন্ধ করতে: /endgame", "en": "❌ To stop: /endgame", "hi": "❌ रोकने के लिए: /endgame"},
+    "game_skip_btn": {"bn": "⏭️ Skip / Next Word", "en": "⏭️ Skip / Next Word", "hi": "⏭️ Skip / अगला शब्द"},
+    "game_correct": {
+        "bn": "🎉 একদম সঠিক! আপনি ৫ কয়েন পেয়েছেন।",
+        "en": "🎉 Correct! You earned 5 coins.",
+        "hi": "🎉 बिल्कुल सही! आपने 5 सिक्के कमाए।"
+    },
+    "game_next_word": {"bn": "🔤 পরের শব্দ: `{word}`", "en": "🔤 Next word: `{word}`", "hi": "🔤 अगला शब्द: `{word}`"},
+    "game_wrong": {"bn": "❌ ভুল হয়েছে!", "en": "❌ Wrong!", "hi": "❌ गलत!"},
+    "game_hint": {
+        "bn": "💡 হিন্ট: প্রথম অক্ষর `{first}`, শব্দটির {length}টি অক্ষর।",
+        "en": "💡 Hint: first letter `{first}`, {length} letters.",
+        "hi": "💡 संकेत: पहला अक्षर `{first}`, {length} अक्षर।"
+    },
+    "game_try_again": {"bn": "👉 আবার চেষ্টা করুন।", "en": "👉 Try again.", "hi": "👉 फिर कोशिश करें।"},
+    "game_over_title": {"bn": "🎮 গেম শেষ!", "en": "🎮 Game Over!", "hi": "🎮 गेम खत्म!"},
+    "game_total_score": {"bn": "🏆 আপনার মোট স্কোর: {score}", "en": "🏆 Your total score: {score}", "hi": "🏆 आपका कुल स्कोर: {score}"},
+    "game_play_again": {
+        "bn": "আবার খেলতে মেইন মেনু থেকে 🎮 Word Game এ ক্লিক করুন।",
+        "en": "To play again, tap 🎮 Word Game from main menu.",
+        "hi": "फिर से खेलने के लिए मुख्य मेनू से 🎮 Word Game पर टैप करें।"
+    },
+    "game_not_in": {"bn": "⚠️ আপনি এখন কোনো গেমে নেই।", "en": "⚠️ You're not in a game.", "hi": "⚠️ आप किसी गेम में नहीं हैं।"},
+    "game_new_word": {"bn": "নতুন শব্দ আসছে...", "en": "Loading new word...", "hi": "नया शब्द आ रहा है..."},
+
+    # ===== FLASHCARD LOCALIZATION =====
+    "fc_title": {"bn": "📇 ডেইলি Vocabulary Flashcards", "en": "📇 Daily Vocabulary Flashcards", "hi": "📇 डेली Vocabulary Flashcards"},
+    "fc_choose_level": {
+        "bn": "আপনি কোন লেভেলের শব্দ শিখতে চান?\nনিচের বাটন থেকে বেছে নিন:",
+        "en": "Which level of words do you want to learn?\nChoose from below:",
+        "hi": "आप किस स्तर के शब्द सीखना चाहते हैं?\nनीचे से चुनें:"
+    },
+    "fc_easy": {"bn": "🟢 Easy - সহজ শব্দ", "en": "🟢 Easy words", "hi": "🟢 Easy - आसान शब्द"},
+    "fc_medium": {"bn": "🟡 Medium - মাঝারি শব্দ", "en": "🟡 Medium words", "hi": "🟡 Medium - मध्यम शब्द"},
+    "fc_hard": {"bn": "🔴 Hard - কঠিন শব্দ", "en": "🔴 Hard words", "hi": "🔴 Hard - कठिन शब्द"},
+    "fc_word": {"bn": "📇 শব্দ: {word}", "en": "📇 Word: {word}", "hi": "📇 शब्द: {word}"},
+    "fc_pron": {"bn": "🔊 উচ্চারণ: {pron}", "en": "🔊 Pronunciation: {pron}", "hi": "🔊 उच्चारण: {pron}"},
+    "fc_ask": {
+        "bn": "👉 আপনি কি শব্দটির অর্থ জানেন?\nনিচের বাটনে ক্লিক করে উত্তর দেখুন।",
+        "en": "👉 Do you know the meaning of this word?\nTap below to see the answer.",
+        "hi": "👉 क्या आपको इस शब्द का अर्थ पता है?\nनीचे टैप करके उत्तर देखें।"
+    },
+    "fc_show_btn": {"bn": "✅ উত্তর দেখুন", "en": "✅ Show Answer", "hi": "✅ उत्तर देखें"},
+    "fc_next_btn": {"bn": "⏭️ পরের শব্দ", "en": "⏭️ Next Word", "hi": "⏭️ अगला शब्द"},
+    "fc_meaning": {"bn": "📝 অর্থ: {meaning}", "en": "📝 Meaning: {meaning}", "hi": "📝 अर्थ: {meaning}"},
+    "fc_example": {"bn": "✏️ উদাহরণ: {ex}", "en": "✏️ Example: {ex}", "hi": "✏️ उदाहरण: {ex}"},
+    "fc_remember_hint": {
+        "bn": "🎯 এই শব্দটি মনে রাখার চেষ্টা করুন।",
+        "en": "🎯 Try to remember this word.",
+        "hi": "🎯 इस शब्द को याद रखने की कोशिश करें।"
+    },
+    "fc_change_level": {"bn": "🔙 লেভেল পরিবর্তন", "en": "🔙 Change Level", "hi": "🔙 स्तर बदलें"},
+
+    # ===== PREMIUM BODY =====
+    "premium_body": {
+        "bn": (
+            "💎 Premium Membership\n\n"
+            "⭐ {stars} Telegram Stars → {days} দিন\n"
+            "💳 bKash/Rocket: {bdt} BDT → {days} দিন\n"
+            "🪙 Crypto: {usdt} USDT → {days} দিন\n\n"
+            "🎁 Benefits:\n"
+            "• Unlimited AI\n"
+            "• 📸 Unlimited photos\n"
+            "• 🎤 Unlimited voices + Voice replies\n"
+            "• 🎭 Unlimited role-plays\n"
+            "• Detailed Lessons\n"
+            "• Priority Response"
+        ),
+        "en": (
+            "💎 Premium Membership\n\n"
+            "⭐ {stars} Telegram Stars → {days} days\n"
+            "💳 bKash/Rocket: {bdt} BDT → {days} days\n"
+            "🪙 Crypto: {usdt} USDT → {days} days\n\n"
+            "🎁 Benefits:\n"
+            "• Unlimited AI\n"
+            "• 📸 Unlimited photos\n"
+            "• 🎤 Unlimited voices + Voice replies\n"
+            "• 🎭 Unlimited role-plays\n"
+            "• Detailed Lessons\n"
+            "• Priority Response"
+        ),
+        "hi": (
+            "💎 Premium Membership\n\n"
+            "⭐ {stars} Telegram Stars → {days} दिन\n"
+            "💳 bKash/Rocket: {bdt} BDT → {days} दिन\n"
+            "🪙 Crypto: {usdt} USDT → {days} दिन\n\n"
+            "🎁 Benefits:\n"
+            "• Unlimited AI\n"
+            "• 📸 Unlimited photos\n"
+            "• 🎤 Unlimited voices + Voice replies\n"
+            "• 🎭 Unlimited role-plays\n"
+            "• Detailed Lessons\n"
+            "• Priority Response"
+        ),
+    },
+    "premium_bkash_btn": {"bn": "💳 bKash ({n}৳)", "en": "💳 bKash ({n}৳)", "hi": "💳 bKash ({n}৳)"},
+    "premium_rocket_btn": {"bn": "💳 Rocket ({n}৳)", "en": "💳 Rocket ({n}৳)", "hi": "💳 Rocket ({n}৳)"},
+    "premium_trc20_btn": {"bn": "🪙 USDT (TRC20)", "en": "🪙 USDT (TRC20)", "hi": "🪙 USDT (TRC20)"},
+    "premium_bsc20_btn": {"bn": "🪙 USDT (BSC20)", "en": "🪙 USDT (BSC20)", "hi": "🪙 USDT (BSC20)"},
+
+    "payment_cancelled": {"bn": "✅ পেমেন্ট বাতিল করা হয়েছে।", "en": "✅ Payment cancelled.", "hi": "✅ भुगतान रद्द कर दिया गया।"},
+    "payment_fail": {"bn": "❌ পেমেন্ট ব্যর্থ হয়েছে", "en": "❌ Payment failed", "hi": "❌ भुगतान विफल"},
 }
 
 
@@ -1209,12 +1342,12 @@ async def practice_command(update, context):
 
 
 async def end_roleplay_command(update, context):
+    lang = await get_user_lang(update.effective_user.id)
     if context.user_data.get("roleplay"):
         context.user_data.pop("roleplay", None)
-        lang = await get_user_lang(update.effective_user.id)
         await update.message.reply_text(t("rp_ended", lang))
     else:
-        await update.message.reply_text("⚠️ আপনি Role-Play মোডে নেই।")
+        await update.message.reply_text(t("rp_not_in", lang))
 
 
 async def review_command(update, context):
@@ -1236,17 +1369,18 @@ async def review_command(update, context):
 
 
 async def endgame_command(update, context):
+    lang = await get_user_lang(update.effective_user.id)
     if context.user_data.get('game_active'):
         context.user_data['game_active'] = False
         score = context.user_data.get('game_score', 0)
         context.user_data['game_score'] = 0
         await update.message.reply_text(
-            f"🎮 গেম শেষ!\n\n"
-            f"🏆 আপনার মোট স্কোর: {score}\n\n"
-            f"আবার খেলতে মেইন মেনু থেকে 🎮 Word Game এ ক্লিক করুন।"
+            f"{t('game_over_title', lang)}\n\n"
+            f"{t('game_total_score', lang, score=score)}\n\n"
+            f"{t('game_play_again', lang)}"
         )
     else:
-        await update.message.reply_text("⚠️ আপনি এখন কোনো গেমে নেই।")
+        await update.message.reply_text(t("game_not_in", lang))
 
 
 async def memory_command(update, context):
@@ -1654,7 +1788,10 @@ async def approve_command(update, context):
         await update_user(target_uid, is_premium=True, premium_until=until)
         await update.message.reply_text(f"✅ User {target_uid} has been granted Premium!")
         try:
-            await context.bot.send_message(target_uid, "🎉 আপনার পেমেন্ট ভেরিফাই হয়েছে! আপনি এখন Premium সদস্য।")
+            target_lang = await get_user_lang(target_uid)
+            await context.bot.send_message(
+                target_uid, t("premium_success", target_lang, days=PREMIUM_DAYS)
+            )
         except Exception:
             pass
     except Exception as e:
@@ -1674,7 +1811,7 @@ async def reply_command(update, context):
         reply_text = " ".join(context.args[1:])
         await context.bot.send_message(
             target_uid,
-            f"📩 **অ্যাডমিনের উত্তর:**\n\n{reply_text}"
+            f"📩 Admin Reply:\n\n{reply_text}"
         )
         await update.message.reply_text(f"✅ Reply sent to {target_uid}")
     except Exception as e:
@@ -1743,7 +1880,7 @@ async def cb_forcesub_check(update, context):
 
 async def cb_feedback(update, context):
     q = update.callback_query
-    await q.answer("🙏 ধন্যবাদ!")
+    await q.answer("🙏")
     data = q.data
     parts = data.split("_")
     rating = parts[1]
@@ -1773,8 +1910,9 @@ async def cb_suggestion_click(update, context):
     uid = q.from_user.id
     idx = int(q.data.split("_")[1])
     suggestions = context.user_data.get('cached_suggestions', [])
+    lang = await get_user_lang(uid)
     if idx >= len(suggestions):
-        await q.message.reply_text("⚠️ এক্সপায়ার হয়ে গেছে। আবার চেষ্টা করুন।")
+        await q.message.reply_text(t("suggestion_expired", lang))
         return
     user_text = suggestions[idx]
     
@@ -1783,7 +1921,6 @@ async def cb_suggestion_click(update, context):
     except Exception:
         pass
         
-    lang = await get_user_lang(uid)
     user = await get_user(uid)
     
     try:
@@ -2119,23 +2256,15 @@ async def cb_premium(update, context):
     context.user_data.pop("awaiting_support", None)
     await safe_edit(
         q,
-        f"{t('premium_title', lang)}\n\n"
-        f"⭐ {PREMIUM_STARS} Telegram Stars → {PREMIUM_DAYS} {t('days', lang)}\n"
-        f"💳 bKash/Rocket: {PREMIUM_PRICE_BDT} BDT → {PREMIUM_DAYS} {t('days', lang)}\n"
-        f"🪙 Crypto: {USDT_AMOUNT} USDT → {PREMIUM_DAYS} {t('days', lang)}\n\n"
-        f"🎁 Benefits:\n"
-        f"• Unlimited AI\n"
-        f"• 📸 Unlimited photos\n"
-        f"• 🎤 Unlimited voices + Voice replies\n"
-        f"• 🎭 Unlimited role-plays\n"
-        f"• Detailed Lessons\n"
-        f"• Priority Response",
+        t("premium_body", lang,
+          stars=PREMIUM_STARS, days=PREMIUM_DAYS,
+          bdt=PREMIUM_PRICE_BDT, usdt=USDT_AMOUNT),
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton(t("premium_buy", lang, n=PREMIUM_STARS), callback_data="buy_premium")],
-            [InlineKeyboardButton(f"💳 bKash ({PREMIUM_PRICE_BDT}৳)", callback_data="pay_bkash")],
-            [InlineKeyboardButton(f"💳 Rocket ({PREMIUM_PRICE_BDT}৳)", callback_data="pay_rocket")],
-            [InlineKeyboardButton("🪙 USDT (TRC20)", callback_data="pay_trc20")],
-            [InlineKeyboardButton("🪙 USDT (BSC20)", callback_data="pay_bsc20")],
+            [InlineKeyboardButton(t("premium_bkash_btn", lang, n=PREMIUM_PRICE_BDT), callback_data="pay_bkash")],
+            [InlineKeyboardButton(t("premium_rocket_btn", lang, n=PREMIUM_PRICE_BDT), callback_data="pay_rocket")],
+            [InlineKeyboardButton(t("premium_trc20_btn", lang), callback_data="pay_trc20")],
+            [InlineKeyboardButton(t("premium_bsc20_btn", lang), callback_data="pay_bsc20")],
             [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")],
         ]),
     )
@@ -2145,6 +2274,7 @@ async def cb_buy_premium(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
+    lang = await get_user_lang(uid)
     try:
         await context.bot.send_invoice(
             chat_id=uid,
@@ -2157,7 +2287,7 @@ async def cb_buy_premium(update, context):
         )
     except Exception as e:
         logger.error(f"Invoice error: {e}")
-        await q.answer("❌ Payment failed", show_alert=True)
+        await q.answer(t("payment_fail", lang), show_alert=True)
 
 
 # ==========================================================
@@ -2181,14 +2311,14 @@ async def cb_word_game(update, context):
     context.user_data['game_score'] = context.user_data.get('game_score', 0)
     
     text = (
-        f"🎮 Word Scramble Game\n\n"
-        f"🔤 এলোমেলো শব্দ: `{scrambled_word}`\n\n"
-        f"👉 সঠিক ইংরেজি শব্দটি চ্যাটে লিখে পাঠান।\n"
-        f"🏆 আপনার স্কোর: {context.user_data['game_score']}\n\n"
-        f"❌ খেলা বন্ধ করতে: /endgame"
+        f"{t('game_title', lang)}\n\n"
+        f"{t('game_scrambled', lang, word=scrambled_word)}\n\n"
+        f"{t('game_prompt', lang)}\n"
+        f"{t('game_score', lang, score=context.user_data['game_score'])}\n\n"
+        f"{t('game_stop_hint', lang)}"
     )
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("⏭️ Skip / Next Word", callback_data="game_skip")],
+        [InlineKeyboardButton(t("game_skip_btn", lang), callback_data="game_skip")],
         [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
@@ -2196,8 +2326,9 @@ async def cb_word_game(update, context):
 
 async def cb_game_skip(update, context):
     q = update.callback_query
-    await q.answer("নতুন শব্দ আসছে...")
     uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    await q.answer(t("game_new_word", lang))
     
     word = random.choice(WORD_GAME_LIST).lower()
     scrambled = list(word)
@@ -2208,15 +2339,15 @@ async def cb_game_skip(update, context):
     context.user_data['game_word'] = word
     
     text = (
-        f"🎮 Word Scramble Game\n\n"
-        f"🔤 এলোমেলো শব্দ: `{scrambled_word}`\n\n"
-        f"👉 সঠিক ইংরেজি শব্দটি চ্যাটে লিখে পাঠান।\n"
-        f"🏆 আপনার স্কোর: {context.user_data.get('game_score', 0)}\n\n"
-        f"❌ খেলা বন্ধ করতে: /endgame"
+        f"{t('game_title', lang)}\n\n"
+        f"{t('game_scrambled', lang, word=scrambled_word)}\n\n"
+        f"{t('game_prompt', lang)}\n"
+        f"{t('game_score', lang, score=context.user_data.get('game_score', 0))}\n\n"
+        f"{t('game_stop_hint', lang)}"
     )
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("⏭️ Skip / Next Word", callback_data="game_skip")],
-        [InlineKeyboardButton("🏠 মেইন মেনু", callback_data="m_menu")]
+        [InlineKeyboardButton(t("game_skip_btn", lang), callback_data="game_skip")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -2226,17 +2357,16 @@ async def cb_flashcard_menu(update, context):
     await q.answer()
     lang = await get_user_lang(q.from_user.id)
     text = (
-        "📇 **Daily Vocabulary Flashcards**\n\n"
-        "আপনি কোন লেভেলের শব্দ শিখতে চান?\n"
-        "নিচের বাটন থেকে বেছে নিন:\n\n"
-        "🟢 Easy - সহজ শব্দ\n"
-        "🟡 Medium - মাঝারি শব্দ\n"
-        "🔴 Hard - কঠিন শব্দ"
+        f"{t('fc_title', lang)}\n\n"
+        f"{t('fc_choose_level', lang)}\n\n"
+        f"{t('fc_easy', lang)}\n"
+        f"{t('fc_medium', lang)}\n"
+        f"{t('fc_hard', lang)}"
     )
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🟢 Easy", callback_data="fc_easy"),
-         InlineKeyboardButton("🟡 Medium", callback_data="fc_medium")],
-        [InlineKeyboardButton("🔴 Hard", callback_data="fc_hard")],
+        [InlineKeyboardButton(t("fc_easy", lang), callback_data="fc_easy"),
+         InlineKeyboardButton(t("fc_medium", lang), callback_data="fc_medium")],
+        [InlineKeyboardButton(t("fc_hard", lang), callback_data="fc_hard")],
         [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
@@ -2247,6 +2377,7 @@ async def cb_flashcard_start(update, context):
     await q.answer()
     level = q.data.replace("fc_", "")
     uid = q.from_user.id
+    lang = await get_user_lang(uid)
     
     if level not in FLASHCARDS:
         level = "easy"
@@ -2256,14 +2387,13 @@ async def cb_flashcard_start(update, context):
     context.user_data['fc_level'] = level
     
     text = (
-        f"📇 **Word:** {card['word']}\n"
-        f"🔊 **Pronunciation:** {card['pron']}\n\n"
-        f"👉 আপনি কি শব্দটির অর্থ জানেন?\n"
-        f"নিচের বাটনে ক্লিক করে উত্তর দেখুন।"
+        f"{t('fc_word', lang, word=card['word'])}\n"
+        f"{t('fc_pron', lang, pron=card['pron'])}\n\n"
+        f"{t('fc_ask', lang)}"
     )
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("✅ উত্তর দেখুন", callback_data="fc_show")],
-        [InlineKeyboardButton("⏭️ পরের শব্দ", callback_data=f"fc_{level}")]
+        [InlineKeyboardButton(t("fc_show_btn", lang), callback_data="fc_show")],
+        [InlineKeyboardButton(t("fc_next_btn", lang), callback_data=f"fc_{level}")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -2271,6 +2401,7 @@ async def cb_flashcard_start(update, context):
 async def cb_flashcard_show(update, context):
     q = update.callback_query
     await q.answer()
+    lang = await get_user_lang(q.from_user.id)
     card = context.user_data.get('current_card')
     level = context.user_data.get('fc_level', 'easy')
     
@@ -2279,16 +2410,16 @@ async def cb_flashcard_show(update, context):
         return
         
     text = (
-        f"📇 **Word:** {card['word']}\n"
-        f"🔊 **Pronunciation:** {card['pron']}\n"
-        f"📝 **Meaning:** {card['meaning']}\n\n"
-        f"✏️ **Example:** {card['ex']}\n\n"
-        f"🎯 এই শব্দটি মনে রাখার চেষ্টা করুন।"
+        f"{t('fc_word', lang, word=card['word'])}\n"
+        f"{t('fc_pron', lang, pron=card['pron'])}\n"
+        f"{t('fc_meaning', lang, meaning=card['meaning'])}\n\n"
+        f"{t('fc_example', lang, ex=card['ex'])}\n\n"
+        f"{t('fc_remember_hint', lang)}"
     )
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("⏭️ পরের শব্দ", callback_data=f"fc_{level}")],
-        [InlineKeyboardButton("🔙 লেভেল পরিবর্তন", callback_data="m_flashcard")],
-        [InlineKeyboardButton("🏠 মেইন মেনু", callback_data="m_menu")]
+        [InlineKeyboardButton(t("fc_next_btn", lang), callback_data=f"fc_{level}")],
+        [InlineKeyboardButton(t("fc_change_level", lang), callback_data="m_flashcard")],
+        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -2382,30 +2513,35 @@ async def cb_pay_bsc20(update, context):
 async def cb_copy_bkash(update, context):
     q = update.callback_query
     await q.answer()
-    await q.message.reply_text(f"`{BKASH_NUMBER}`\n\n👇 ট্যাপ করে কপি করুন। / Tap to copy.")
+    lang = await get_user_lang(q.from_user.id)
+    await q.message.reply_text(f"`{BKASH_NUMBER}`\n\n{t('copy_hint', lang)}")
 
 async def cb_copy_rocket(update, context):
     q = update.callback_query
     await q.answer()
-    await q.message.reply_text(f"`{ROCKET_NUMBER}`\n\n👇 ট্যাপ করে কপি করুন। / Tap to copy.")
+    lang = await get_user_lang(q.from_user.id)
+    await q.message.reply_text(f"`{ROCKET_NUMBER}`\n\n{t('copy_hint', lang)}")
 
 async def cb_copy_trc20(update, context):
     q = update.callback_query
     await q.answer()
-    await q.message.reply_text(f"`{TRC20_ADDRESS}`\n\n👇 ট্যাপ করে কপি করুন। / Tap to copy.")
+    lang = await get_user_lang(q.from_user.id)
+    await q.message.reply_text(f"`{TRC20_ADDRESS}`\n\n{t('copy_hint', lang)}")
 
 async def cb_copy_bsc20(update, context):
     q = update.callback_query
     await q.answer()
-    await q.message.reply_text(f"`{BSC20_ADDRESS}`\n\n👇 ট্যাপ করে কপি করুন। / Tap to copy.")
+    lang = await get_user_lang(q.from_user.id)
+    await q.message.reply_text(f"`{BSC20_ADDRESS}`\n\n{t('copy_hint', lang)}")
 
 
 async def cb_cancel_payment(update, context):
     q = update.callback_query
-    await q.answer("Payment cancelled.")
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    await q.answer(t("payment_cancelled", lang))
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
-    lang = await get_user_lang(q.from_user.id)
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -2717,22 +2853,21 @@ async def handle_message(update, context):
             context.user_data['game_word'] = word
             
             text = (
-                f"🎉 একদম সঠিক! আপনি ৫ কয়েন পেয়েছেন।\n\n"
-                f"🔤 পরের শব্দ: `{scrambled_word}`\n\n"
-                f"🏆 আপনার স্কোর: {score}\n\n"
-                f"❌ খেলা বন্ধ করতে: /endgame"
+                f"{t('game_correct', lang)}\n\n"
+                f"{t('game_next_word', lang, word=scrambled_word)}\n\n"
+                f"{t('game_score', lang, score=score)}\n\n"
+                f"{t('game_stop_hint', lang)}"
             )
             markup = InlineKeyboardMarkup([
-                [InlineKeyboardButton("⏭️ Skip / Next Word", callback_data="game_skip")],
-                [InlineKeyboardButton("🏠 মেইন মেনু", callback_data="m_menu")]
+                [InlineKeyboardButton(t("game_skip_btn", lang), callback_data="game_skip")],
+                [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
             ])
             await message.reply_text(text, reply_markup=markup)
         else:
-            hint = correct_word[0].upper() + "_" * (len(correct_word) - 1)
             await message.reply_text(
-                f"❌ ভুল হয়েছে!\n\n"
-                f"💡 হিন্ট: প্রথম অক্ষর `{correct_word[0].upper()}`, শব্দটির {len(correct_word)}টি অক্ষর।\n"
-                f"👉 আবার চেষ্টা করুন।"
+                f"{t('game_wrong', lang)}\n\n"
+                f"{t('game_hint', lang, first=correct_word[0].upper(), length=len(correct_word))}\n"
+                f"{t('game_try_again', lang)}"
             )
         return
 
@@ -2856,19 +2991,15 @@ async def handle_message(update, context):
                     )
                     await context.bot.send_message(
                         admin_id,
-                        f"💰 {method} পেমেন্ট প্রুফ পাওয়া গেছে!\n\n"
-                        f"👤 ইউজারের নাম: {message.from_user.full_name}\n"
-                        f"🆔 ইউজার আইডি: `{uid}`\n\n"
-                        f"ভেরিফাই করে অ্যাপ্রুভ করতে এই কমান্ডটি কপি করুন:\n"
-                        f"`/approve {uid}`"
+                        f"💰 {method} payment proof received!\n\n"
+                        f"👤 User: {message.from_user.full_name}\n"
+                        f"🆔 User ID: `{uid}`\n\n"
+                        f"Approve with:\n`/approve {uid}`"
                     )
                 except Exception as e:
                     logger.error(f"Failed to forward payment proof to admin {admin_id}: {e}")
 
-            await message.reply_text(
-                "✅ আপনার পেমেন্ট প্রুফ অ্যাডমিনের কাছে পাঠানো হয়েছে।\n"
-                "ভেরিফিকেশন শেষ হলে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেওয়া হবে।"
-            )
+            await message.reply_text(t("payment_proof_sent", lang))
             context.user_data.pop('awaiting_payment', None)
             context.user_data.pop('payment_method', None)
             return
@@ -2931,11 +3062,10 @@ async def handle_message(update, context):
                 )
                 await context.bot.send_message(
                     admin_id,
-                    f"📩 সাপোর্ট মেসেজ!\n\n"
-                    f"👤 ইউজারের নাম: {message.from_user.full_name}\n"
-                    f"🆔 ইউজার আইডি: `{uid}`\n\n"
-                    f"ইউজারকে উত্তর দিতে চাইলে এই কমান্ড দিন:\n"
-                    f"`/reply {uid} আপনার_উত্তর`"
+                    f"📩 Support message!\n\n"
+                    f"👤 User: {message.from_user.full_name}\n"
+                    f"🆔 User ID: `{uid}`\n\n"
+                    f"Reply with:\n`/reply {uid} your_reply`"
                 )
             except Exception as e:
                 logger.error(f"Support forward fail for admin {admin_id}: {e}")
@@ -2956,17 +3086,14 @@ async def handle_message(update, context):
                 )
                 await context.bot.send_message(
                     admin_id,
-                    f"💰 {method} পেমেন্ট ইনফো (টেক্সট)!\n\n"
-                    f"👤 ইউজারের নাম: {message.from_user.full_name}\n"
-                    f"🆔 ইউজার আইডি: `{uid}`\n\n"
-                    f"অ্যাপ্রুভ করতে: `/approve {uid}`"
+                    f"💰 {method} payment info (text)!\n\n"
+                    f"👤 User: {message.from_user.full_name}\n"
+                    f"🆔 User ID: `{uid}`\n\n"
+                    f"Approve with: `/approve {uid}`"
                 )
             except Exception as e:
                 logger.error(f"Failed to forward text to admin: {e}")
-        await message.reply_text(
-            "✅ আপনার পেমেন্ট ইনফো অ্যাডমিনের কাছে পাঠানো হয়েছে।\n"
-            "ভেরিফিকেশন শেষ হলে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেওয়া হবে।"
-        )
+        await message.reply_text(t("payment_info_sent", lang))
         context.user_data.pop('awaiting_payment', None)
         context.user_data.pop('payment_method', None)
         return
