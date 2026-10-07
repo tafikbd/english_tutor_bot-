@@ -50,7 +50,11 @@ FORCE_SUB_GROUP_ID = os.getenv("FORCE_SUB_GROUP_ID", "")
 FORCE_SUB_GROUP_LINK = os.getenv("FORCE_SUB_GROUP_LINK", "")
 
 # 👇 আপনার PDF এর file_id এখানে বসানো হয়েছে
-PDF_FILE_ID = "BQACAgUAAxkBAAEDHFxqxcN_AgctxkFzw_nOuuf0L8TcawACqiIAAriGMFbHPj8HCiIl8T0E"
+# পুরনো লাইনটি মুছে ফেলুন
+# PDF_FILE_ID = "BQACAgUAAxkBAAED..."
+
+# নতুন লাইন বসান
+PDF_URL = "https://drive.google.com/file/d/10RoxnUbUOuCwcotzg6-d-j1LXNMyUWqa/view?usp=drivesdk"
 
 if not BOT_TOKEN:
     raise RuntimeError("BOT_TOKEN missing.")
@@ -2305,33 +2309,6 @@ async def cb_buy_premium(update, context):
 # ==========================================================
 # VOCABULARY BOOK CALLBACK (নতুন)
 # ==========================================================
-async def cb_vocab_book(update, context):
-    q = update.callback_query
-    await q.answer()
-    uid = q.from_user.id
-    lang = await get_user_lang(uid)
-    if not await is_user_joined(context.bot, uid):
-        return
-    
-    caption_text = (
-        f"{t('vocab_book_title', lang)}\n\n"
-        f"{t('vocab_book_desc', lang)}"
-    )
-    
-    try:
-        await context.bot.send_document(
-            chat_id=uid,
-            document=PDF_FILE_ID,
-            caption=caption_text
-        )
-        # মেইন মেনুতে ফেরার বাটন
-        await q.message.reply_text(
-            t("main_menu", lang),
-            reply_markup=main_menu_kb()
-        )
-    except Exception as e:
-        logger.error(f"PDF send error: {e}")
-        await q.message.reply_text("❌ PDF পাঠাতে সমস্যা হচ্ছে। পরে আবার চেষ্টা করুন।")
 
 
 # ==========================================================
@@ -2366,7 +2343,38 @@ async def cb_word_game(update, context):
         [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
-
+async def cb_vocab_book(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
+    
+    caption_text = (
+        f"{t('vocab_book_title', lang)}\n\n"
+        f"{t('vocab_book_desc', lang)}"
+    )
+    
+    try:
+        await context.bot.send_document(
+            chat_id=uid,
+            document=PDF_URL,
+            filename="Sir_English_Vocabulary_Book.pdf",
+            caption=caption_text
+        )
+        await q.message.reply_text(
+            t("main_menu", lang),
+            reply_markup=main_menu_kb()
+        )
+    except Exception as e:
+        logger.error(f"PDF send error: {e}")
+        # যদি URL কাজ না করে, তাহলে ব্যাকআপ হিসেবে লিংক দিন
+        await q.message.reply_text(
+            f"📘 **Sir English Vocabulary Book**\n\n"
+            f"👇 নিচের লিংক থেকে ডাউনলোড করুন:\n{PDF_URL}",
+            disable_web_page_preview=False
+        )
 
 async def cb_game_skip(update, context):
     q = update.callback_query
