@@ -49,6 +49,9 @@ ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().
 FORCE_SUB_GROUP_ID = os.getenv("FORCE_SUB_GROUP_ID", "")
 FORCE_SUB_GROUP_LINK = os.getenv("FORCE_SUB_GROUP_LINK", "")
 
+# 👇 আপনার PDF এর file_id এখানে বসানো হয়েছে
+PDF_FILE_ID = "BQACAgUAAxkBAAEDHFxqxcN_AgctxkFzw_nOuuf0L8TcawACqiIAAriGMFbHPj8HCiIl8T0E"
+
 if not BOT_TOKEN:
     raise RuntimeError("BOT_TOKEN missing.")
 if not GROQ_API_KEY:
@@ -513,6 +516,14 @@ T = {
 
     "payment_cancelled": {"bn": "✅ পেমেন্ট বাতিল করা হয়েছে।", "en": "✅ Payment cancelled.", "hi": "✅ भुगतान रद्द कर दिया गया।"},
     "payment_fail": {"bn": "❌ পেমেন্ট ব্যর্থ হয়েছে", "en": "❌ Payment failed", "hi": "❌ भुगतान विफल"},
+    
+    # ===== VOCABULARY BOOK =====
+    "vocab_book_title": {"bn": "📘 Sir English Vocabulary Book", "en": "📘 Sir English Vocabulary Book", "hi": "📘 Sir English Vocabulary Book"},
+    "vocab_book_desc": {
+        "bn": "✨ ৫০০+ শব্দ, ২০টি সেকশন\n📖 অর্থ, উচ্চারণ ও উদাহরণসহ\n\n👇 নিচে থেকে ডাউনলোড করুন:",
+        "en": "✨ 500+ words, 20 sections\n📖 With meaning, pronunciation & examples\n\n👇 Download below:",
+        "hi": "✨ 500+ शब्द, 20 सेक्शन\n📖 अर्थ, उच्चारण और उदाहरण के साथ\n\n👇 नीचे से डाउनलोड करें:"
+    },
 }
 
 
@@ -1088,6 +1099,7 @@ def main_menu_kb():
          InlineKeyboardButton("📖 Word of Day", callback_data="m_word")],
         [InlineKeyboardButton("📇 Flashcards", callback_data="m_flashcard"),
          InlineKeyboardButton("🎮 Word Game", callback_data="m_game")],
+        [InlineKeyboardButton("📘 Vocabulary Book", callback_data="m_vocab_book")], # 👈 নতুন বাটন
         [InlineKeyboardButton("📊 My Progress", callback_data="m_profile"),
          InlineKeyboardButton("🏆 Leaderboard", callback_data="m_leaderboard")],
         [InlineKeyboardButton("🎁 Invite & Earn", callback_data="m_invite"),
@@ -2291,6 +2303,38 @@ async def cb_buy_premium(update, context):
 
 
 # ==========================================================
+# VOCABULARY BOOK CALLBACK (নতুন)
+# ==========================================================
+async def cb_vocab_book(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
+    
+    caption_text = (
+        f"{t('vocab_book_title', lang)}\n\n"
+        f"{t('vocab_book_desc', lang)}"
+    )
+    
+    try:
+        await context.bot.send_document(
+            chat_id=uid,
+            document=PDF_FILE_ID,
+            caption=caption_text
+        )
+        # মেইন মেনুতে ফেরার বাটন
+        await q.message.reply_text(
+            t("main_menu", lang),
+            reply_markup=main_menu_kb()
+        )
+    except Exception as e:
+        logger.error(f"PDF send error: {e}")
+        await q.message.reply_text("❌ PDF পাঠাতে সমস্যা হচ্ছে। পরে আবার চেষ্টা করুন।")
+
+
+# ==========================================================
 # WORD GAME & FLASHCARD CALLBACKS
 # ==========================================================
 async def cb_word_game(update, context):
@@ -3282,6 +3326,9 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_achievements, pattern="^m_achievements$"))
         application.add_handler(CallbackQueryHandler(cb_reminder, pattern="^m_reminder$"))
         application.add_handler(CallbackQueryHandler(cb_help, pattern="^m_help$"))
+        
+        # 👇 নতুন PDF হ্যান্ডলার
+        application.add_handler(CallbackQueryHandler(cb_vocab_book, pattern="^m_vocab_book$"))
 
         application.add_handler(CallbackQueryHandler(cb_buy_premium, pattern="^buy_premium$"))
         application.add_handler(CallbackQueryHandler(cb_pay_bkash, pattern="^pay_bkash$"))
