@@ -1442,7 +1442,7 @@ async def help_command(update, context):
             "/mistakes - गलतियाँ\n/achievements - बैज\n"
             "/level - स्तर\n/reminder - रिमाइंडर\n"
             "/language - भाषा\n/reset - चैट साफ़\n"
-            "🆘 सहायता के लिए Support बटन दबाएं या @RohanVerse पर संपर्क करें"
+            "🆘 सहायता के लिए Support बटन दबाएं या @asikul_echo पर संपर्क करें"
         )
     else:
         text = (
@@ -1457,7 +1457,7 @@ async def help_command(update, context):
             "/level - লেভেল\n/reminder - রিমাইন্ডার\n"
             "/language - ভাষা\n/reset - চ্যাট ক্লিয়ার\n\n"
             "📸 ছবি, 🎤 ভয়েস পাঠান, 👍👎 রেটিং দিন\n"
-            "🆘 যেকোনো সমস্যায় Support বাটনে ক্লিক করুন অথবা @RohanVerse তে মেসেজ দিন"
+            "🆘 যেকোনো সমস্যায় Support বাটনে ক্লিক করুন অথবা @asikul_echo তে মেসেজ দিন"
         )
     await update.message.reply_text(text)
 
