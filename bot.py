@@ -1428,7 +1428,7 @@ async def help_command(update, context):
             "/level - Set level\n/reminder - Reminder\n"
             "/language - Change language\n/reset - Clear chat\n\n"
             "📸 Send photo, 🎤 voice, 👍👎 rate replies\n"
-            "🆘 Need help? Use the Support button or contact @RohanVerse"
+            "🆘 Need help? Use the Support button or contact @asikul_echo "
         )
     elif lang == "hi":
         text = (
