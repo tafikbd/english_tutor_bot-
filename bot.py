@@ -73,7 +73,7 @@ BKASH_NUMBER = "01608364088"
 ROCKET_NUMBER = "01608364088"
 TRC20_ADDRESS = "TKeEd3wuTqHse2rdzAg3rqYeRfQD1NC7tq"
 BSC20_ADDRESS = "0xb83a03d9ded3ac7a4908aa87cfdfe1df9e05f719"
-SUPPORT_CONTACT = "@RohanVerse"
+SUPPORT_CONTACT = "@asikul_echo"
 
 ACHIEVEMENTS = {
     "first_chat": ("🥇", {"bn": "প্রথম চ্যাট", "en": "First Chat", "hi": "पहला चैट"}),
@@ -370,9 +370,9 @@ T = {
     # ===== SUPPORT LOCALIZATION =====
     "support_title": {"bn": "🆘 সাপোর্ট", "en": "🆘 Support", "hi": "🆘 सहायता"},
     "support_desc": {
-        "bn": "আপনার কোনো সমস্যা, প্রশ্ন বা সাজেশন থাকলে নিচে লিখে পাঠান।\n\n📩 আপনার মেসেজটি সরাসরি অ্যাডমিনের কাছে পাঠানো হবে এবং শীঘ্রই উত্তর দেওয়া হবে।\n\n📞 বিকল্প যোগাযোগ: @RohanVerse",
-        "en": "If you have any problem, question, or suggestion, write it below.\n\n📩 Your message will be sent directly to the admin and you will get a reply soon.\n\n📞 Alternative contact: @RohanVerse",
-        "hi": "यदि आपको कोई समस्या, प्रश्न या सुझाव है तो नीचे लिखें।\n\n📩 आपका संदेश सीधे एडमिन को भेजा जाएगा और जल्द ही उत्तर दिया जाएगा।\n\n📞 वैकल्पिक संपर्क: @RohanVerse"
+        "bn": "আপনার কোনো সমস্যা, প্রশ্ন বা সাজেশন থাকলে নিচে লিখে পাঠান।\n\n📩 আপনার মেসেজটি সরাসরি অ্যাডমিনের কাছে পাঠানো হবে এবং শীঘ্রই উত্তর দেওয়া হবে।\n\n📞 বিকল্প যোগাযোগ: @asikul_echo",
+        "en": "If you have any problem, question, or suggestion, write it below.\n\n📩 Your message will be sent directly to the admin and you will get a reply soon.\n\n📞 Alternative contact: @asikul_echo",
+        "hi": "यदि आपको कोई समस्या, प्रश्न या सुझाव है तो नीचे लिखें।\n\n📩 आपका संदेश सीधे एडमिन को भेजा जाएगा और जल्द ही उत्तर दिया जाएगा।\n\n📞 वैकल्पिक संपर्क: @asikul_echo"
     },
     "support_sent": {
         "bn": "✅ আপনার মেসেজ অ্যাডমিনের কাছে পাঠানো হয়েছে। শীঘ্রই উত্তর পাবেন।",
@@ -1428,7 +1428,7 @@ async def help_command(update, context):
             "/level - Set level\n/reminder - Reminder\n"
             "/language - Change language\n/reset - Clear chat\n\n"
             "📸 Send photo, 🎤 voice, 👍👎 rate replies\n"
-            "🆘 Need help? Use the Support button or contact @asikul_echo "
+            "🆘 Need help? Use the Support button or contact @asikul_echo"
         )
     elif lang == "hi":
         text = (
@@ -2743,7 +2743,7 @@ async def cb_help(update, context):
                 "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
                 "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
                 "📸 Send photos, 🎤 voice, 👍👎 rate replies\n"
-                "🆘 Need help? Use the Support button or contact @RohanVerse")
+                "🆘 Need help? Use the Support button or contact @asikul_echo")
     elif lang == "hi":
         text = ("ℹ️ सहायता\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
@@ -2752,7 +2752,7 @@ async def cb_help(update, context):
                 "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
                 "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
                 "📸 फोटो, 🎤 वॉइस, 👍👎 रेटिंग\n"
-                "🆘 सहायता के लिए Support बटन दबाएं या @RohanVerse पर संपर्क करें")
+                "🆘 सहायता के लिए Support बटन दबाएं या @asikul_echo पर संपर्क करें")
     else:
         text = ("ℹ️ সাহায্য\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
@@ -2761,7 +2761,7 @@ async def cb_help(update, context):
                 "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
                 "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
                 "📸 ছবি, 🎤 ভয়েস, 👍👎 রেটিং\n"
-                "🆘 যেকোনো সমস্যায় Support বাটনে ক্লিক করুন অথবা @RohanVerse তে মেসেজ দিন")
+                "🆘 যেকোনো সমস্যায় Support বাটনে ক্লিক করুন অথবা @asikul_echo তে মেসেজ দিন")
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
