@@ -1979,12 +1979,26 @@ async def feedback_command(update, context):
 async def broadcast_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
-        await update.message.reply_text(t("admin_only", "en"))
+        await update.message.reply_text("⛔ Admin only.")
         return
-    if not context.args:
-        await update.message.reply_text("Usage: /broadcast your message")
+    
+    # Support for multi-line: reply to any message
+    if update.message.reply_to_message:
+        msg_text = update.message.reply_to_message.text or update.message.reply_to_message.caption or ""
+    elif context.args:
+        msg_text = " ".join(context.args)
+    else:
+        await update.message.reply_text(
+            "Usage:\n"
+            "1. /broadcast your message (single line)\n"
+            "2. Reply to any message with /broadcast (multi-line)"
+        )
         return
-    msg = " ".join(context.args)
+    
+    if not msg_text:
+        await update.message.reply_text("❌ Empty message.")
+        return
+    
     if db_pool is None:
         uids = list(_mem_users.keys())
     else:
@@ -1994,10 +2008,11 @@ async def broadcast_command(update, context):
                 uids = [r["user_id"] for r in rows]
         except Exception:
             uids = []
+    
     sent, failed = 0, 0
     for u_id in uids:
         try:
-            await context.bot.send_message(u_id, f"📢 {msg}")
+            await context.bot.send_message(u_id, f"📢 {msg_text}")
             sent += 1
             await asyncio.sleep(0.05)
         except Exception:
