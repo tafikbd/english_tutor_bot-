@@ -33,6 +33,12 @@ try:
 except ImportError:
     HAS_TTS = False
 
+try:
+    from pypdf import PdfReader
+    HAS_PDF = True
+except ImportError:
+    HAS_PDF = False
+
 
 # ==========================================================
 # CONFIG
@@ -49,12 +55,8 @@ ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().
 FORCE_SUB_GROUP_ID = os.getenv("FORCE_SUB_GROUP_ID", "")
 FORCE_SUB_GROUP_LINK = os.getenv("FORCE_SUB_GROUP_LINK", "")
 
-# 👇 আপনার PDF এর file_id এখানে বসানো হয়েছে
-# পুরনো লাইনটি মুছে ফেলুন
-# PDF_FILE_ID = "BQACAgUAAxkBAAED..."
-
-# নতুন লাইন বসান
-PDF_URL = "https://drive.google.com/file/d/10RoxnUbUOuCwcotzg6-d-j1LXNMyUWqa/view?usp=drivesdk"
+# Direct download URL for Vocabulary Book
+PDF_URL = "https://drive.google.com/uc?export=download&id=10RoxnUbUOuCwcotzg6-d-j1LXNMyUWqa"
 
 if not BOT_TOKEN:
     raise RuntimeError("BOT_TOKEN missing.")
@@ -71,7 +73,10 @@ PREMIUM_STARS = 100
 PREMIUM_DAYS = 30
 FREE_IMG_PER_DAY = 5
 FREE_VOICE_PER_DAY = 10
+FREE_PDF_PER_DAY = 5
 MAX_REVIEW_PER_DAY = 5
+MAX_PDF_SIZE_MB = 10
+MAX_PDF_PAGES = 20
 
 # Payment configuration
 PREMIUM_PRICE_BDT = 200
@@ -229,9 +234,9 @@ WORD_GAME_LIST = [
 
 T = {
     "welcome": {
-        "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI - আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 অনুবাদ\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 ছবি বিশ্লেষণ\n• 🎤 ভয়েস সাপোর্ট\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 নিচের বাটন থেকে বেছে নিন।",
-        "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI - your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 Translation\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 Photo analysis\n• 🎤 Voice support\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 Choose from below.",
-        "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ - आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 अनुवाद\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 फोटो विश्लेषण\n• 🎤 वॉइस सपोर्ट\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 नीचे से चुनें।",
+        "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI - আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 অনুবাদ\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 ছবি বিশ্লেষণ\n• 📄 PDF বিশ্লেষণ\n• 🎤 ভয়েস সাপোর্ট\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 নিচের বাটন থেকে বেছে নিন।",
+        "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI - your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 Translation\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 Photo analysis\n• 📄 PDF analysis\n• 🎤 Voice support\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 Choose from below.",
+        "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ - आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 अनुवाद\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 फोटो विश्लेषण\n• 📄 PDF विश्लेषण\n• 🎤 वॉइस सपोर्ट\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 नीचे से चुनें।",
     },
     "main_menu": {"bn": "🏠 মেইন মেনু:", "en": "🏠 Main Menu:", "hi": "🏠 मुख्य मेनू:"},
     "menu_btn": {"bn": "🏠 মেইন মেনু", "en": "🏠 Main Menu", "hi": "🏠 मुख्य मेनू"},
@@ -278,7 +283,7 @@ T = {
     "premium_title": {"bn": "💎 Premium Membership", "en": "💎 Premium Membership", "hi": "💎 Premium Membership"},
     "premium_buy": {"bn": "⭐ কিনুন ({n} Stars)", "en": "⭐ Buy ({n} Stars)", "hi": "⭐ खरीदें ({n} Stars)"},
     "premium_already": {"bn": "💎 আপনি ইতিমধ্যে Premium!", "en": "💎 You are already Premium!", "hi": "💎 आप पहले से Premium हैं!"},
-    "premium_success": {"bn": "🎉 অভিনন্দন! আপনি Premium হয়েছেন!\n✅ {days} দিনের জন্য সক্রিয়।\n\n🎁 এখন পাবেন:\n• আনলিমিটেড ছবি\n• আনলিমিটেড ভয়েস\n• Voice reply", "en": "🎉 Congratulations! You are now Premium!\n✅ Active for {days} days.\n\n🎁 Now you get:\n• Unlimited photos\n• Unlimited voice\n• Voice replies", "hi": "🎉 बधाई! आप अब Premium हैं!\n✅ {days} दिनों के लिए सक्रिय।"},
+    "premium_success": {"bn": "🎉 অভিনন্দন! আপনি Premium হয়েছেন!\n✅ {days} দিনের জন্য সক্রিয়।\n\n🎁 এখন পাবেন:\n• আনলিমিটেড ছবি\n• আনলিমিটেড ভয়েস\n• Voice reply\n• আনলিমিটেড PDF", "en": "🎉 Congratulations! You are now Premium!\n✅ Active for {days} days.\n\n🎁 Now you get:\n• Unlimited photos\n• Unlimited voice\n• Voice replies\n• Unlimited PDFs", "hi": "🎉 बधाई! आप अब Premium हैं!\n✅ {days} दिनों के लिए सक्रिय।"},
     "achievements_title": {"bn": "🏅 Achievements", "en": "🏅 Achievements", "hi": "🏅 Achievements"},
     "mistakes_title": {"bn": "📚 সাম্প্রতিক ভুল", "en": "📚 Recent Mistakes", "hi": "📚 हाल की गलतियाँ"},
     "mistakes_none": {"bn": "✅ কোনো ভুল নেই!", "en": "✅ No mistakes!", "hi": "✅ कोई गलती नहीं!"},
@@ -321,8 +326,30 @@ T = {
         "en": "📸 Free users can send {n} photos per day.\n\n⭐ Get Premium for unlimited.",
         "hi": "📸 फ्री यूज़र्स दिन में {n} फोटो भेज सकते हैं।\n\n⭐ Premium लें।",
     },
+    "pdf_limit": {
+        "bn": "📄 ফ্রি ইউজাররা দিনে {n}টি PDF পাঠাতে পারেন।\n\n⭐ Premium নিলে আনলিমিটেড পাবেন।",
+        "en": "📄 Free users can send {n} PDFs per day.\n\n⭐ Get Premium for unlimited.",
+        "hi": "📄 फ्री यूज़र्स दिन में {n} PDF भेज सकते हैं।\n\n⭐ Premium लें।",
+    },
     "processing_voice": {"bn": "🎤 ভয়েস প্রসেস হচ্ছে...", "en": "🎤 Processing voice...", "hi": "🎤 वॉइस प्रोसेस हो रही है..."},
     "processing_img": {"bn": "📸 ছবি বিশ্লেষণ হচ্ছে...", "en": "📸 Analyzing image...", "hi": "📸 फोटो विश्लेषण हो रहा है..."},
+    "processing_pdf": {"bn": "📄 PDF পড়া হচ্ছে...", "en": "📄 Reading PDF...", "hi": "📄 PDF पढ़ रहा हूँ..."},
+    "pdf_analyzing": {"bn": "🤖 PDF বিশ্লেষণ করা হচ্ছে...", "en": "🤖 Analyzing PDF...", "hi": "🤖 PDF विश्लेषण हो रहा है..."},
+    "pdf_fail": {
+        "bn": "❌ PDF পড়তে পারিনি। টেক্সট-ভিত্তিক PDF পাঠান (স্ক্যান করা নয়)।",
+        "en": "❌ Could not read PDF. Please send a text-based PDF (not scanned).",
+        "hi": "❌ PDF नहीं पढ़ सका। टेक्स्ट-बेस्ड PDF भेजें।"
+    },
+    "pdf_too_big": {
+        "bn": "📄 PDF বড়, প্রথম {n} পৃষ্ঠা পড়া হয়েছে।",
+        "en": "📄 PDF is large. First {n} pages were read.",
+        "hi": "📄 PDF बड़ा है। पहले {n} पेज पढ़े गए।"
+    },
+    "pdf_too_large": {
+        "bn": "❌ ফাইলটি খুব বড়। সর্বোচ্চ {n} MB পাঠাতে পারবেন।",
+        "en": "❌ File is too large. Max {n} MB allowed.",
+        "hi": "❌ फाइल बहुत बड़ी है। अधिकतम {n} MB।"
+    },
     "voice_heard": {"bn": "📝 আপনি বলেছেন: {text}", "en": "📝 You said: {text}", "hi": "📝 आपने कहा: {text}"},
     "voice_fail": {"bn": "❌ ভয়েস বুঝতে পারিনি। আবার পাঠান।", "en": "❌ Could not understand voice.", "hi": "❌ वॉइस समझ नहीं आई।"},
     "img_fail": {"bn": "❌ ছবি বুঝতে পারিনি। আবার পাঠান।", "en": "❌ Could not analyze image.", "hi": "❌ फोटो समझ नहीं आई।"},
@@ -482,6 +509,7 @@ T = {
             "• Unlimited AI\n"
             "• 📸 Unlimited photos\n"
             "• 🎤 Unlimited voices + Voice replies\n"
+            "• 📄 Unlimited PDFs\n"
             "• 🎭 Unlimited role-plays\n"
             "• Detailed Lessons\n"
             "• Priority Response"
@@ -495,6 +523,7 @@ T = {
             "• Unlimited AI\n"
             "• 📸 Unlimited photos\n"
             "• 🎤 Unlimited voices + Voice replies\n"
+            "• 📄 Unlimited PDFs\n"
             "• 🎭 Unlimited role-plays\n"
             "• Detailed Lessons\n"
             "• Priority Response"
@@ -508,6 +537,7 @@ T = {
             "• Unlimited AI\n"
             "• 📸 Unlimited photos\n"
             "• 🎤 Unlimited voices + Voice replies\n"
+            "• 📄 Unlimited PDFs\n"
             "• 🎭 Unlimited role-plays\n"
             "• Detailed Lessons\n"
             "• Priority Response"
@@ -528,6 +558,67 @@ T = {
         "en": "✨ 500+ words, 20 sections\n📖 With meaning, pronunciation & examples\n\n👇 Download below:",
         "hi": "✨ 500+ शब्द, 20 सेक्शन\n📖 अर्थ, उच्चारण और उदाहरण के साथ\n\n👇 नीचे से डाउनलोड करें:"
     },
+    "vocab_book_fail": {
+        "bn": "❌ PDF পাঠাতে সমস্যা হচ্ছে। পরে আবার চেষ্টা করুন।",
+        "en": "❌ Failed to send PDF. Please try again later.",
+        "hi": "❌ PDF भेजने में समस्या। बाद में प्रयास करें।"
+    },
+    
+    # ===== FILES MENU =====
+    "files_menu_title": {"bn": "📂 ফাইল ও রিসোর্স", "en": "📂 Files & Resources", "hi": "📂 फाइल्स और रिसोर्स"},
+    "files_menu_desc": {
+        "bn": "নিচের ফাইলগুলো থেকে বেছে নিন:",
+        "en": "Choose from the files below:",
+        "hi": "नीचे दी गई फाइल्स से चुनें:"
+    },
+    "files_none": {
+        "bn": "📂 এখনো কোনো ফাইল আপলোড করা হয়নি।",
+        "en": "📂 No files uploaded yet.",
+        "hi": "📂 अभी तक कोई फाइल अपलोड नहीं की गई।"
+    },
+    "file_sending": {"bn": "📤 পাঠানো হচ্ছে...", "en": "📤 Sending...", "hi": "📤 भेजा जा रहा है..."},
+    "file_not_found": {"bn": "❌ ফাইল পাওয়া যায়নি।", "en": "❌ File not found.", "hi": "❌ फाइल नहीं मिली।"},
+    "file_send_fail": {
+        "bn": "❌ ফাইল পাঠাতে সমস্যা হচ্ছে। পরে আবার চেষ্টা করুন।",
+        "en": "❌ Failed to send file. Please try again later.",
+        "hi": "❌ फाइल भेजने में समस्या।"
+    },
+    
+    # ===== ADMIN FILE UPLOAD =====
+    "admin_only": {"bn": "⛔ শুধু অ্যাডমিন।", "en": "⛔ Admin only.", "hi": "⛔ केवल एडमिन।"},
+    "addfile_mode": {
+        "bn": "📎 File Upload Mode চালু হয়েছে!\n\nএখন যেকোনো PDF, DOC বা ফাইল এই চ্যাটে পাঠান।\n\nবাতিল করতে: /cancel",
+        "en": "📎 File Upload Mode ON!\n\nSend any PDF, DOC or file to this chat.\n\nTo cancel: /cancel",
+        "hi": "📎 File Upload Mode चालू!\n\nअब कोई PDF, DOC या फाइल इस चैट में भेजें।\n\nरद्द करने के लिए: /cancel"
+    },
+    "addfile_received": {
+        "bn": "📎 File received: {name}\n\nএখন একটি caption লিখুন (বা caption ছাড়াই সেভ করতে /skip পাঠান)।",
+        "en": "📎 File received: {name}\n\nNow type a caption (or send /skip to save without caption).",
+        "hi": "📎 फाइल मिली: {name}\n\nअब कैप्शन लिखें (या /skip भेजें)।"
+    },
+    "addfile_saved": {
+        "bn": "✅ File সেভ হয়েছে!\n📎 {name}\n📝 Caption: {caption}\n\nইউজাররা এখন 📂 Files মেনু থেকে এটি পাবে।",
+        "en": "✅ File saved!\n📎 {name}\n📝 Caption: {caption}\n\nUsers can now get it from 📂 Files menu.",
+        "hi": "✅ फाइल सेव हो गई!\n📎 {name}\n📝 कैप्शन: {caption}\n\nयूज़र्स अब 📂 Files मेनू से पाएंगे।"
+    },
+    "addfile_saved_no_caption": {
+        "bn": "✅ Caption ছাড়াই সেভ হয়েছে!\n📎 {name}",
+        "en": "✅ Saved without caption!\n📎 {name}",
+        "hi": "✅ कैप्शन के बिना सेव!\n📎 {name}"
+    },
+    "addfile_save_fail": {"bn": "❌ সেভ করতে ব্যর্থ হয়েছে।", "en": "❌ Save failed.", "hi": "❌ सेव विफल।"},
+    "addfile_cancel": {"bn": "✅ File upload বাতিল করা হয়েছে।", "en": "✅ File upload cancelled.", "hi": "✅ फाइल अपलोड रद्द।"},
+    "addfile_nothing": {"bn": "⚠️ কোনো pending ফাইল নেই।", "en": "⚠️ No pending file.", "hi": "⚠️ कोई पेंडिंग फाइल नहीं।"},
+    "listfiles_empty": {
+        "bn": "📂 এখনো কোনো ফাইল নেই। /addfile দিয়ে যোগ করুন।",
+        "en": "📂 No files yet. Add with /addfile.",
+        "hi": "📂 कोई फाइल नहीं। /addfile से जोड़ें।"
+    },
+    "listfiles_header": {"bn": "📂 Saved Files:", "en": "📂 Saved Files:", "hi": "📂 सेव की गई फाइल्स:"},
+    "listfiles_footer": {"bn": "মুছতে: /delfile <id>", "en": "To delete: /delfile <id>", "hi": "डिलीट करने के लिए: /delfile <id>"},
+    "delfile_usage": {"bn": "Usage: /delfile <id>\n\nআইডি দেখতে: /listfiles", "en": "Usage: /delfile <id>\n\nSee IDs: /listfiles", "hi": "Usage: /delfile <id>"},
+    "delfile_done": {"bn": "✅ File {id} মুছে ফেলা হয়েছে।", "en": "✅ File {id} deleted.", "hi": "✅ फाइल {id} डिलीट हो गई।"},
+    "delfile_fail": {"bn": "❌ Delete failed.", "en": "❌ Delete failed.", "hi": "❌ डिलीट विफल।"},
 }
 
 
@@ -724,6 +815,36 @@ def analyze_image_sync(image_path, prompt):
         logger.error(f"Vision error: {e}")
         return None
 
+
+def extract_pdf_text_sync(pdf_path, max_chars=6000):
+    try:
+        if not HAS_PDF:
+            return None
+        reader = PdfReader(pdf_path)
+        total_pages = len(reader.pages)
+        text_parts = []
+        pages_to_read = min(total_pages, MAX_PDF_PAGES)
+        for i in range(pages_to_read):
+            try:
+                page = reader.pages[i]
+                txt = page.extract_text() or ""
+                if txt.strip():
+                    text_parts.append(f"[Page {i+1}]\n{txt}")
+            except Exception:
+                continue
+            if sum(len(x) for x in text_parts) > max_chars:
+                break
+        full_text = "\n\n".join(text_parts).strip()
+        if not full_text:
+            return None
+        if len(full_text) > max_chars:
+            full_text = full_text[:max_chars] + "\n\n[... truncated ...]"
+        return full_text, total_pages
+    except Exception as e:
+        logger.error(f"PDF extract error: {e}")
+        return None
+
+
 # ==========================================================
 # DATABASE
 # ==========================================================
@@ -791,10 +912,13 @@ async def init_db():
                     remind_at VARCHAR(5),
                     voice_count_today INTEGER DEFAULT 0,
                     img_count_today INTEGER DEFAULT 0,
+                    pdf_count_today INTEGER DEFAULT 0,
                     last_voice_date DATE,
                     last_img_date DATE,
+                    last_pdf_date DATE,
                     photos_sent INTEGER DEFAULT 0,
                     voices_sent INTEGER DEFAULT 0,
+                    pdfs_sent INTEGER DEFAULT 0,
                     roleplay_count INTEGER DEFAULT 0,
                     review_count INTEGER DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -841,6 +965,29 @@ async def init_db():
                 )
             """)
             await conn.execute("CREATE INDEX IF NOT EXISTS idx_sr_user ON s_review(user_id)")
+            # New: Files table for admin uploads
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS s_files (
+                    id SERIAL PRIMARY KEY,
+                    file_id TEXT UNIQUE,
+                    file_name TEXT,
+                    caption TEXT,
+                    uploaded_by BIGINT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            # Column migrations (for existing DBs)
+            for col_name, col_def in [
+                ("pdf_count_today", "INTEGER DEFAULT 0"),
+                ("last_pdf_date", "DATE"),
+                ("pdfs_sent", "INTEGER DEFAULT 0"),
+            ]:
+                try:
+                    await conn.execute(
+                        f"ALTER TABLE s_users ADD COLUMN IF NOT EXISTS {col_name} {col_def}"
+                    )
+                except Exception:
+                    pass
         logger.info("*** ALL TABLES CREATED ***")
     except Exception as e:
         logger.error(f"*** TABLE CREATE FAILED: {e} ***")
@@ -891,8 +1038,10 @@ async def create_user(uid, name):
                 "is_premium": False, "premium_until": None,
                 "referred_by": None, "achievements": "",
                 "remind_at": None, "voice_count_today": 0,
-                "img_count_today": 0, "last_voice_date": None,
-                "last_img_date": None, "photos_sent": 0, "voices_sent": 0,
+                "img_count_today": 0, "pdf_count_today": 0,
+                "last_voice_date": None, "last_img_date": None,
+                "last_pdf_date": None,
+                "photos_sent": 0, "voices_sent": 0, "pdfs_sent": 0,
                 "roleplay_count": 0, "review_count": 0,
             }
         return
@@ -1032,6 +1181,62 @@ async def mark_reviewed(review_id):
 
 
 # ==========================================================
+# FILE STORAGE HELPERS (Admin Uploads)
+# ==========================================================
+async def save_file(file_id, file_name, caption, uploaded_by):
+    if db_pool is None:
+        return False
+    try:
+        async with db_pool.acquire() as conn:
+            await conn.execute(
+                "INSERT INTO s_files (file_id, file_name, caption, uploaded_by) "
+                "VALUES ($1, $2, $3, $4) ON CONFLICT (file_id) DO NOTHING",
+                file_id, file_name, caption, uploaded_by
+            )
+        return True
+    except Exception as e:
+        logger.error(f"save_file: {e}")
+        return False
+
+
+async def get_all_files():
+    if db_pool is None:
+        return []
+    try:
+        async with db_pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT id, file_name, caption FROM s_files ORDER BY id DESC"
+            )
+            return [dict(r) for r in rows]
+    except Exception:
+        return []
+
+
+async def get_file_by_db_id(fid):
+    if db_pool is None:
+        return None
+    try:
+        async with db_pool.acquire() as conn:
+            row = await conn.fetchrow(
+                "SELECT file_id, file_name, caption FROM s_files WHERE id = $1", fid
+            )
+            return dict(row) if row else None
+    except Exception:
+        return None
+
+
+async def delete_file(fid):
+    if db_pool is None:
+        return False
+    try:
+        async with db_pool.acquire() as conn:
+            await conn.execute("DELETE FROM s_files WHERE id = $1", fid)
+        return True
+    except Exception:
+        return False
+
+
+# ==========================================================
 # FORCE SUBSCRIBE
 # ==========================================================
 async def is_user_joined(bot, user_id):
@@ -1103,7 +1308,8 @@ def main_menu_kb():
          InlineKeyboardButton("📖 Word of Day", callback_data="m_word")],
         [InlineKeyboardButton("📇 Flashcards", callback_data="m_flashcard"),
          InlineKeyboardButton("🎮 Word Game", callback_data="m_game")],
-        [InlineKeyboardButton("📘 Vocabulary Book", callback_data="m_vocab_book")], # 👈 নতুন বাটন
+        [InlineKeyboardButton("📘 Vocabulary Book", callback_data="m_vocab_book"),
+         InlineKeyboardButton("📂 Files / Resources", callback_data="m_files")],
         [InlineKeyboardButton("📊 My Progress", callback_data="m_profile"),
          InlineKeyboardButton("🏆 Leaderboard", callback_data="m_leaderboard")],
         [InlineKeyboardButton("🎁 Invite & Earn", callback_data="m_invite"),
@@ -1296,6 +1502,10 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.pop("payment_method", None)
     context.user_data.pop("awaiting_support", None)
     context.user_data.pop("game_active", None)
+    context.user_data.pop("awaiting_file", None)
+    context.user_data.pop("awaiting_file_caption", None)
+    context.user_data.pop("pending_file_id", None)
+    context.user_data.pop("pending_file_name", None)
     if not await is_user_joined(context.bot, u.id):
         existing = await get_user(u.id)
         lang = (existing or {}).get("language") or "bn"
@@ -1419,6 +1629,7 @@ async def memory_command(update, context):
         f"🎯 {t('quizzes', lang)}: {user.get('quizzes_taken') or 0}\n"
         f"📸 Photos sent: {user.get('photos_sent') or 0}\n"
         f"🎤 Voices sent: {user.get('voices_sent') or 0}\n"
+        f"📄 PDFs sent: {user.get('pdfs_sent') or 0}\n"
         f"🎭 Role-plays: {user.get('roleplay_count') or 0}\n"
         f"🔁 Reviews: {user.get('review_count') or 0}\n"
         f"🌍 Language: {user.get('language') or 'bn'}"
@@ -1443,7 +1654,7 @@ async def help_command(update, context):
             "/mistakes - Mistakes\n/achievements - Badges\n"
             "/level - Set level\n/reminder - Reminder\n"
             "/language - Change language\n/reset - Clear chat\n\n"
-            "📸 Send photo, 🎤 voice, 👍👎 rate replies\n"
+            "📸 Send photo, 🎤 voice, 📄 PDF, 👍👎 rate replies\n"
             "🆘 Need help? Use the Support button or contact @asikul_echo"
         )
     elif lang == "hi":
@@ -1472,7 +1683,7 @@ async def help_command(update, context):
             "/mistakes - ভুল\n/achievements - ব্যাজ\n"
             "/level - লেভেল\n/reminder - রিমাইন্ডার\n"
             "/language - ভাষা\n/reset - চ্যাট ক্লিয়ার\n\n"
-            "📸 ছবি, 🎤 ভয়েস পাঠান, 👍👎 রেটিং দিন\n"
+            "📸 ছবি, 🎤 ভয়েস, 📄 PDF পাঠান, 👍👎 রেটিং দিন\n"
             "🆘 যেকোনো সমস্যায় Support বাটনে ক্লিক করুন অথবা @asikul_echo তে মেসেজ দিন"
         )
     await update.message.reply_text(text)
@@ -1500,6 +1711,7 @@ async def profile_command(update, context):
         f"{t('score', lang)}: {user.get('quiz_score') or 0}\n"
         f"📸 Photos: {user.get('photos_sent') or 0}\n"
         f"🎤 Voices: {user.get('voices_sent') or 0}\n"
+        f"📄 PDFs: {user.get('pdfs_sent') or 0}\n"
         f"🎭 Role-plays: {user.get('roleplay_count') or 0}\n"
         f"🔁 Reviews: {user.get('review_count') or 0}\n"
         f"{t('premium_status', lang)}: {status}"
@@ -1689,13 +1901,15 @@ async def reset_command(update, context):
     context.user_data.pop("payment_method", None)
     context.user_data.pop("awaiting_support", None)
     context.user_data.pop("game_active", None)
+    context.user_data.pop("awaiting_file", None)
+    context.user_data.pop("awaiting_file_caption", None)
     await update.message.reply_text(t("reset_done", lang))
 
 
 async def adminstats_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
-        await update.message.reply_text("⛔ Admin only.")
+        await update.message.reply_text(t("admin_only", "en"))
         return
     if db_pool is None:
         await update.message.reply_text(
@@ -1715,12 +1929,13 @@ async def adminstats_command(update, context):
             total_coins = await conn.fetchval("SELECT COALESCE(SUM(coins),0) FROM s_users")
             total_msgs = await conn.fetchval("SELECT COUNT(*) FROM s_history")
             total_reviews = await conn.fetchval("SELECT COUNT(*) FROM s_review")
+            total_files = await conn.fetchval("SELECT COUNT(*) FROM s_files")
         await safe_reply(
             update.message,
             f"📊 Admin Dashboard\n\n"
             f"👥 Total Users: {total}\n🟢 24h Active: {today}\n📅 7d Active: {week}\n"
             f"💎 Premium: {premium}\n🪙 Total Coins: {total_coins}\n💬 Messages: {total_msgs}\n"
-            f"🔁 Reviews saved: {total_reviews}\n\n"
+            f"🔁 Reviews saved: {total_reviews}\n📂 Files saved: {total_files}\n\n"
             f"💾 Mode: PostgreSQL ✅"
         )
     except Exception as e:
@@ -1730,7 +1945,7 @@ async def adminstats_command(update, context):
 async def feedback_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
-        await update.message.reply_text("⛔ Admin only.")
+        await update.message.reply_text(t("admin_only", "en"))
         return
     if db_pool is None:
         await update.message.reply_text("❌ DB নেই।")
@@ -1764,7 +1979,7 @@ async def feedback_command(update, context):
 async def broadcast_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
-        await update.message.reply_text("⛔ Admin only.")
+        await update.message.reply_text(t("admin_only", "en"))
         return
     if not context.args:
         await update.message.reply_text("Usage: /broadcast your message")
@@ -1793,7 +2008,7 @@ async def broadcast_command(update, context):
 async def approve_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
-        await update.message.reply_text("⛔ Admin only.")
+        await update.message.reply_text(t("admin_only", "en"))
         return
     if not context.args:
         await update.message.reply_text("Usage: /approve <user_id>")
@@ -1817,7 +2032,7 @@ async def approve_command(update, context):
 async def reply_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
-        await update.message.reply_text("⛔ Admin only.")
+        await update.message.reply_text(t("admin_only", "en"))
         return
     if not context.args or len(context.args) < 2:
         await update.message.reply_text("Usage: /reply <user_id> <your_message>")
@@ -1832,6 +2047,88 @@ async def reply_command(update, context):
         await update.message.reply_text(f"✅ Reply sent to {target_uid}")
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
+
+
+# ==========================================================
+# ADMIN FILE UPLOAD COMMANDS
+# ==========================================================
+async def addfile_command(update, context):
+    uid = update.effective_user.id
+    if uid not in ADMIN_IDS:
+        await update.message.reply_text(t("admin_only", "en"))
+        return
+    context.user_data['awaiting_file'] = True
+    context.user_data.pop('awaiting_file_caption', None)
+    context.user_data.pop('pending_file_id', None)
+    context.user_data.pop('pending_file_name', None)
+    await update.message.reply_text(t("addfile_mode", "en"))
+
+
+async def listfiles_command(update, context):
+    uid = update.effective_user.id
+    if uid not in ADMIN_IDS:
+        await update.message.reply_text(t("admin_only", "en"))
+        return
+    files = await get_all_files()
+    if not files:
+        await update.message.reply_text(t("listfiles_empty", "en"))
+        return
+    text = t("listfiles_header", "en") + "\n\n"
+    for f in files:
+        text += f"🆔 {f['id']} — {f['file_name']}\n"
+    text += "\n" + t("listfiles_footer", "en")
+    await update.message.reply_text(text)
+
+
+async def delfile_command(update, context):
+    uid = update.effective_user.id
+    if uid not in ADMIN_IDS:
+        await update.message.reply_text(t("admin_only", "en"))
+        return
+    if not context.args:
+        await update.message.reply_text(t("delfile_usage", "en"))
+        return
+    try:
+        fid = int(context.args[0])
+        ok = await delete_file(fid)
+        if ok:
+            await update.message.reply_text(t("delfile_done", "en", id=fid))
+        else:
+            await update.message.reply_text(t("delfile_fail", "en"))
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
+
+async def cancel_command(update, context):
+    uid = update.effective_user.id
+    if uid not in ADMIN_IDS:
+        return
+    cleared = False
+    for k in ['awaiting_file', 'awaiting_file_caption', 'pending_file_id', 'pending_file_name']:
+        if context.user_data.pop(k, None) is not None:
+            cleared = True
+    if cleared:
+        await update.message.reply_text(t("addfile_cancel", "en"))
+    else:
+        await update.message.reply_text(t("addfile_nothing", "en"))
+
+
+async def skip_command(update, context):
+    uid = update.effective_user.id
+    if uid not in ADMIN_IDS:
+        return
+    if not context.user_data.get('awaiting_file_caption'):
+        await update.message.reply_text(t("addfile_nothing", "en"))
+        return
+    file_id = context.user_data.pop('pending_file_id', None)
+    file_name = context.user_data.pop('pending_file_name', 'file')
+    context.user_data.pop('awaiting_file_caption', None)
+    if file_id:
+        ok = await save_file(file_id, file_name, "", uid)
+        if ok:
+            await update.message.reply_text(t("addfile_saved_no_caption", "en", name=file_name))
+        else:
+            await update.message.reply_text(t("addfile_save_fail", "en"))
 
 
 # ==========================================================
@@ -2121,6 +2418,7 @@ async def cb_profile(update, context):
         f"{t('score', lang)}: {user.get('quiz_score') or 0}\n"
         f"📸 Photos: {user.get('photos_sent') or 0}\n"
         f"🎤 Voices: {user.get('voices_sent') or 0}\n"
+        f"📄 PDFs: {user.get('pdfs_sent') or 0}\n"
         f"🎭 Role-plays: {user.get('roleplay_count') or 0}\n"
         f"🔁 Reviews: {user.get('review_count') or 0}\n"
         f"{t('premium_status', lang)}: {status}"
@@ -2307,8 +2605,93 @@ async def cb_buy_premium(update, context):
 
 
 # ==========================================================
-# VOCABULARY BOOK CALLBACK (নতুন)
+# VOCABULARY BOOK CALLBACK
 # ==========================================================
+async def cb_vocab_book(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
+    
+    caption_text = (
+        f"{t('vocab_book_title', lang)}\n\n"
+        f"{t('vocab_book_desc', lang)}"
+    )
+    
+    try:
+        await context.bot.send_document(
+            chat_id=uid,
+            document=PDF_URL,
+            filename="Sir_English_Vocabulary_Book.pdf",
+            caption=caption_text
+        )
+        await q.message.reply_text(
+            t("main_menu", lang),
+            reply_markup=main_menu_kb()
+        )
+    except Exception as e:
+        logger.error(f"PDF send error: {e}")
+        await q.message.reply_text(
+            f"📘 Sir English Vocabulary Book\n\n👇 Link:\n{PDF_URL}",
+            disable_web_page_preview=False
+        )
+
+
+# ==========================================================
+# FILES MENU (User) — Admin uploaded files
+# ==========================================================
+async def cb_files_menu(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    if not await is_user_joined(context.bot, uid):
+        return
+    files = await get_all_files()
+    if not files:
+        await safe_edit(
+            q,
+            t("files_none", lang),
+            reply_markup=back_kb(lang)
+        )
+        return
+    rows = []
+    for f in files:
+        name = f['file_name'] or "file"
+        display = name if len(name) < 30 else name[:27] + "..."
+        rows.append([InlineKeyboardButton(f"📎 {display}", callback_data=f"fget_{f['id']}")])
+    rows.append([InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")])
+    await safe_edit(
+        q,
+        f"{t('files_menu_title', lang)}\n\n{t('files_menu_desc', lang)}",
+        reply_markup=InlineKeyboardMarkup(rows)
+    )
+
+
+async def cb_file_send(update, context):
+    q = update.callback_query
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    await q.answer(t("file_sending", lang))
+    try:
+        fid = int(q.data.split("_")[1])
+    except Exception:
+        return
+    file = await get_file_by_db_id(fid)
+    if not file:
+        await q.message.reply_text(t("file_not_found", lang))
+        return
+    try:
+        await context.bot.send_document(
+            chat_id=uid,
+            document=file['file_id'],
+            caption=file.get('caption') or ""
+        )
+    except Exception as e:
+        logger.error(f"Send file error: {e}")
+        await q.message.reply_text(t("file_send_fail", lang))
 
 
 # ==========================================================
@@ -2343,38 +2726,7 @@ async def cb_word_game(update, context):
         [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
-async def cb_vocab_book(update, context):
-    q = update.callback_query
-    await q.answer()
-    uid = q.from_user.id
-    lang = await get_user_lang(uid)
-    if not await is_user_joined(context.bot, uid):
-        return
-    
-    caption_text = (
-        f"{t('vocab_book_title', lang)}\n\n"
-        f"{t('vocab_book_desc', lang)}"
-    )
-    
-    try:
-        await context.bot.send_document(
-            chat_id=uid,
-            document=PDF_URL,
-            filename="Sir_English_Vocabulary_Book.pdf",
-            caption=caption_text
-        )
-        await q.message.reply_text(
-            t("main_menu", lang),
-            reply_markup=main_menu_kb()
-        )
-    except Exception as e:
-        logger.error(f"PDF send error: {e}")
-        # যদি URL কাজ না করে, তাহলে ব্যাকআপ হিসেবে লিংক দিন
-        await q.message.reply_text(
-            f"📘 **Sir English Vocabulary Book**\n\n"
-            f"👇 নিচের লিংক থেকে ডাউনলোড করুন:\n{PDF_URL}",
-            disable_web_page_preview=False
-        )
+
 
 async def cb_game_skip(update, context):
     q = update.callback_query
@@ -2723,6 +3075,7 @@ async def cb_memory(update, context):
         f"🔥 {t('streak', lang)}: {user.get('streak') or 0} {t('days', lang)}\n"
         f"📚 {t('words_learned', lang)}: {user.get('words_learned') or 0}\n"
         f"🎯 {t('quizzes', lang)}: {user.get('quizzes_taken') or 0}\n"
+        f"📄 PDFs: {user.get('pdfs_sent') or 0}\n"
         f"🎭 Role-plays: {user.get('roleplay_count') or 0}\n"
         f"🔁 Reviews: {user.get('review_count') or 0}\n"
         f"🌍 Language: {user.get('language') or 'bn'}"
@@ -2794,7 +3147,7 @@ async def cb_help(update, context):
                 "🔥 Daily, 📖 Word of Day, 📊 Progress, 🏆 Leaderboard\n"
                 "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
                 "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
-                "📸 Send photos, 🎤 voice, 👍👎 rate replies\n"
+                "📸 Send photos, 🎤 voice, 📄 PDFs, 👍👎 rate replies\n"
                 "🆘 Need help? Use the Support button or contact @asikul_echo")
     elif lang == "hi":
         text = ("ℹ️ सहायता\n\n"
@@ -2803,7 +3156,7 @@ async def cb_help(update, context):
                 "🔥 Daily, 📖 Word of Day, 📊 Progress, 🏆 Leaderboard\n"
                 "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
                 "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
-                "📸 फोटो, 🎤 वॉइस, 👍👎 रेटिंग\n"
+                "📸 फोटो, 🎤 वॉइस, 📄 PDF, 👍👎 रेटिंग\n"
                 "🆘 सहायता के लिए Support बटन दबाएं या @asikul_echo पर संपर्क करें")
     else:
         text = ("ℹ️ সাহায্য\n\n"
@@ -2812,7 +3165,7 @@ async def cb_help(update, context):
                 "🔥 Daily, 📖 Word of Day, 📊 Progress, 🏆 Leaderboard\n"
                 "🎁 Invite, ⭐ Premium, 📚 Mistakes, 🏅 Achievements\n"
                 "🧠 Memory, 🔔 Reminder, 🌍 Language\n\n"
-                "📸 ছবি, 🎤 ভয়েস, 👍👎 রেটিং\n"
+                "📸 ছবি, 🎤 ভয়েস, 📄 PDF পাঠান, 👍👎 রেটিং\n"
                 "🆘 যেকোনো সমস্যায় Support বাটনে ক্লিক করুন অথবা @asikul_echo তে মেসেজ দিন")
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
@@ -2824,7 +3177,7 @@ async def cb_fallback(update, context):
 
 
 # ==========================================================
-# TEXT / PHOTO / VOICE HANDLER
+# TEXT / PHOTO / VOICE / PDF / DOCUMENT HANDLER
 # ==========================================================
 async def handle_message(update, context):
     message = update.effective_message
@@ -2851,6 +3204,22 @@ async def handle_message(update, context):
 
     lang = user.get("language") or "bn"
     today = datetime.now().date()
+
+    # ================= ADMIN FILE UPLOAD (CAPTION MODE) =================
+    if context.user_data.get('awaiting_file_caption') and uid in ADMIN_IDS and message.text:
+        caption = message.text.strip()
+        file_id = context.user_data.pop('pending_file_id', None)
+        file_name = context.user_data.pop('pending_file_name', 'file')
+        context.user_data.pop('awaiting_file_caption', None)
+        if file_id:
+            ok = await save_file(file_id, file_name, caption, uid)
+            if ok:
+                await message.reply_text(
+                    t("addfile_saved", "en", name=file_name, caption=caption)
+                )
+            else:
+                await message.reply_text(t("addfile_save_fail", "en"))
+        return
 
     # ================= ROLE-PLAY MODE =================
     rp = context.user_data.get("roleplay")
@@ -3027,6 +3396,117 @@ async def handle_message(update, context):
         except Exception as e:
             logger.error(f"Voice handler: {e}")
             await msg.edit_text("❌ Error processing voice.")
+        return
+
+    # ================= DOCUMENT (PDF ANALYSIS or ADMIN UPLOAD) =================
+    if message.document:
+        doc = message.document
+        file_size = doc.file_size or 0
+        file_name = doc.file_name or "document.pdf"
+        mime = (doc.mime_type or "").lower()
+
+        # ---- Admin file upload mode ----
+        if uid in ADMIN_IDS and context.user_data.get('awaiting_file'):
+            context.user_data['pending_file_id'] = doc.file_id
+            context.user_data['pending_file_name'] = file_name
+            context.user_data['awaiting_file'] = False
+            context.user_data['awaiting_file_caption'] = True
+            await message.reply_text(
+                t("addfile_received", "en", name=file_name)
+            )
+            return
+
+        # ---- Normal user PDF analysis ----
+        if file_size > MAX_PDF_SIZE_MB * 1024 * 1024:
+            await message.reply_text(t("pdf_too_large", lang, n=MAX_PDF_SIZE_MB))
+            return
+
+        if "pdf" not in mime and not file_name.lower().endswith(".pdf"):
+            await message.reply_text("❌ Only PDF files are supported for analysis.")
+            return
+
+        if not HAS_PDF:
+            await message.reply_text("❌ PDF support is not enabled.")
+            return
+
+        # Free user limit
+        if not user.get("is_premium"):
+            last_date = user.get("last_pdf_date")
+            count = user.get("pdf_count_today") or 0
+            if last_date != today:
+                count = 0
+                await update_user(uid, pdf_count_today=0, last_pdf_date=today)
+            if count >= FREE_PDF_PER_DAY:
+                await message.reply_text(t("pdf_limit", lang, n=FREE_PDF_PER_DAY))
+                return
+            await update_user(uid, pdf_count_today=count + 1)
+
+        msg = await message.reply_text(t("processing_pdf", lang))
+        pdf_path = f"/tmp/doc_{uid}.pdf"
+
+        try:
+            f = await context.bot.get_file(doc.file_id)
+            await f.download_to_drive(pdf_path)
+
+            result = await asyncio.to_thread(extract_pdf_text_sync, pdf_path)
+            try:
+                os.remove(pdf_path)
+            except Exception:
+                pass
+
+            if not result:
+                await msg.edit_text(t("pdf_fail", lang))
+                return
+
+            pdf_text, total_pages = result
+
+            if total_pages > MAX_PDF_PAGES:
+                await msg.edit_text(t("pdf_too_big", lang, n=MAX_PDF_PAGES))
+            else:
+                await msg.edit_text(t("pdf_analyzing", lang))
+
+            user_caption = (message.caption or "").strip()
+            if user_caption:
+                prompt = (
+                    f"The user sent a PDF file named '{file_name}' with this request: {user_caption}\n\n"
+                    f"PDF Content:\n{pdf_text}\n\n"
+                    f"Analyze the PDF and answer the user's request. If no specific request, summarize the PDF "
+                    f"and explain its key points in simple English (with Bangla explanation if the user's language is Bangla). "
+                    f"Use plain text and emojis only. No markdown."
+                )
+            else:
+                prompt = (
+                    f"The user sent a PDF file named '{file_name}'.\n\n"
+                    f"PDF Content:\n{pdf_text}\n\n"
+                    f"Please: 1) Give a short summary, 2) List 5-7 key points, "
+                    f"3) Suggest what the user can learn from it. Use plain text and emojis only."
+                )
+
+            answer, suggestions = await asyncio.to_thread(ask_groq, prompt, None, user)
+            if not answer:
+                answer = t("ai_error", lang)
+
+            await save_history(uid, "user", f"[PDF] {file_name} - {user_caption[:100]}")
+            await save_history(uid, "assistant", answer)
+            await update_user(uid,
+                              last_active=datetime.now(),
+                              pdfs_sent=(user.get("pdfs_sent") or 0) + 1)
+
+            kb = suggestions_kb(suggestions, context)
+            await safe_reply_feedback(message, answer, message.message_id, kb)
+
+            try:
+                await msg.delete()
+            except Exception:
+                pass
+            await check_achievements(uid)
+
+        except Exception as e:
+            logger.error(f"PDF handler: {e}")
+            try:
+                await msg.edit_text("❌ PDF প্রসেস করতে সমস্যা হয়েছে।")
+            except Exception:
+                pass
         return
 
     # ================= PHOTO =================
@@ -3306,6 +3786,11 @@ def run_bot():
             ("endgame", endgame_command),
             ("review", review_command),
             ("memory", memory_command),
+            ("addfile", addfile_command),
+            ("listfiles", listfiles_command),
+            ("delfile", delfile_command),
+            ("cancel", cancel_command),
+            ("skip", skip_command),
         ]:
             application.add_handler(CommandHandler(cmd, fn))
 
@@ -3335,8 +3820,12 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_reminder, pattern="^m_reminder$"))
         application.add_handler(CallbackQueryHandler(cb_help, pattern="^m_help$"))
         
-        # 👇 নতুন PDF হ্যান্ডলার
+        # PDF Book
         application.add_handler(CallbackQueryHandler(cb_vocab_book, pattern="^m_vocab_book$"))
+        
+        # Files menu (admin uploads)
+        application.add_handler(CallbackQueryHandler(cb_files_menu, pattern="^m_files$"))
+        application.add_handler(CallbackQueryHandler(cb_file_send, pattern="^fget_"))
 
         application.add_handler(CallbackQueryHandler(cb_buy_premium, pattern="^buy_premium$"))
         application.add_handler(CallbackQueryHandler(cb_pay_bkash, pattern="^pay_bkash$"))
@@ -3372,7 +3861,8 @@ def run_bot():
 
         application.add_handler(
             MessageHandler(
-                (filters.TEXT | filters.PHOTO | filters.VOICE | filters.AUDIO) & ~filters.COMMAND,
+                (filters.TEXT | filters.PHOTO | filters.VOICE | filters.AUDIO
+                 | filters.Document.ALL) & ~filters.COMMAND,
                 handle_message
             )
         )
