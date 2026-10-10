@@ -365,28 +365,58 @@ LANG_NAMES = {
 }
 
 
-def build_lesson_prompt(course_key, day, lang):
-    """Lesson prompt with full example — AI copies the format exactly."""
-    d = get_day_info(course_key, day)
-    if not d:
-        return None
+def build_lesson_prompt(course, day, lang="bn"):
+    topic = get_topic_display(course, day, lang)
+    course_name = get_course_name(course, lang)
+    return f"""You are an English teacher creating a lesson for a {course_name} student.
 
-    course_name = get_course_name(course_key, "en")
-    topic = d["t"]
-    vocab = d.get("v", [])
-    grammar = d.get("g", "")
-    user_lang = LANG_NAMES.get(lang, "English")
+📅 Course: {course_name}
+📅 Day: {day}
+📌 Topic: {topic}
 
-    # Review day
-    if not vocab:
-        return (
-            f"Teach Day {day}/30 of {course_name} — REVIEW DAY.\n"
-            f"Topic: {topic}\n"
-            f"Explain EVERYTHING in {user_lang}.\n"
-            f"English words stay in English; translations in {user_lang}.\n"
-            f"Create: recap + 5 questions + 1 short dialogue with {user_lang} translation.\n"
-            f"Plain text + emojis. Under 1800 chars."
-        )
+CRITICAL: Follow this EXACT structure. DO NOT skip any section:
+
+📅 DAY {day} — {topic}
+
+━━━━━━━━━━━━━━━━━
+🔤 VOCABULARY (5 words)
+━━━━━━━━━━━━━━━━━
+[5 English words with Bengali pronunciation, meaning, example, and Bengali translation]
+
+━━━━━━━━━━━━━━━━━
+📝 GRAMMAR
+━━━━━━━━━━━━━━━━━
+[1 grammar rule with clear explanation + 2 examples + Bengali translations]
+
+━━━━━━━━━━━━━━━━━
+💬 USEFUL PHRASES
+━━━━━━━━━━━━━━━━━
+[4-5 useful phrases with Bengali meanings]
+
+━━━━━━━━━━━━━━━━━
+🎭 DIALOGUE
+━━━━━━━━━━━━━━━━━
+[A 4-line conversation between A and B with Bengali translations for each line]
+
+━━━━━━━━━━━━━━━━━
+✍️ PRACTICE (3 sentences)
+━━━━━━━━━━━━━━━━━
+[3 practice sentences in English with Bengali translations]
+
+━━━━━━━━━━━━━━━━━
+💡 শেখার নিয়ম:
+1. লেসনটা একবার পড়ুন
+2. জোরে পড়ুন ২ বার
+3. Practice-এর ৩টা বাক্য নিজে লিখুন
+4. এই মেসেজে REPLY দিয়ে পাঠান
+5. আমি ভুল ঠিক করে দেব ✅
+
+RULES:
+- Reply in Bengali + English mix (like the example above)
+- ALWAYS include ALL 6 sections above
+- Use plain text with emojis only. No markdown.
+- Keep it beginner-friendly even for intermediate/advanced
+"""
 
     vocab_str = "\n".join([f"  - {w}" for w in vocab])
 
