@@ -4336,26 +4336,23 @@ async def cb_course_day(update, context):
 
     topic = get_topic_display(course, day, lang)
 
-    # ===== Static content for Bengali Beginner =====
     lesson_text = None
     if course == "beginner" and lang == "bn" and HAS_STATIC_BN:
         lesson_text = get_static_lesson_bn(course, day)
 
-    # ===== Cache lookup (language-specific) =====
     if not lesson_text:
         lesson_text = await get_cached_lesson(course, day, lang)
 
-    # ===== Generate if not cached =====
     loading_msg = None
     if not lesson_text:
         try:
-    loading_msg = await q.message.reply_text(
-        f"📅 Day {day}/{COURSE_TOTAL_DAYS}\n"
-        f"📌 {topic}\n\n"
-        f"{t('course_loading', lang)}"
-    )
-except Exception:
-    pass
+            loading_msg = await q.message.reply_text(
+                f"📅 Day {day}/{COURSE_TOTAL_DAYS}\n"
+                f"📌 {topic}\n\n"
+                f"{t('course_loading', lang)}"
+            )
+        except Exception:
+            pass
 
         prompt = build_lesson_prompt(course, day, lang)
         if prompt:
@@ -4399,7 +4396,7 @@ except Exception:
     kb_rows.append([InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")])
 
     await safe_edit(q, header + body, reply_markup=InlineKeyboardMarkup(kb_rows))
-
+    
 async def cb_course_quiz(update, context):
     q = update.callback_query
     await q.answer()
