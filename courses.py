@@ -363,8 +363,6 @@ LANG_NAMES = {
     "hi": "Hindi (Devanagari script)",
     "ru": "Russian (Cyrillic script)",
 }
-
-
 def build_lesson_prompt(course, day, lang="bn"):
     topic = get_topic_display(course, day, lang)
     course_name = get_course_name(course, lang)
@@ -374,137 +372,74 @@ def build_lesson_prompt(course, day, lang="bn"):
 📅 Day: {day}
 📌 Topic: {topic}
 
-CRITICAL: Follow this EXACT structure. DO NOT skip any section:
+CRITICAL INSTRUCTION: Follow this EXACT structure. NEVER skip any section.
 
 📅 DAY {day} — {topic}
 
 ━━━━━━━━━━━━━━━━━
-🔤 VOCABULARY (5 words)
+🔤 VOCABULARY
 ━━━━━━━━━━━━━━━━━
-[5 English words with Bengali pronunciation, meaning, example, and Bengali translation]
+Give 5 English words related to the topic. For each word show:
+1️⃣ word  /pronunciation/
+   📖 অর্থ: Bangla meaning
+   ✏️ Example sentence in English.
+   🇧🇩 Bangla translation of the example.
 
 ━━━━━━━━━━━━━━━━━
 📝 GRAMMAR
 ━━━━━━━━━━━━━━━━━
-[1 grammar rule with clear explanation + 2 examples + Bengali translations]
+Give 1 grammar rule related to the topic with:
+🎯 নিয়ম: [Explanation in Bangla]
+   [English structure]
+✏️ Example 1 in English.
+🇧🇩 Bangla translation.
+✏️ Example 2 in English.
+🇧🇩 Bangla translation.
 
 ━━━━━━━━━━━━━━━━━
 💬 USEFUL PHRASES
 ━━━━━━━━━━━━━━━━━
-[4-5 useful phrases with Bengali meanings]
+Give 4-5 useful phrases related to the topic with Bangla meanings.
+Format: • English phrase — Bangla meaning
 
 ━━━━━━━━━━━━━━━━━
 🎭 DIALOGUE
 ━━━━━━━━━━━━━━━━━
-[A 4-line conversation between A and B with Bengali translations for each line]
+Write a 4-line conversation between A and B related to the topic.
+Format:
+A: English sentence.
+🇧🇩 Bangla translation.
+
+B: English sentence.
+🇧🇩 Bangla translation.
+
+A: English sentence.
+🇧🇩 Bangla translation.
+
+B: English sentence.
+🇧🇩 Bangla translation.
 
 ━━━━━━━━━━━━━━━━━
-✍️ PRACTICE (3 sentences)
+✍️ PRACTICE (say aloud)
 ━━━━━━━━━━━━━━━━━
-[3 practice sentences in English with Bengali translations]
+Give 3 practice sentences in English with Bangla translations.
+Format:
+1. English sentence.
+   🇧🇩 Bangla translation.
 
-━━━━━━━━━━━━━━━━━
-💡 শেখার নিয়ম:
-1. লেসনটা একবার পড়ুন
-2. জোরে পড়ুন ২ বার
-3. Practice-এর ৩টা বাক্য নিজে লিখুন
-4. এই মেসেজে REPLY দিয়ে পাঠান
-5. আমি ভুল ঠিক করে দেব ✅
+2. English sentence.
+   🇧🇩 Bangla translation.
+
+3. English sentence.
+   🇧🇩 Bangla translation.
 
 RULES:
-- Reply in Bengali + English mix (like the example above)
-- ALWAYS include ALL 6 sections above
-- Use plain text with emojis only. No markdown.
-- Keep it beginner-friendly even for intermediate/advanced
+- Reply in Bengali + English mix.
+- ALWAYS include ALL 5 sections above (Vocabulary, Grammar, Phrases, Dialogue, Practice).
+- Use plain text with emojis only. Never use markdown like asterisks or bold.
+- Use Bangla script for translations.
+- Keep it clear and educational.
 """
-
-    vocab_str = "\n".join([f"  - {w}" for w in vocab])
-
-    # Bengali-specific example (most common user)
-    if lang == "bn":
-        example_block = (
-            "📅 DAY 1 — Greetings\n\n"
-            "🔤 VOCABULARY:\n\n"
-            "1️⃣ hello — /heh-LOH/\n"
-            "   📖 অর্থ: হ্যালো / শুভেচ্ছা\n"
-            "   ✏️ Hello, how are you?\n"
-            "   🇧🇩 হ্যালো, আপনি কেমন আছেন?\n\n"
-            "2️⃣ hi — /hai/\n"
-            "   📖 অর্থ: হাই / ওহে\n"
-            "   ✏️ Hi! Nice to meet you.\n"
-            "   🇧🇩 হাই! আপনার সাথে পরিচিত হয়ে ভালো লাগলো।\n\n"
-            "3️⃣ good morning — /good MOR-ning/\n"
-            "   📖 অর্থ: সুপ্রভাত\n"
-            "   ✏️ Good morning, everyone.\n"
-            "   🇧🇩 সুপ্রভাত, সবাইকে।\n\n"
-            "📝 GRAMMAR:\n"
-            "🎯 নিয়ম: নিজের পরিচয় দিতে \"Hi, I'm ___\" ব্যবহার করুন।\n"
-            "   Example 1: Hi, I'm Alex.\n"
-            "   🇧🇩 হাই, আমি আলেক্স।\n\n"
-            "   Example 2: Hello, I'm Maya.\n"
-            "   🇧🇩 হ্যালো, আমি মায়া।\n\n"
-            "💬 USEFUL PHRASES:\n"
-            "• Hi, I'm ___ — নিজের পরিচয় দেওয়া\n"
-            "• Hello, nice to meet you — নতুন কারো সাথে পরিচিত হওয়া\n"
-            "• Good morning, how are you? — সকালের শুভেচ্ছা\n"
-            "• Goodbye, see you later — বিদায়\n\n"
-            "🎭 DIALOGUE:\n"
-            "A: Hi, I'm Sam.\n"
-            "   🇧🇩 হাই, আমি স্যাম।\n"
-            "B: Hello, I'm Lily.\n"
-            "   🇧🇩 হ্যালো, আমি লিলি।\n"
-            "A: Nice to meet you, Lily.\n"
-            "   🇧🇩 আপনার সাথে পরিচিত হয়ে ভালো লাগলো, লিলি।\n"
-            "B: Nice to meet you too, Sam.\n"
-            "   🇧🇩 আমারও ভালো লাগলো, স্যাম।\n\n"
-            "✍️ PRACTICE:\n"
-            "1. Hi, I'm John.\n"
-            "   🇧🇩 হাই, আমি জন।\n"
-            "2. Good morning, I'm Sarah.\n"
-            "   🇧🇩 সুপ্রভাত, আমি সারা।\n"
-            "3. Goodbye, I'm Tom.\n"
-            "   🇧🇩 বিদায়, আমি টম।\n"
-        )
-    else:
-        # Generic example for other langs
-        example_block = (
-            f"DAY 1 — Greetings\n\n"
-            f"VOCABULARY:\n"
-            f"1. hello — [{user_lang} meaning]\n"
-            f"   Example: Hello, how are you?\n"
-            f"   Translation: [SAME SENTENCE in {user_lang}]\n\n"
-            f"(do this for all 5 words)\n\n"
-            f"GRAMMAR: [Rule in {user_lang}]\n"
-            f"DIALOGUE: each line + [{user_lang} translation below]\n"
-            f"PRACTICE: 3 sentences + [{user_lang} translation]"
-        )
-
-    return (
-        f"You are an English teacher. Teach Day {day} of {course_name}.\n"
-        f"The student's native language is {user_lang}.\n\n"
-        f"TOPIC: {topic}\n"
-        f"GRAMMAR: {grammar}\n"
-        f"5 VOCABULARY WORDS:\n{vocab_str}\n\n"
-        f"╔══════════════════════════════════════════╗\n"
-        f"║  MOST IMPORTANT RULE — FOLLOW EXACTLY:   ║\n"
-        f"╚══════════════════════════════════════════╝\n"
-        f"Every English sentence MUST have its translation\n"
-        f"on the VERY NEXT line, in {user_lang} script.\n"
-        f"The translation line MUST start with 🇧🇩 (for Bangla) or the flag of {user_lang}.\n"
-        f"DO NOT repeat the English text. WRITE THE ACTUAL {user_lang} TRANSLATION.\n"
-        f"If you don't know a word, use a simple {user_lang} equivalent.\n\n"
-        f"EXAMPLE OF CORRECT OUTPUT:\n"
-        f"────────────────────────────────────────────\n"
-        f"{example_block}"
-        f"────────────────────────────────────────────\n\n"
-        f"NOW GENERATE DAY {day} ({topic}) USING THE SAME FORMAT.\n"
-        f"Use these 5 words: {', '.join(vocab)}\n"
-        f"Grammar point: {grammar}\n\n"
-        f"Format rules:\n"
-        f"- Plain text + emojis. No markdown.\n"
-        f"- Under 2000 characters.\n"
-        f"- Every 🇧🇩 line = real {user_lang} translation, NOT English."
-    )
 
     vocab_str = ", ".join(vocab)
 
