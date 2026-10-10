@@ -4297,10 +4297,24 @@ async def cb_course_day(update, context):
             await save_cached_lesson(course, day, lesson_text)
 
     header = (
-        f"📅 Day {day}/{COURSE_TOTAL_DAYS} — {get_course_name(course, lang)}\n"
-        f"📌 {topic}\n\n"
-        f"━━━━━━━━━━━━━━━━━\n\n"
-    )
+    f"📅 Day {day}/{COURSE_TOTAL_DAYS} — {get_course_name(course, lang)}\n"
+    f"📌 {topic}\n\n"
+    f"━━━━━━━━━━━━━━━━━\n\n"
+)
+body = lesson_text if len(lesson_text) < 3000 else lesson_text[:3000] + "..."
+
+# Practice hint for user
+practice_hint = (
+    "\n\n━━━━━━━━━━━━━━━━━\n"
+    "💡 HOW TO LEARN:\n"
+    "━━━━━━━━━━━━━━━━━\n"
+    "1. পড়ুন লেসনটা একবার\n"
+    "2. জোরে পড়ুন ২ বার\n"
+    "3. ✍️ Practice-এর ৩টা বাক্য নিজে লিখুন\n"
+    "4. এই মেসেজে REPLY দিয়ে লিখে পাঠান\n"
+    "5. আমি চেক করে ভুল ঠিক করে দেব ✅\n"
+)
+body = body + practice_hint
     body = lesson_text if len(lesson_text) < 3400 else lesson_text[:3400] + "..."
 
     kb_rows = []
@@ -5076,35 +5090,65 @@ async def handle_message(update, context):
         context.user_data.pop('premium_plan', None)
         return
 
-    if chat.type == "private":
-        user_text = message.text.strip()
-        if not user_text:
-            return
-    else:
-        bot_username = context.bot.username
-        if not bot_username:
-            return
-        is_reply_to_bot = (
-            message.reply_to_message is not None
-            and message.reply_to_message.from_user is not None
-            and message.reply_to_message.from_user.id == context.bot.id
-        )
-        mention = f"@{bot_username.lower()}"
-        if mention not in message.text.lower() and not is_reply_to_bot:
-            return
-        user_text = message.text.replace(f"@{bot_username}", "").strip()
-        if not user_text:
-            user_text = "Please help me with English."
+    # ===== Detect if user is replying to a bot message =====
+replied_text = ""
+if (message.reply_to_message
+        and message.reply_to_message.from_user
+        and message.reply_to_message.from_user.id == context.bot.id):
+    replied_text = (
+        message.reply_to_message.text
+        or message.reply_to_message.caption
+        or ""
+    ).strip()
 
-    await update_user(uid, last_active=datetime.now())
-    await check_streak(uid)
-    await save_history(uid, "user", user_text)
-    history = await get_history(uid)
-    try:
-        await message.chat.send_action("typing")
-    except Exception:
-        pass
-    answer, suggestions = await asyncio.to_thread(ask_groq, user_text, history, user)
+if chat.type == "private":
+    user_text = message.text.strip()
+    if not user_text:
+        return
+else:
+    bot_username = context.bot.username
+    if not bot_username:
+        return
+    is_reply_to_bot = bool(replied_text)
+    mention = f"@{bot_username.lower()}"
+    if mention not in message.text.lower() and not is_reply_to_bot:
+        return
+    user_text = message.text.replace(f"@{bot_username}", "").strip()
+    if not user_text:
+        user_text = "Please help me with English."
+
+# ===== Build AI input with reply context =====
+if replied_text:
+    # Truncate the replied message if too long
+    ctx = replied_text[:800]
+    ai_input = (
+        f"[CONTEXT: The user is REPLYING to a specific message you sent earlier.]\n"
+        f"[Your original message was:]\n"
+        f"\"\"\"\n{ctx}\n\"\"\"\n\n"
+        f"[The user's reply is:]\n"
+        f"\"{user_text}\"\n\n"
+        f"⚠️ INTERPRETATION RULES:\n"
+        f"1. If your original message ASKED a question or gave a task "
+        f"(like 'practice these sentences', 'answer these questions'), "
+        f"the user is trying to ANSWER it.\n"
+        f"2. CHECK their answer carefully. If correct → praise them. "
+        f"If wrong → gently correct and show the right version.\n"
+        f"3. If the user is asking about your message → explain it.\n"
+        f"4. Stay in {user.get('language', 'bn')} language.\n"
+        f"5. Be encouraging. Under 1500 characters."
+    )
+else:
+    ai_input = user_text
+
+await update_user(uid, last_active=datetime.now())
+await check_streak(uid)
+await save_history(uid, "user", user_text)
+history = await get_history(uid)
+try:
+    await message.chat.send_action("typing")
+except Exception:
+    pass
+answer, suggestions = await asyncio.to_thread(ask_groq, ai_input, history, user)
     if not answer:
         answer = t("ai_error", lang)
     await save_history(uid, "assistant", answer)
