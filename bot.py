@@ -4235,7 +4235,6 @@ async def cb_course_pick(update, context):
         [InlineKeyboardButton("⬅️ Back", callback_data="course_home")],
     ]))
 
-
 async def cb_course_start(update, context):
     q = update.callback_query
     await q.answer()
@@ -4244,7 +4243,6 @@ async def cb_course_start(update, context):
     await start_course(uid, course)
     q.data = f"course_day_{course}_1"
     await cb_course_day(update, context)
-
 
 async def cb_course_day(update, context):
     q = update.callback_query
@@ -4257,11 +4255,9 @@ async def cb_course_day(update, context):
         course = parts[2]
         day = int(parts[3])
     except Exception:
-        await q.answer("Invalid", show_alert=True)
         return
 
     if course not in COURSE_DATA or day < 1 or day > COURSE_TOTAL_DAYS:
-        await q.answer("Invalid day", show_alert=True)
         return
 
     prog = await get_course_progress(uid, course)
@@ -4270,31 +4266,50 @@ async def cb_course_day(update, context):
         prog = await get_course_progress(uid, course)
 
     current_day = (prog["current_day"] if prog else 0) or 0
-
     if day > current_day + 1:
         await q.answer(f"⚠️ আগে Day {current_day + 1} শেষ করুন!", show_alert=True)
         return
 
     topic = get_topic_display(course, day, lang)
 
+    # ===== Check static / cache first =====
     lesson_text = None
     if course == "beginner" and lang == "bn" and HAS_STATIC_BN:
         lesson_text = get_static_lesson_bn(course, day)
 
     if not lesson_text:
-        cached = await get_cached_lesson(course, day)
-        if cached:
-            lesson_text = cached
-        else:
-            await safe_edit(q, "⏳ Lesson তৈরি হচ্ছে...", reply_markup=None)
-            prompt = build_lesson_prompt(course, day, lang)
-            if prompt:
-                lesson_text, _ = await asyncio.to_thread(ask_groq, prompt, None, None)
-            if not lesson_text:
-                lesson_text = "❌ Lesson generate failed. আবার চেষ্টা করুন।"
-            else:
-                await save_cached_lesson(course, day, lesson_text)
+        lesson_text = await get_cached_lesson(course, day)
 
+    # ===== If no cache, generate with NEW loading message =====
+    loading_msg = None
+    if not lesson_text:
+        try:
+            loading_msg = await q.message.reply_text(
+                f"📅 Day {day}/{COURSE_TOTAL_DAYS}\n"
+                f"📌 {topic}\n\n"
+                f"⏳ Lesson তৈরি হচ্ছে...\n"
+                f"অনুগ্রহ করে ১০-১৫ সেকেন্ড অপেক্ষা করুন।"
+            )
+        except Exception:
+            pass
+
+        prompt = build_lesson_prompt(course, day, lang)
+        if prompt:
+            lesson_text, _ = await asyncio.to_thread(ask_groq, prompt, None, None)
+
+        if not lesson_text:
+            lesson_text = "❌ Lesson generate failed. আবার চেষ্টা করুন।"
+        else:
+            await save_cached_lesson(course, day, lesson_text)
+
+    # ===== Delete loading message =====
+    if loading_msg:
+        try:
+            await loading_msg.delete()
+        except Exception:
+            pass
+
+    # ===== Render content =====
     header = (
         f"📅 Day {day}/{COURSE_TOTAL_DAYS} — {get_course_name(course, lang)}\n"
         f"📌 {topic}\n\n"
@@ -4305,6 +4320,34 @@ async def cb_course_day(update, context):
         body = lesson_text[:3000] + "..."
     else:
         body = lesson_text
+
+    practice_hint = (
+        "\n\n━━━━━━━━━━━━━━━━━\n"
+        "💡 শেখার নিয়ম:\n"
+        "1. লেসনটা একবার পড়ুন\n"
+        "2. জোরে পড়ুন ২ বার\n"
+        "3. Practice-এর ৩টা বাক্য নিজে লিখুন\n"
+        "4. এই মেসেজে REPLY দিয়ে পাঠান\n"
+        "5. আমি ভুল ঠিক করে দেব ✅\n"
+    )
+    body = body + practice_hint
+
+    kb_rows = []
+    kb_rows.append([InlineKeyboardButton(
+        f"🎯 Take Quiz — Day {day}",
+        callback_data=f"course_quiz_{course}_{day}"
+    )])
+
+    nav_row = []
+    if day > 1:
+        nav_row.append(InlineKeyboardButton("⬅️ Prev", callback_data=f"course_day_{course}_{day-1}"))
+    nav_row.append(InlineKeyboardButton("🏠 Course", callback_data="course_home"))
+    if day < current_day:
+        nav_row.append(InlineKeyboardButton("Next ➡️", callback_data=f"course_day_{course}_{day+1}"))
+    kb_rows.append(nav_row)
+    kb_rows.append([InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")])
+
+    await safe_edit(q, header + body, reply_markup=InlineKeyboardMarkup(kb_rows))
 
     practice_hint = (
         "\n\n━━━━━━━━━━━━━━━━━\n"
