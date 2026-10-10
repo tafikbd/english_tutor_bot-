@@ -4770,8 +4770,10 @@ async def handle_message(update, context):
                 f = await context.bot.get_file(voice.file_id)
                 await f.download_to_drive(path)
                 text = await asyncio.to_thread(transcribe_sync, path)
-                try: os.remove(path)
-                except: pass
+                try:
+                    os.remove(path)
+                except Exception:
+                    pass
                 if not text:
                     await msg.edit_text(t("voice_fail", lang))
                     return
@@ -4792,8 +4794,10 @@ async def handle_message(update, context):
                 f = await context.bot.get_file(voice.file_id)
                 await f.download_to_drive(path)
                 user_said = await asyncio.to_thread(transcribe_sync, path)
-                try: os.remove(path)
-                except: pass
+                try:
+                    os.remove(path)
+                except Exception:
+                    pass
                 if not user_said:
                     await msg.edit_text(t("voice_fail", lang))
                     return
@@ -4834,15 +4838,17 @@ async def handle_message(update, context):
                                     voice=vf,
                                     caption=t("pron_listen_again", lang)
                                 )
-                            try: os.remove(tts_path)
-                            except: pass
+                            try:
+                                os.remove(tts_path)
+                            except Exception:
+                                pass
                     except Exception:
                         pass
 
                 await message.reply_text(
-                    f"👉 Send another voice to try again.\n"
-                    f"🔄 /pronounce for new sentence\n"
-                    f"❌ /cancelpronounce to exit"
+                    "👉 Send another voice to try again.\n"
+                    "🔄 /pronounce for new sentence\n"
+                    "❌ /cancelpronounce to exit"
                 )
 
                 await update_user(uid, last_active=datetime.now(),
@@ -4884,21 +4890,27 @@ async def handle_message(update, context):
             f = await context.bot.get_file(doc.file_id)
             await f.download_to_drive(pdf_path)
             result = await asyncio.to_thread(extract_pdf_text_sync, pdf_path)
-            try: os.remove(pdf_path)
-            except: pass
+            try:
+                os.remove(pdf_path)
+            except Exception:
+                pass
             if not result:
                 await msg.edit_text(t("pdf_fail", lang))
                 return
             pdf_text, _ = result
-            try: await msg.delete()
-            except: pass
+            try:
+                await msg.delete()
+            except Exception:
+                pass
             await generate_pdf_quiz(message, context, uid, pdf_text, file_name, user)
             await update_user(uid, last_active=datetime.now(),
                               pdfs_sent=(user.get("pdfs_sent") or 0) + 1)
         except Exception as e:
             logger.error(f"PDF Quiz error: {e}")
-            try: await msg.edit_text("❌ Error processing PDF.")
-            except: pass
+            try:
+                await msg.edit_text("❌ Error processing PDF.")
+            except Exception:
+                pass
         return
 
     pdf_quiz = context.user_data.get('pdf_quiz')
@@ -4933,7 +4945,58 @@ async def handle_message(update, context):
                 ok = await text_to_voice(answer[:400], tts_path)
                 if ok:
                     with open(tts_path, "rb") as vf:
-t.split() if len(w) > 3)
+                        await message.reply_voice(voice=vf)
+                    try:
+                        os.remove(tts_path)
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+        return
+
+    if context.user_data.get('game_active') and message.text and not message.text.startswith("/"):
+        user_answer = message.text.strip().lower()
+        correct_word = context.user_data.get('game_word', '').lower()
+        if user_answer == correct_word:
+            score = context.user_data.get('game_score', 0) + 5
+            context.user_data['game_score'] = score
+            await add_coins(uid, 5)
+            word = random.choice(WORD_GAME_LIST).lower()
+            scrambled = list(word)
+            random.shuffle(scrambled)
+            scrambled_word = "".join(scrambled).upper()
+            context.user_data['game_word'] = word
+            text = (
+                f"{t('game_correct', lang)}\n\n"
+                f"{t('game_next_word', lang, word=scrambled_word)}\n\n"
+                f"{t('game_score', lang, score=score)}\n\n"
+                f"{t('game_stop_hint', lang)}"
+            )
+            markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton(t("game_skip_btn", lang), callback_data="game_skip")],
+                [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
+            ])
+            await message.reply_text(text, reply_markup=markup)
+        else:
+            await message.reply_text(
+                f"{t('game_wrong', lang)}\n\n"
+                f"{t('game_hint', lang, first=correct_word[0].upper(), length=len(correct_word))}\n"
+                f"{t('game_try_again', lang)}"
+            )
+        return
+
+    rq = context.user_data.get("review_queue")
+    if rq and message.text and not message.text.startswith("/"):
+        idx = context.user_data.get("review_index", 0)
+        if idx >= len(rq):
+            context.user_data.pop("review_queue", None)
+            context.user_data.pop("review_index", None)
+            await message.reply_text(t("review_none", lang))
+            return
+        current = rq[idx]
+        user_ans = message.text.strip().lower()
+        correct = current["corrected_text"].lower()
+        correct_words = set(w for w in correct.split() if len(w) > 3)
         user_words = set(w for w in user_ans.split() if len(w) > 3)
         match = len(correct_words & user_words) / max(len(correct_words), 1) if correct_words else 0
         if match >= 0.6:
@@ -4956,345 +5019,247 @@ t.split() if len(w) > 3)
             context.user_data.pop("review_index", None)
             await message.reply_text(t("review_none", lang))
         return
-        if message.voice or message.audio:
-    if not user.get("is_premium"):
-        last_date = user.get("last_voice_date")
-        count = user.get("voice_count_today") or 0
-        if last_date != today:
-            count = 0
-            await update_user(uid, voice_count_today=0, last_voice_date=today)
-        if count >= FREE_VOICE_PER_DAY:
-            await message.reply_text(t("voice_limit", lang, n=FREE_VOICE_PER_DAY))
-            return
-        await update_user(uid, voice_count_today=count + 1)
-    msg = await message.reply_text(t("processing_voice", lang))
-    path = f"/tmp/voice_{uid}.ogg"
-    try:
-        voice = message.voice or message.audio
-        f = await context.bot.get_file(voice.file_id)
-        await f.download_to_drive(path)
-        text = await asyncio.to_thread(transcribe_sync, path)
-        try: os.remove(path)
-        except Exception: pass
-        if not text:
-            await msg.edit_text(t("voice_fail", lang))
-            return
-        await msg.edit_text(t("voice_heard", lang, text=text) + "\n\n⏳")
-        history = await get_history(uid)
-        answer, suggestions = await asyncio.to_thread(ask_groq, text, history, user)
-        if not answer:
-            answer = t("ai_error", lang)
-        await save_history(uid, "user", text)
-        await save_history(uid, "assistant", answer)
-        await update_user(uid, last_active=datetime.now(),
-                          voices_sent=(user.get("voices_sent") or 0) + 1)
-        kb = suggestions_kb(suggestions, context)
-        await safe_reply_feedback(message, answer, message.message_id, kb)
-        corr = extract_correction(answer)
-        if corr:
-            await save_review(uid, corr[0], corr[1])
-        if user.get("is_premium") and HAS_TTS:
+
+    if message.voice or message.audio:
+        if not user.get("is_premium"):
+            last_date = user.get("last_voice_date")
+            count = user.get("voice_count_today") or 0
+            if last_date != today:
+                count = 0
+                await update_user(uid, voice_count_today=0, last_voice_date=today)
+            if count >= FREE_VOICE_PER_DAY:
+                await message.reply_text(t("voice_limit", lang, n=FREE_VOICE_PER_DAY))
+                return
+            await update_user(uid, voice_count_today=count + 1)
+        msg = await message.reply_text(t("processing_voice", lang))
+        path = f"/tmp/voice_{uid}.ogg"
+        try:
+            voice = message.voice or message.audio
+            f = await context.bot.get_file(voice.file_id)
+            await f.download_to_drive(path)
+            text = await asyncio.to_thread(transcribe_sync, path)
             try:
-                tts_path = f"/tmp/tts_{uid}.mp3"
-                ok = await text_to_voice(answer[:500], tts_path)
-                if ok:
-                    with open(tts_path, "rb") as vf:
-                        await message.reply_voice(voice=vf)
-                    try: os.remove(tts_path)
-                    except Exception: pass
-            except Exception as e:
-                logger.error(f"Voice reply: {e}")
-        try: await msg.delete()
-        except Exception: pass
-        await check_achievements(uid)
-    except Exception as e:
-        logger.error(f"Voice handler: {e}")
-        await msg.edit_text("❌ Error processing voice.")
-    return
-
-if message.document:
-    doc = message.document
-    file_size = doc.file_size or 0
-    file_name = doc.file_name or "document.pdf"
-    mime = (doc.mime_type or "").lower()
-
-    if uid in ADMIN_IDS and context.user_data.get('awaiting_file'):
-        context.user_data['pending_file_id'] = doc.file_id
-        context.user_data['pending_file_name'] = file_name
-        context.user_data['awaiting_file'] = False
-        context.user_data['awaiting_file_caption'] = True
-        await message.reply_text(t("addfile_received", "en", name=file_name))
-        return
-
-    if file_size > MAX_PDF_SIZE_MB * 1024 * 1024:
-        await message.reply_text(t("pdf_too_large", lang, n=MAX_PDF_SIZE_MB))
-        return
-    if "pdf" not in mime and not file_name.lower().endswith(".pdf"):
-        await message.reply_text("❌ Only PDF files are supported for analysis.")
-        return
-    if not HAS_PDF:
-        await message.reply_text("❌ PDF support is not enabled.")
-        return
-
-
-    if not user.get("is_premium"):
-        last_date = user.get("last_img_date")
-        count = user.get("img_count_today") or 0
-        if last_date != today:
-            count = 0
-            await update_user(uid, img_count_today=0, last_img_date=today)
-        if count >= FREE_IMG_PER_DAY:
-            await message.reply_text(t("img_limit", lang, n=FREE_IMG_PER_DAY))
-            return
-        await update_user(uid, img_count_today=count + 1)
-
-    msg = await message.reply_text(t("processing_img", lang))
-    path = f"/tmp/img_{uid}.jpg"
-    try:
-        photo = message.photo[-1]
-        f = await context.bot.get_file(photo.file_id)
-        await f.download_to_drive(path)
-        caption = build_photo_prompt(lang, message.caption)
-        answer = await asyncio.to_thread(analyze_image_sync, path, caption)
-        try: os.remove(path)
-        except Exception: pass
-        if not answer:
-            await msg.edit_text(t("img_fail", lang))
-            return
-        await save_history(uid, "user", f"[Photo] {caption}")
-        await save_history(uid, "assistant", answer)
-        await update_user(uid, last_active=datetime.now(),
-                          photos_sent=(user.get("photos_sent") or 0) + 1)
-        await safe_reply_feedback(message, answer, message.message_id)
-        try: await msg.delete()
-        except Exception: pass
-        await check_achievements(uid)
-    except Exception as e:
-        logger.error(f"Photo handler: {e}")
-        await msg.edit_text("❌ Error processing photo.")
-    return
-
-if not message.text:
-    return
-
-if context.user_data.get('awaiting_support') and message.text and not message.text.startswith("/"):
-    for admin_id in ADMIN_IDS:
-        try:
-            await context.bot.forward_message(
-                chat_id=admin_id, from_chat_id=message.chat_id,
-                message_id=message.message_id
-            )
-            await context.bot.send_message(
-                admin_id,
-                f"📩 Support message!\n\n"
-                f"👤 User: {message.from_user.full_name}\n"
-                f"🆔 User ID: `{uid}`\n\n"
-                f"Reply with:\n`/reply {uid} your_reply`"
-            )
-        except Exception as e:
-            logger.error(f"Support fwd fail: {e}")
-    await message.reply_text(t("support_sent", lang))
-    context.user_data.pop('awaiting_support', None)
-    return
-
-if context.user_data.get('awaiting_payment') and message.text and not message.text.startswith("/"):
-    method = context.user_data.get('payment_method', 'Unknown')
-    plan_key = context.user_data.get('premium_plan', '1m')
-    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
-    for admin_id in ADMIN_IDS:
-        try:
-            await context.bot.forward_message(
-                chat_id=admin_id, from_chat_id=message.chat_id,
-                message_id=message.message_id
-            )
-            await context.bot.send_message(
-                admin_id,
-                f"💰 {method} payment info (text)!\n\n"
-                f"👤 User: {message.from_user.full_name}\n"
-                f"🆔 User ID: `{uid}`\n"
-                f"📦 Plan: {plan_key} ({plan['days']} days)\n\n"
-                f"Approve with: `/approve {uid} {plan_key}`"
-            )
-        except Exception as e:
-            logger.error(f"Text fwd fail: {e}")
-    await message.reply_text(t("payment_info_sent", lang))
-    context.user_data.pop('awaiting_payment', None)
-    context.user_data.pop('payment_method', None)
-    context.user_data.pop('premium_plan', None)
-    return
-
-replied_text = ""
-if (message.reply_to_message
-        and message.reply_to_message.from_user
-        and message.reply_to_message.from_user.id == context.bot.id):
-    replied_text = (
-        message.reply_to_message.text
-        or message.reply_to_message.caption
-        or ""
-    ).strip()
-
-if chat.type == "private":
-    user_text = message.text.strip()
-    if not user_text:
-        return
-else:
-    bot_username = context.bot.username
-    if not bot_username:
-        return
-    is_reply_to_bot = bool(replied_text)
-    mention = f"@{bot_username.lower()}"
-    if mention not in message.text.lower() and not is_reply_to_bot:
-        return
-    user_text = message.text.replace(f"@{bot_username}", "").strip()
-    if not user_text:
-        user_text = "Please help me with English."
-
-if replied_text:
-    ctx = replied_text[:800]
-    ai_input = (
-        f"[CONTEXT: The user is REPLYING to a specific message you sent earlier.]\n"
-        f"[Your original message was:]\n"
-        f"\"\"\"\n{ctx}\n\"\"\"\n\n"
-if message.voice or message.audio:
-    if not user.get("is_premium"):
-        last_date = user.get("last_voice_date")
-        count = user.get("voice_count_today") or 0
-        if last_date != today:
-            count = 0
-            await update_user(uid, voice_count_today=0, last_voice_date=today)
-        if count >= FREE_VOICE_PER_DAY:
-            await message.reply_text(t("voice_limit", lang, n=FREE_VOICE_PER_DAY))
-            return
-        await update_user(uid, voice_count_today=count + 1)
-    msg = await message.reply_text(t("processing_voice", lang))
-    path = f"/tmp/voice_{uid}.ogg"
-    try:
-        voice = message.voice or message.audio
-        f = await context.bot.get_file(voice.file_id)
-        await f.download_to_drive(path)
-        text = await asyncio.to_thread(transcribe_sync, path)
-        try: os.remove(path)
-        except Exception: pass
-        if not text:
-            await msg.edit_text(t("voice_fail", lang))
-            return
-        await msg.edit_text(t("voice_heard", lang, text=text) + "\n\n⏳")
-        history = await get_history(uid)
-        answer, suggestions = await asyncio.to_thread(ask_groq, text, history, user)
-        if not answer:
-            answer = t("ai_error", lang)
-        await save_history(uid, "user", text)
-        await save_history(uid, "assistant", answer)
-        await update_user(uid, last_active=datetime.now(),
-                          voices_sent=(user.get("voices_sent") or 0) + 1)
-        kb = suggestions_kb(suggestions, context)
-        await safe_reply_feedback(message, answer, message.message_id, kb)
-        corr = extract_correction(answer)
-        if corr:
-            await save_review(uid, corr[0], corr[1])
-        if user.get("is_premium") and HAS_TTS:
+                os.remove(path)
+            except Exception:
+                pass
+            if not text:
+                await msg.edit_text(t("voice_fail", lang))
+                return
+            await msg.edit_text(t("voice_heard", lang, text=text) + "\n\n⏳")
+            history = await get_history(uid)
+            answer, suggestions = await asyncio.to_thread(ask_groq, text, history, user)
+            if not answer:
+                answer = t("ai_error", lang)
+            await save_history(uid, "user", text)
+            await save_history(uid, "assistant", answer)
+            await update_user(uid, last_active=datetime.now(),
+                              voices_sent=(user.get("voices_sent") or 0) + 1)
+            kb = suggestions_kb(suggestions, context)
+            await safe_reply_feedback(message, answer, message.message_id, kb)
+            corr = extract_correction(answer)
+            if corr:
+                await save_review(uid, corr[0], corr[1])
+            if user.get("is_premium") and HAS_TTS:
+                try:
+                    tts_path = f"/tmp/tts_{uid}.mp3"
+                    ok = await text_to_voice(answer[:500], tts_path)
+                    if ok:
+                        with open(tts_path, "rb") as vf:
+                            await message.reply_voice(voice=vf)
+                        try:
+                            os.remove(tts_path)
+                        except Exception:
+                            pass
+                except Exception as e:
+                    logger.error(f"Voice reply: {e}")
             try:
-                tts_path = f"/tmp/tts_{uid}.mp3"
-                ok = await text_to_voice(answer[:500], tts_path)
-                if ok:
-                    with open(tts_path, "rb") as vf:
-                        await message.reply_voice(voice=vf)
-                    try: os.remove(tts_path)
-                    except Exception: pass
-            except Exception as e:
-                logger.error(f"Voice reply: {e}")
-        try: await msg.delete()
-        except Exception: pass
-        await check_achievements(uid)
-    except Exception as e:
-        logger.error(f"Voice handler: {e}")
-        await msg.edit_text("❌ Error processing voice.")
-    return
-
-if message.document:
-    doc = message.document
-    file_size = doc.file_size or 0
-    file_name = doc.file_name or "document.pdf"
-    mime = (doc.mime_type or "").lower()
-
-    if uid in ADMIN_IDS and context.user_data.get('awaiting_file'):
-        context.user_data['pending_file_id'] = doc.file_id
-        context.user_data['pending_file_name'] = file_name
-        context.user_data['awaiting_file'] = False
-        context.user_data['awaiting_file_caption'] = True
-        await message.reply_text(t("addfile_received", "en", name=file_name))
+                await msg.delete()
+            except Exception:
+                pass
+            await check_achievements(uid)
+        except Exception as e:
+            logger.error(f"Voice handler: {e}")
+            await msg.edit_text("❌ Error processing voice.")
         return
 
-    if file_size > MAX_PDF_SIZE_MB * 1024 * 1024:
-        await message.reply_text(t("pdf_too_large", lang, n=MAX_PDF_SIZE_MB))
-        return
-    if "pdf" not in mime and not file_name.lower().endswith(".pdf"):
-        await message.reply_text("❌ Only PDF files are supported for analysis.")
-        return
-    if not HAS_PDF:
-        await message.reply_text("❌ PDF support is not enabled.")
-        return
-    if not user.get("is_premium"):
-        last_date = user.get("last_pdf_date")
-        count = user.get("pdf_count_today") or 0
-        if last_date != today:
-            count = 0
-            await update_user(uid, pdf_count_today=0, last_pdf_date=today)
-        if count >= FREE_PDF_PER_DAY:
-            await message.reply_text(t("pdf_limit", lang, n=FREE_PDF_PER_DAY))
+    if message.document:
+        doc = message.document
+        file_size = doc.file_size or 0
+        file_name = doc.file_name or "document.pdf"
+        mime = (doc.mime_type or "").lower()
+
+        if uid in ADMIN_IDS and context.user_data.get('awaiting_file'):
+            context.user_data['pending_file_id'] = doc.file_id
+            context.user_data['pending_file_name'] = file_name
+            context.user_data['awaiting_file'] = False
+            context.user_data['awaiting_file_caption'] = True
+            await message.reply_text(t("addfile_received", "en", name=file_name))
             return
-        await update_user(uid, pdf_count_today=count + 1)
 
-    msg = await message.reply_text(t("processing_pdf", lang))
-    pdf_path = f"/tmp/doc_{uid}.pdf"
-    try:
-        f = await context.bot.get_file(doc.file_id)
-        await f.download_to_drive(pdf_path)
-        result = await asyncio.to_thread(extract_pdf_text_sync, pdf_path)
-        try: os.remove(pdf_path)
-        except Exception: pass
-        if not result:
-            await msg.edit_text(t("pdf_fail", lang))
+        if file_size > MAX_PDF_SIZE_MB * 1024 * 1024:
+            await message.reply_text(t("pdf_too_large", lang, n=MAX_PDF_SIZE_MB))
             return
-        pdf_text, total_pages = result
-        if total_pages > MAX_PDF_PAGES:
-            await msg.edit_text(t("pdf_too_big", lang, n=MAX_PDF_PAGES))
-        else:
-            await msg.edit_text(t("pdf_analyzing", lang))
-        user_caption = (message.caption or "").strip()
-        prompt = build_pdf_prompt(lang, user_caption, file_name, pdf_text)
-        pdf_system = (
-            "You analyze PDF documents for English learners. "
-            "STRICT RULES: "
-            "1. Use PLAIN TEXT with emojis only. No markdown. "
-            "2. Follow the language instruction in the user message exactly. "
-            "3. Keep response under 2000 characters. "
-            "4. Start with a short summary, then key points."
-        )
-        answer, suggestions = await asyncio.to_thread(
-            ask_groq, prompt, None, user, pdf_system
-        )
-        if not answer:
-            answer = t("ai_error", lang)
-        await save_history(uid, "user", f"[PDF] {file_name} - {user_caption[:100]}")
-        await save_history(uid, "assistant", answer)
-        await update_user(uid, last_active=datetime.now(),
-                          pdfs_sent=(user.get("pdfs_sent") or 0) + 1)
-        kb = suggestions_kb(suggestions, context)
-        await safe_reply_feedback(message, answer, message.message_id, kb)
-        try: await msg.delete()
-        except Exception: pass
-        await check_achievements(uid)
-    except Exception as e:
-        logger.error(f"PDF handler: {e}")
+        if "pdf" not in mime and not file_name.lower().endswith(".pdf"):
+            await message.reply_text("❌ Only PDF files are supported for analysis.")
+            return
+        if not HAS_PDF:
+            await message.reply_text("❌ PDF support is not enabled.")
+            return
+        if not user.get("is_premium"):
+            last_date = user.get("last_pdf_date")
+            count = user.get("pdf_count_today") or 0
+            if last_date != today:
+                count = 0
+                await update_user(uid, pdf_count_today=0, last_pdf_date=today)
+            if count >= FREE_PDF_PER_DAY:
+                await message.reply_text(t("pdf_limit", lang, n=FREE_PDF_PER_DAY))
+                return
+            await update_user(uid, pdf_count_today=count + 1)
+
+        msg = await message.reply_text(t("processing_pdf", lang))
+        pdf_path = f"/tmp/doc_{uid}.pdf"
         try:
-            await msg.edit_text("❌ PDF প্রসেস করতে সমস্যা হয়েছে।")
-        except Exception:
-            pass
-    return
+            f = await context.bot.get_file(doc.file_id)
+            await f.download_to_drive(pdf_path)
+            result = await asyncio.to_thread(extract_pdf_text_sync, pdf_path)
+            try:
+                os.remove(pdf_path)
+            except Exception:
+                pass
+            if not result:
+                await msg.edit_text(t("pdf_fail", lang))
+                return
+            pdf_text, total_pages = result
+            if total_pages > MAX_PDF_PAGES:
+                await msg.edit_text(t("pdf_too_big", lang, n=MAX_PDF_PAGES))
+            else:
+                await msg.edit_text(t("pdf_analyzing", lang))
+            user_caption = (message.caption or "").strip()
+            prompt = build_pdf_prompt(lang, user_caption, file_name, pdf_text)
+            pdf_system = (
+                "You analyze PDF documents for English learners. "
+                "STRICT RULES: "
+                "1. Use PLAIN TEXT with emojis only. No markdown. "
+                "2. Follow the language instruction in the user message exactly. "
+                "3. Keep response under 2000 characters. "
+                "4. Start with a short summary, then key points."
+            )
+            answer, suggestions = await asyncio.to_thread(
+                ask_groq, prompt, None, user, pdf_system
+            )
+            if not answer:
+                answer = t("ai_error", lang)
+            await save_history(uid, "user", f"[PDF] {file_name} - {user_caption[:100]}")
+            await save_history(uid, "assistant", answer)
+            await update_user(uid, last_active=datetime.now(),
+                              pdfs_sent=(user.get("pdfs_sent") or 0) + 1)
+            kb = suggestions_kb(suggestions, context)
+            await safe_reply_feedback(message, answer, message.message_id, kb)
+            try:
+                await msg.delete()
+            except Exception:
+                pass
+            await check_achievements(uid)
+        except Exception as e:
+            logger.error(f"PDF handler: {e}")
+            try:
+                await msg.edit_text("❌ PDF প্রসেস করতে সমস্যা হয়েছে।")
+            except Exception:
+                pass
+        return
 
-if message.photo:
-    if context.user_data.get('awaiting_payment'):
+    if message.photo:
+        if context.user_data.get('awaiting_payment'):
+            method = context.user_data.get('payment_method', 'Unknown')
+            plan_key = context.user_data.get('premium_plan', '1m')
+            plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
+            for admin_id in ADMIN_IDS:
+                try:
+                    await context.bot.forward_message(
+                        chat_id=admin_id, from_chat_id=message.chat_id,
+                        message_id=message.message_id
+                    )
+                    await context.bot.send_message(
+                        admin_id,
+                        f"💰 {method} payment proof received!\n\n"
+                        f"👤 User: {message.from_user.full_name}\n"
+                        f"🆔 User ID: `{uid}`\n"
+                        f"📦 Plan: {plan_key} ({plan['days']} days)\n\n"
+                        f"Approve with:\n`/approve {uid} {plan_key}`"
+                    )
+                except Exception as e:
+                    logger.error(f"Fwd proof fail: {e}")
+            await message.reply_text(t("payment_proof_sent", lang))
+            context.user_data.pop('awaiting_payment', None)
+            context.user_data.pop('payment_method', None)
+            context.user_data.pop('premium_plan', None)
+            return
+
+        if not user.get("is_premium"):
+            last_date = user.get("last_img_date")
+            count = user.get("img_count_today") or 0
+            if last_date != today:
+                count = 0
+                await update_user(uid, img_count_today=0, last_img_date=today)
+            if count >= FREE_IMG_PER_DAY:
+                await message.reply_text(t("img_limit", lang, n=FREE_IMG_PER_DAY))
+                return
+            await update_user(uid, img_count_today=count + 1)
+
+        msg = await message.reply_text(t("processing_img", lang))
+        path = f"/tmp/img_{uid}.jpg"
+        try:
+            photo = message.photo[-1]
+            f = await context.bot.get_file(photo.file_id)
+            await f.download_to_drive(path)
+            caption = build_photo_prompt(lang, message.caption)
+            answer = await asyncio.to_thread(analyze_image_sync, path, caption)
+            try:
+                os.remove(path)
+            except Exception:
+                pass
+            if not answer:
+                await msg.edit_text(t("img_fail", lang))
+                return
+            await save_history(uid, "user", f"[Photo] {caption}")
+            await save_history(uid, "assistant", answer)
+            await update_user(uid, last_active=datetime.now(),
+                              photos_sent=(user.get("photos_sent") or 0) + 1)
+            await safe_reply_feedback(message, answer, message.message_id)
+            try:
+                await msg.delete()
+            except Exception:
+                pass
+            await check_achievements(uid)
+        except Exception as e:
+            logger.error(f"Photo handler: {e}")
+            await msg.edit_text("❌ Error processing photo.")
+        return
+
+    if not message.text:
+        return
+
+    if context.user_data.get('awaiting_support') and message.text and not message.text.startswith("/"):
+        for admin_id in ADMIN_IDS:
+            try:
+                await context.bot.forward_message(
+                    chat_id=admin_id, from_chat_id=message.chat_id,
+                    message_id=message.message_id
+                )
+                await context.bot.send_message(
+                    admin_id,
+                    f"📩 Support message!\n\n"
+                    f"👤 User: {message.from_user.full_name}\n"
+                    f"🆔 User ID: `{uid}`\n\n"
+                    f"Reply with:\n`/reply {uid} your_reply`"
+                )
+            except Exception as e:
+                logger.error(f"Support fwd fail: {e}")
+        await message.reply_text(t("support_sent", lang))
+        context.user_data.pop('awaiting_support', None)
+        return
+
+    if context.user_data.get('awaiting_payment') and message.text and not message.text.startswith("/"):
         method = context.user_data.get('payment_method', 'Unknown')
         plan_key = context.user_data.get('premium_plan', '1m')
         plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
@@ -5306,192 +5271,113 @@ if message.photo:
                 )
                 await context.bot.send_message(
                     admin_id,
-                    f"💰 {method} payment proof received!\n\n"
+                    f"💰 {method} payment info (text)!\n\n"
                     f"👤 User: {message.from_user.full_name}\n"
                     f"🆔 User ID: `{uid}`\n"
                     f"📦 Plan: {plan_key} ({plan['days']} days)\n\n"
-                    f"Approve with:\n`/approve {uid} {plan_key}`"
+                    f"Approve with: `/approve {uid} {plan_key}`"
                 )
             except Exception as e:
-                logger.error(f"Fwd proof fail: {e}")
-        await message.reply_text(t("payment_proof_sent", lang))
+                logger.error(f"Text fwd fail: {e}")
+        await message.reply_text(t("payment_info_sent", lang))
         context.user_data.pop('awaiting_payment', None)
         context.user_data.pop('payment_method', None)
         context.user_data.pop('premium_plan', None)
         return
 
-    if not user.get("is_premium"):
-        last_date = user.get("last_img_date")
-        count = user.get("img_count_today") or 0
-        if last_date != today:
-            count = 0
-            await update_user(uid, img_count_today=0, last_img_date=today)
-        if count >= FREE_IMG_PER_DAY:
-            await message.reply_text(t("img_limit", lang, n=FREE_IMG_PER_DAY))
+    replied_text = ""
+    if (message.reply_to_message
+            and message.reply_to_message.from_user
+            and message.reply_to_message.from_user.id == context.bot.id):
+        replied_text = (
+            message.reply_to_message.text
+            or message.reply_to_message.caption
+            or ""
+        ).strip()
+
+    if chat.type == "private":
+        user_text = message.text.strip()
+        if not user_text:
             return
-        await update_user(uid, img_count_today=count + 1)
-
-    msg = await message.reply_text(t("processing_img", lang))
-    path = f"/tmp/img_{uid}.jpg"
-    try:
-        photo = message.photo[-1]
-        f = await context.bot.get_file(photo.file_id)
-        await f.download_to_drive(path)
-        caption = build_photo_prompt(lang, message.caption)
-        answer = await asyncio.to_thread(analyze_image_sync, path, caption)
-        try: os.remove(path)
-        except Exception: pass
-        if not answer:
-            await msg.edit_text(t("img_fail", lang))
+    else:
+        bot_username = context.bot.username
+        if not bot_username:
             return
-        await save_history(uid, "user", f"[Photo] {caption}")
-        await save_history(uid, "assistant", answer)
-        await update_user(uid, last_active=datetime.now(),
-                          photos_sent=(user.get("photos_sent") or 0) + 1)
-        await safe_reply_feedback(message, answer, message.message_id)
-        try: await msg.delete()
-        except Exception: pass
-        await check_achievements(uid)
-    except Exception as e:
-        logger.error(f"Photo handler: {e}")
-        await msg.edit_text("❌ Error processing photo.")
-    return
+        is_reply_to_bot = bool(replied_text)
+        mention = f"@{bot_username.lower()}"
+        if mention not in message.text.lower() and not is_reply_to_bot:
+            return
+        user_text = message.text.replace(f"@{bot_username}", "").strip()
+        if not user_text:
+            user_text = "Please help me with English."
 
-if not message.text:
-    return
-
-if context.user_data.get('awaiting_support') and message.text and not message.text.startswith("/"):
-    for admin_id in ADMIN_IDS:
-        try:
-            await context.bot.forward_message(
-                chat_id=admin_id, from_chat_id=message.chat_id,
-                message_id=message.message_id
-            )
-            await context.bot.send_message(
-                admin_id,
-                f"📩 Support message!\n\n"
-                f"👤 User: {message.from_user.full_name}\n"
-                f"🆔 User ID: `{uid}`\n\n"
-                f"Reply with:\n`/reply {uid} your_reply`"
-            )
-        except Exception as e:
-            logger.error(f"Support fwd fail: {e}")
-    await message.reply_text(t("support_sent", lang))
-    context.user_data.pop('awaiting_support', None)
-    return
-
-if context.user_data.get('awaiting_payment') and message.text and not message.text.startswith("/"):
-    method = context.user_data.get('payment_method', 'Unknown')
-    plan_key = context.user_data.get('premium_plan', '1m')
-    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
-    for admin_id in ADMIN_IDS:
-        try:
-            await context.bot.forward_message(
-                chat_id=admin_id, from_chat_id=message.chat_id,
-                message_id=message.message_id
-            )
-            await context.bot.send_message(
-                admin_id,
-                f"💰 {method} payment info (text)!\n\n"
-                f"👤 User: {message.from_user.full_name}\n"
-                f"🆔 User ID: `{uid}`\n"
-                f"📦 Plan: {plan_key} ({plan['days']} days)\n\n"
-                f"Approve with: `/approve {uid} {plan_key}`"
-            )
-        except Exception as e:
-            logger.error(f"Text fwd fail: {e}")
-    await message.reply_text(t("payment_info_sent", lang))
-    context.user_data.pop('awaiting_payment', None)
-    context.user_data.pop('payment_method', None)
-    context.user_data.pop('premium_plan', None)
-    return
-
-replied_text = ""
-if (message.reply_to_message
-        and message.reply_to_message.from_user
-        and message.reply_to_message.from_user.id == context.bot.id):
-    replied_text = (
-        message.reply_to_message.text
-        or message.reply_to_message.caption
-        or ""
-    ).strip()
-
-if chat.type == "private":
-    user_text = message.text.strip()
-    if not user_text:
-        return
-else:
-    bot_username = context.bot.username
-    if not bot_username:
-        return
-    is_reply_to_bot = bool(replied_text)
-    mention = f"@{bot_username.lower()}"
-    if mention not in message.text.lower() and not is_reply_to_bot:
-        return
-    user_text = message.text.replace(f"@{bot_username}", "").strip()
-    if not user_text:
-        user_text = "Please help me with English."
-
-if replied_text:
-    ctx = replied_text[:800]
-    ai_input = (
-        f"[CONTEXT: The user is REPLYING to a specific message you sent earlier.]\n"
-        f"[Your original message was:]\n"
-        f"\"\"\"\n{ctx}\n\"\"\"\n\n"
-        f"[The user's reply is:]\n"
-        f"\"{user_text}\"\n\n"
-        f"⚠️ INTERPRETATION RULES:\n"
-        f"1. If your original message ASKED a question or gave a task "
-        f"(like 'practice these sentences', 'answer these questions'), "
-        f"the user is trying to ANSWER it.\n"
-        f"2. CHECK their answer carefully. If correct → praise them. "
-        f"If wrong → gently correct and show the right version.\n"
-        f"3. If the user is asking about your message → explain it.\n"
-        f"4. Stay in {user.get('language', 'bn')} language.\n"
-        f"5. Be encouraging. Under 1500 characters."
-    )
-else:
-    ai_input = user_text
-
-await update_user(uid, last_active=datetime.now())
-await check_streak(uid)
-await save_history(uid, "user", user_text)
-history = await get_history(uid)
-try:
-    await message.chat.send_action("typing")
-except Exception:
-    pass
-answer, suggestions = await asyncio.to_thread(ask_groq, ai_input, history, user)
-if not answer:
-    answer = t("ai_error", lang)
-await save_history(uid, "assistant", answer)
-kb = suggestions_kb(suggestions, context)
-await safe_reply_feedback(message, answer, message.message_id, kb)
-corr = extract_correction(answer)
-if corr:
-    await save_review(uid, corr[0], corr[1])
-if user.get("is_premium") and HAS_TTS and len(answer) < 400:
-    try:
-        tts_path = f"/tmp/tts_{uid}.mp3"
-        ok = await text_to_voice(answer[:400], tts_path)
-        if ok:
-            with open(tts_path, "rb") as vf:
-                await message.reply_voice(voice=vf)
-            try: os.remove(tts_path)
-            except Exception: pass
-    except Exception as e:
-        logger.error(f"TTS send: {e}")
-new = await check_achievements(uid)
-if new:
-    try:
-        await message.reply_text(
-            t("new_achievement", lang) + "\n" +
-            "\n".join(f"{ACHIEVEMENTS[k][0]} {ACHIEVEMENTS[k][1].get(lang, k)}" for k in new)
+    if replied_text:
+        ctx = replied_text[:800]
+        ai_input = (
+            f"[CONTEXT: The user is REPLYING to a specific message you sent earlier.]\n"
+            f"[Your original message was:]\n"
+            f"\"\"\"\n{ctx}\n\"\"\"\n\n"
+            f"[The user's reply is:]\n"
+            f"\"{user_text}\"\n\n"
+            f"⚠️ INTERPRETATION RULES:\n"
+            f"1. If your original message ASKED a question or gave a task "
+            f"(like 'practice these sentences', 'answer these questions'), "
+            f"the user is trying to ANSWER it.\n"
+            f"2. CHECK their answer carefully. If correct → praise them. "
+            f"If wrong → gently correct and show the right version.\n"
+            f"3. If the user is asking about your message → explain it.\n"
+            f"4. Stay in {user.get('language', 'bn')} language.\n"
+            f"5. Be encouraging. Under 1500 characters."
         )
+    else:
+        ai_input = user_text
+
+    await update_user(uid, last_active=datetime.now())
+    await check_streak(uid)
+    await save_history(uid, "user", user_text)
+    history = await get_history(uid)
+    try:
+        await message.chat.send_action("typing")
     except Exception:
         pass
+    answer, suggestions = await asyncio.to_thread(ask_groq, ai_input, history, user)
+    if not answer:
+        answer = t("ai_error", lang)
+    await save_history(uid, "assistant", answer)
+    kb = suggestions_kb(suggestions, context)
+    await safe_reply_feedback(message, answer, message.message_id, kb)
+    corr = extract_correction(answer)
+    if corr:
+        await save_review(uid, corr[0], corr[1])
+    if user.get("is_premium") and HAS_TTS and len(answer) < 400:
+        try:
+            tts_path = f"/tmp/tts_{uid}.mp3"
+            ok = await text_to_voice(answer[:400], tts_path)
+            if ok:
+                with open(tts_path, "rb") as vf:
+                    await message.reply_voice(voice=vf)
+                try:
+                    os.remove(tts_path)
+                except Exception:
+                    pass
+        except Exception as e:
+            logger.error(f"TTS send: {e}")
+    new = await check_achievements(uid)
+    if new:
+        try:
+            await message.reply_text(
+                t("new_achievement", lang) + "\n" +
+                "\n".join(f"{ACHIEVEMENTS[k][0]} {ACHIEVEMENTS[k][1].get(lang, k)}" for k in new)
+            )
+        except Exception:
+            pass
+    
+                
 
+    
+        
 
+ 
 # ==========================================================
 # DAILY REVIEW JOB
 # ==========================================================
