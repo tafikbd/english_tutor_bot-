@@ -482,6 +482,23 @@ T = {
     "main_menu": {"bn": "🏠 মেইন মেনু:", "en": "🏠 Main Menu:", "hi": "🏠 मुख्य मेनू:", "ru": "🏠 Главное меню:"},
     "menu_btn": {"bn": "🏠 মেইন মেনু", "en": "🏠 Main Menu", "hi": "🏠 मुख्य मेनू", "ru": "🏠 Главное меню"},
     "loading": {"bn": "⏳ তৈরি হচ্ছে...", "en": "⏳ Generating...", "hi": "⏳ बना रहा हूँ...", "ru": "⏳ Генерирую..."},
+    "course_loading": {
+    "bn": "⏳ Lesson তৈরি হচ্ছে...\nঅনুগ্রহ করে ১০-১৫ সেকেন্ড অপেক্ষা করুন।",
+    "en": "⏳ Generating lesson...\nPlease wait 10-15 seconds.",
+    "hi": "⏳ पाठ तैयार हो रहा है...\nकृपया 10-15 सेकंड प्रतीक्षा करें।",
+    "ru": "⏳ Урок генерируется...\nПожалуйста, подождите 10-15 секунд.",
+    "ar": "⏳ يتم إنشاء الدرس...\nيرجى الانتظار 10-15 ثانية.",
+    "es": "⏳ Generando lección...\nPor favor espere 10-15 segundos.",
+    "fr": "⏳ Génération de la leçon...\nVeuillez patienter 10-15 secondes.",
+    "pt": "⏳ Gerando lição...\nPor favor aguarde 10-15 segundos.",
+    "id": "⏳ Membuat pelajaran...\nMohon tunggu 10-15 detik.",
+    "ur": "⏳ سبق تیار ہو رہا ہے...\nبراہ کرم 10-15 سیکنڈ انتظار کریں۔",
+    "tr": "⏳ Ders oluşturuluyor...\nLütfen 10-15 saniye bekleyin.",
+    "de": "⏳ Lektion wird erstellt...\nBitte warten Sie 10-15 Sekunden.",
+    "zh": "⏳ 正在生成课程...\n请等待 10-15 秒。",
+    "it": "⏳ Generazione lezione...\nAttendere 10-15 secondi.",
+    "vi": "⏳ Đang tạo bài học...\nVui lòng đợi 10-15 giây.",
+},
     "ai_error": {"bn": "⚠️ এখন AI-তে সমস্যা হচ্ছে। আবার চেষ্টা করুন।", "en": "⚠️ AI is having issues. Please try again.", "hi": "⚠️ AI में समस्या है।", "ru": "⚠️ Проблема с AI."},
     "profile_title": {"bn": "👤 আপনার প্রোফাইল", "en": "👤 Your Profile", "hi": "👤 आपकी प्रोफ़ाइल", "ru": "👤 Ваш профиль"},
     "name": {"bn": "📛 নাম", "en": "📛 Name", "hi": "📛 नाम", "ru": "📛 Имя"},
@@ -4332,14 +4349,13 @@ async def cb_course_day(update, context):
     loading_msg = None
     if not lesson_text:
         try:
-            loading_msg = await q.message.reply_text(
-                f"📅 Day {day}/{COURSE_TOTAL_DAYS}\n"
-                f"📌 {topic}\n\n"
-                f"⏳ Lesson তৈরি হচ্ছে...\n"
-                f"অনুগ্রহ করে ১০-১৫ সেকেন্ড অপেক্ষা করুন।"
-            )
-        except Exception:
-            pass
+    loading_msg = await q.message.reply_text(
+        f"📅 Day {day}/{COURSE_TOTAL_DAYS}\n"
+        f"📌 {topic}\n\n"
+        f"{t('course_loading', lang)}"
+    )
+except Exception:
+    pass
 
         prompt = build_lesson_prompt(course, day, lang)
         if prompt:
