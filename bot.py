@@ -4250,7 +4250,6 @@ async def cb_course_start(update, context):
     q.data = f"course_day_{course}_1"
     await cb_course_day(update, context)
 
-
 async def cb_course_day(update, context):
     q = update.callback_query
     await q.answer()
@@ -4282,50 +4281,62 @@ async def cb_course_day(update, context):
 
     topic = get_topic_display(course, day, lang)
 
-    # ★ NEW: Static Bangla content for Beginner course
-if course == "beginner" and lang == "bn" and HAS_STATIC_BN:
-    lesson_text = get_static_lesson_bn(course, day)
-    if lesson_text:
-        pass  # Use static content — guaranteed Bangla
-    else:
-        # Fallback to AI
+    lesson_text = None
+    if course == "beginner" and lang == "bn" and HAS_STATIC_BN:
+        lesson_text = get_static_lesson_bn(course, day)
+
+    if not lesson_text:
         cached = await get_cached_lesson(course, day)
         if cached:
             lesson_text = cached
         else:
-            await safe_edit(q, f"⏳ Lesson তৈরি হচ্ছে...", reply_markup=None)
+            await safe_edit(q, "⏳ Lesson তৈরি হচ্ছে...", reply_markup=None)
             prompt = build_lesson_prompt(course, day, lang)
-            lesson_text, _ = await asyncio.to_thread(ask_groq, prompt, None, None) if prompt else ("❌ Lesson error.", None)
-            if lesson_text:
+            if prompt:
+                lesson_text, _ = await asyncio.to_thread(ask_groq, prompt, None, None)
+            if not lesson_text:
+                lesson_text = "❌ Lesson generate failed. আবার চেষ্টা করুন।"
+            else:
                 await save_cached_lesson(course, day, lesson_text)
-else:
-    cached = await get_cached_lesson(course, day)
-    if cached:
-        lesson_text = cached
-    else:
-        await safe_edit(
-            q,
-            f"📅 Day {day}/{COURSE_TOTAL_DAYS}\n\n"
-            f"📌 {topic}\n\n"
-            f"⏳ Lesson তৈরি হচ্ছে... (৫-১০ সেকেন্ড)",
-            reply_markup=None
-        )
-        prompt = build_lesson_prompt(course, day, lang)
-        if not prompt:
-            await safe_edit(q, "❌ Lesson data missing.", reply_markup=back_kb(lang))
-            return
-        lesson_text, _ = await asyncio.to_thread(ask_groq, prompt, None, None)
-        if not lesson_text:
-            lesson_text = "❌ Lesson generate failed. আবার চেষ্টা করুন।"
-        else:
-            await save_cached_lesson(course, day, lesson_text)
 
     header = (
-    f"📅 Day {day}/{COURSE_TOTAL_DAYS} — {get_course_name(course, lang)}\n"
-    f"📌 {topic}\n\n"
-    f"━━━━━━━━━━━━━━━━━\n\n"
-)
-body = lesson_text if len(lesson_text) < 3000 else lesson_text[:3000] + "..."
+        f"📅 Day {day}/{COURSE_TOTAL_DAYS} — {get_course_name(course, lang)}\n"
+        f"📌 {topic}\n\n"
+        f"━━━━━━━━━━━━━━━━━\n\n"
+    )
+
+    if len(lesson_text) > 3000:
+        body = lesson_text[:3000] + "..."
+    else:
+        body = lesson_text
+
+    practice_hint = (
+        "\n\n━━━━━━━━━━━━━━━━━\n"
+        "💡 শেখার নিয়ম:\n"
+        "1. লেসনটা একবার পড়ুন\n"
+        "2. জোরে পড়ুন ২ বার\n"
+        "3. Practice-এর ৩টা বাক্য নিজে লিখুন\n"
+        "4. এই মেসেজে REPLY দিয়ে পাঠান\n"
+        "5. আমি ভুল ঠিক করে দেব ✅\n"
+    )
+    body = body + practice_hint
+
+    kb_rows = []
+    kb_rows.append([InlineKeyboardButton(
+        f"🎯 Take Quiz — Day {day}",
+        callback_data=f"course_quiz_{course}_{day}"
+    )])
+
+    nav_row = []
+    if day > 1:
+        nav_row.append(InlineKeyboardButton("⬅️ Prev", callback_data=f"course_day_{course}_{day-1}"))
+    nav_row.append(InlineKeyboardButton("🏠 Course", callback_data="course_home"))
+    if day < current_day:
+        nav_row.append(InlineKeyboardButton("Next ➡️", callback_data=f"course_day_{course}_{day+1}"))
+    kb_rows.append(nav_row)
+    kb_rows.append([InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")])
+
+    await safe_edit(q, header + body, reply_markup=InlineKeyboardMarkup(kb_rows))
 
 # Practice hint for user
 practice_hint = (
@@ -5113,8 +5124,7 @@ async def handle_message(update, context):
         context.user_data.pop('payment_method', None)
         context.user_data.pop('premium_plan', None)
         return
-
-    # ===== Detect if user is replying to a bot message =====
+# ===== Detect if user is replying to a bot message =====
 replied_text = ""
 if (message.reply_to_message
         and message.reply_to_message.from_user
@@ -5143,7 +5153,6 @@ else:
 
 # ===== Build AI input with reply context =====
 if replied_text:
-    # Truncate the replied message if too long
     ctx = replied_text[:800]
     ai_input = (
         f"[CONTEXT: The user is REPLYING to a specific message you sent earlier.]\n"
@@ -5172,6 +5181,36 @@ try:
     await message.chat.send_action("typing")
 except Exception:
     pass
+answer, suggestions = await asyncio.to_thread(ask_groq, ai_input, history, user)
+if not answer:
+    answer = t("ai_error", lang)
+await save_history(uid, "assistant", answer)
+kb = suggestions_kb(suggestions, context)
+await safe_reply_feedback(message, answer, message.message_id, kb)
+corr = extract_correction(answer)
+if corr:
+    await save_review(uid, corr[0], corr[1])
+if user.get("is_premium") and HAS_TTS and len(answer) < 400:
+    try:
+        tts_path = f"/tmp/tts_{uid}.mp3"
+        ok = await text_to_voice(answer[:400], tts_path)
+        if ok:
+            with open(tts_path, "rb") as vf:
+                await message.reply_voice(voice=vf)
+            try: os.remove(tts_path)
+            except Exception: pass
+    except Exception as e:
+        logger.error(f"TTS send: {e}")
+new = await check_achievements(uid)
+if new:
+    try:
+        await message.reply_text(
+            t("new_achievement", lang) + "\n" +
+            "\n".join(f"{ACHIEVEMENTS[k][0]} {ACHIEVEMENTS[k][1].get(lang, k)}" for k in new)
+        )
+    except Exception:
+        pass
+        
 answer, suggestions = await asyncio.to_thread(ask_groq, ai_input, history, user)
     if not answer:
         answer = t("ai_error", lang)
