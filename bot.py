@@ -69,8 +69,6 @@ logger = logging.getLogger(__name__)
 REFERRAL_REWARD = 10
 DAILY_BONUS = 5
 STREAK_BONUS = 2
-PREMIUM_STARS = 100
-PREMIUM_DAYS = 30
 FREE_IMG_PER_DAY = 5
 FREE_VOICE_PER_DAY = 10
 FREE_PDF_PER_DAY = 5
@@ -78,6 +76,30 @@ MAX_REVIEW_PER_DAY = 5
 MAX_PDF_SIZE_MB = 10
 MAX_PDF_PAGES = 20
 
+# ==========================================================
+# PREMIUM PLANS (1-month, 3-month, 6-month)
+# ==========================================================
+PREMIUM_PLANS = {
+    "1m": {
+        "days": 30, "bdt": 200, "stars": 100, "usdt": 2,
+        "label_bn": "১ মাস", "label_en": "1 Month",
+        "label_hi": "1 महीना", "label_ru": "1 месяц",
+    },
+    "3m": {
+        "days": 90, "bdt": 500, "stars": 250, "usdt": 5,
+        "label_bn": "৩ মাস", "label_en": "3 Months",
+        "label_hi": "3 महीने", "label_ru": "3 месяца",
+    },
+    "6m": {
+        "days": 180, "bdt": 900, "stars": 450, "usdt": 9,
+        "label_bn": "৬ মাস", "label_en": "6 Months",
+        "label_hi": "6 महीने", "label_ru": "6 месяцев",
+    },
+}
+
+# Backwards compatibility defaults
+PREMIUM_STARS = 100
+PREMIUM_DAYS = 30
 PREMIUM_PRICE_BDT = 200
 USDT_AMOUNT = 2
 BKASH_NUMBER = "01608364088"
@@ -87,21 +109,21 @@ BSC20_ADDRESS = "0xb83a03d9ded3ac7a4908aa87cfdfe1df9e05f719"
 SUPPORT_CONTACT = "@asikul_echo"
 
 ACHIEVEMENTS = {
-    "first_chat": ("🥇", {"bn": "প্রথম চ্যাট", "en": "First Chat", "hi": "पहला चैट"}),
-    "words_10": ("📚", {"bn": "১০ শব্দ শিখেছেন", "en": "10 words learned", "hi": "10 शब्द सीखे"}),
-    "words_50": ("📖", {"bn": "৫০ শব্দ শিখেছেন", "en": "50 words learned", "hi": "50 शब्द सीखे"}),
-    "quiz_10": ("🎯", {"bn": "১০ কুইজ দিয়েছেন", "en": "10 quizzes done", "hi": "10 क्विज़ पूरी"}),
-    "streak_7": ("🔥", {"bn": "৭ দিনের স্ট্রিক", "en": "7-day streak", "hi": "7 दिन की स्ट्रीक"}),
-    "streak_30": ("💪", {"bn": "৩০ দিনের স্ট্রিক", "en": "30-day streak", "hi": "30 दिन की स्ट्रीक"}),
-    "premium": ("💎", {"bn": "Premium সদস্য", "en": "Premium member", "hi": "Premium सदस्य"}),
-    "referrer": ("🎁", {"bn": "কাউকে ইনভাইট করেছেন", "en": "Invited someone", "hi": "किसी को आमंत्रित किया"}),
-    "photo_5": ("📸", {"bn": "৫টি ছবি পাঠিয়েছেন", "en": "5 photos sent", "hi": "5 फोटो भेजे"}),
-    "voice_10": ("🎤", {"bn": "১০টি ভয়েস পাঠিয়েছেন", "en": "10 voices sent", "hi": "10 वॉइस भेजे"}),
-    "roleplay_5": ("🎭", {"bn": "৫টি Role-Play করেছেন", "en": "5 role-plays done", "hi": "5 रोल-प्ले किए"}),
-    "review_10": ("🔁", {"bn": "১০টি রিভিউ করেছেন", "en": "10 reviews done", "hi": "10 रिव्यू किए"}),
-    "pronounce_10": ("🎤", {"bn": "১০টি উচ্চারণ প্র্যাকটিস", "en": "10 pronunciation practices", "hi": "10 उच्चारण अभ्यास"}),
-    "ielts_done": ("🎯", {"bn": "IELTS টেস্ট সম্পন্ন", "en": "IELTS test completed", "hi": "IELTS टेस्ट पूरा"}),
-    "pdf_quiz_5": ("🧠", {"bn": "৫টি PDF কুইজ", "en": "5 PDF quizzes", "hi": "5 PDF क्विज़"}),
+    "first_chat": ("🥇", {"bn": "প্রথম চ্যাট", "en": "First Chat", "hi": "पहला चैट", "ru": "Первый чат"}),
+    "words_10": ("📚", {"bn": "১০ শব্দ শিখেছেন", "en": "10 words learned", "hi": "10 शब्द सीखे", "ru": "10 слов изучено"}),
+    "words_50": ("📖", {"bn": "৫০ শব্দ শিখেছেন", "en": "50 words learned", "hi": "50 शब्द सीखे", "ru": "50 слов изучено"}),
+    "quiz_10": ("🎯", {"bn": "১০ কুইজ দিয়েছেন", "en": "10 quizzes done", "hi": "10 क्विज़ पूरी", "ru": "10 викторин"}),
+    "streak_7": ("🔥", {"bn": "৭ দিনের স্ট্রিক", "en": "7-day streak", "hi": "7 दिन की स्ट्रीक", "ru": "7-дневная серия"}),
+    "streak_30": ("💪", {"bn": "৩০ দিনের স্ট্রিক", "en": "30-day streak", "hi": "30 दिन की स्ट्रीक", "ru": "30-дневная серия"}),
+    "premium": ("💎", {"bn": "Premium সদস্য", "en": "Premium member", "hi": "Premium सदस्य", "ru": "Premium-участник"}),
+    "referrer": ("🎁", {"bn": "কাউকে ইনভাইট করেছেন", "en": "Invited someone", "hi": "किसी को आमंत्रित किया", "ru": "Пригласил друга"}),
+    "photo_5": ("📸", {"bn": "৫টি ছবি পাঠিয়েছেন", "en": "5 photos sent", "hi": "5 फोटो भेजे", "ru": "5 фото отправлено"}),
+    "voice_10": ("🎤", {"bn": "১০টি ভয়েস পাঠিয়েছেন", "en": "10 voices sent", "hi": "10 वॉइस भेजे", "ru": "10 голосовых"}),
+    "roleplay_5": ("🎭", {"bn": "৫টি Role-Play করেছেন", "en": "5 role-plays done", "hi": "5 रोल-प्ले किए", "ru": "5 ролевых игр"}),
+    "review_10": ("🔁", {"bn": "১০টি রিভিউ করেছেন", "en": "10 reviews done", "hi": "10 रिव्यू किए", "ru": "10 повторений"}),
+    "pronounce_10": ("🎤", {"bn": "১০টি উচ্চারণ প্র্যাকটিস", "en": "10 pronunciation practices", "hi": "10 उच्चारण अभ्यास", "ru": "10 упражнений произношения"}),
+    "ielts_done": ("🎯", {"bn": "IELTS টেস্ট সম্পন্ন", "en": "IELTS test completed", "hi": "IELTS टेस्ट पूरा", "ru": "IELTS тест завершён"}),
+    "pdf_quiz_5": ("🧠", {"bn": "৫টি PDF কুইজ", "en": "5 PDF quizzes", "hi": "5 PDF क्विज़", "ru": "5 викторин по PDF"}),
 }
 
 
@@ -111,8 +133,8 @@ ACHIEVEMENTS = {
 ROLEPLAY_SCENARIOS = {
     "restaurant": {
         "emoji": "🍽️",
-        "title": {"bn": "রেস্টুরেন্ট", "en": "Restaurant", "hi": "रेस्टोरेंट"},
-        "desc": {"bn": "খাবার অর্ডার করা শিখুন", "en": "Learn to order food", "hi": "खाना ऑर्डर करना सीखें"},
+        "title": {"bn": "রেস্টুরেন্ট", "en": "Restaurant", "hi": "रेस्टोरेंट", "ru": "Ресторан"},
+        "desc": {"bn": "খাবার অর্ডার করা শিখুন", "en": "Learn to order food", "hi": "खाना ऑर्डर करना सीखें", "ru": "Учимся заказывать еду"},
         "system": (
             "You are a friendly waiter at a restaurant. The user is a customer. "
             "Start by greeting them and offering the menu. Stay in character at all times. "
@@ -124,8 +146,8 @@ ROLEPLAY_SCENARIOS = {
     },
     "airport": {
         "emoji": "✈️",
-        "title": {"bn": "এয়ারপোর্ট", "en": "Airport Check-in", "hi": "एयरपोर्ट"},
-        "desc": {"bn": "চেক-ইন শেখা", "en": "Learn check-in English", "hi": "चेक-इन सीखें"},
+        "title": {"bn": "এয়ারপোর্ট", "en": "Airport Check-in", "hi": "एयरपोर्ट", "ru": "Аэропорт"},
+        "desc": {"bn": "চেক-ইন শেখা", "en": "Learn check-in English", "hi": "चेक-इन सीखें", "ru": "Регистрация в аэропорту"},
         "system": (
             "You are an airport check-in agent. The user is a passenger. "
             "Ask for passport, ticket, luggage details one by one. Stay in character. "
@@ -136,8 +158,8 @@ ROLEPLAY_SCENARIOS = {
     },
     "interview": {
         "emoji": "💼",
-        "title": {"bn": "চাকরির ইন্টারভিউ", "en": "Job Interview", "hi": "जॉब इंटरव्यू"},
-        "desc": {"bn": "ইন্টারভিউ প্র্যাকটিস", "en": "Practice job interviews", "hi": "इंटरव्यू अभ्यास"},
+        "title": {"bn": "চাকরির ইন্টারভিউ", "en": "Job Interview", "hi": "जॉब इंटरव्यू", "ru": "Собеседование"},
+        "desc": {"bn": "ইন্টারভিউ প্র্যাকটিস", "en": "Practice job interviews", "hi": "इंटरव्यू अभ्यास", "ru": "Практика собеседования"},
         "system": (
             "You are a hiring manager conducting a job interview. The user is a candidate. "
             "Ask one interview question at a time. Give 1-line feedback after each answer. "
@@ -148,8 +170,8 @@ ROLEPLAY_SCENARIOS = {
     },
     "shopping": {
         "emoji": "🛒",
-        "title": {"bn": "শপিং", "en": "Shopping", "hi": "शॉपिंग"},
-        "desc": {"bn": "দোকানে কেনাকাটা", "en": "Shopping at a store", "hi": "दुकान में खरीदारी"},
+        "title": {"bn": "শপিং", "en": "Shopping", "hi": "शॉपिंग", "ru": "Шопинг"},
+        "desc": {"bn": "দোকানে কেনাকাটা", "en": "Shopping at a store", "hi": "दुकान में खरीदारी", "ru": "Покупки в магазине"},
         "system": (
             "You are a friendly shop assistant. The user is a customer. "
             "Help them find items, discuss prices, sizes. Stay in character. "
@@ -160,8 +182,8 @@ ROLEPLAY_SCENARIOS = {
     },
     "doctor": {
         "emoji": "🏥",
-        "title": {"bn": "ডাক্তার", "en": "Doctor Visit", "hi": "डॉक्टर"},
-        "desc": {"bn": "ডাক্তারের সাথে কথা", "en": "Talk to a doctor", "hi": "डॉक्टर से बात"},
+        "title": {"bn": "ডাক্তার", "en": "Doctor Visit", "hi": "डॉक्टर", "ru": "У врача"},
+        "desc": {"bn": "ডাক্তারের সাথে কথা", "en": "Talk to a doctor", "hi": "डॉक्टर से बात", "ru": "Разговор с врачом"},
         "system": (
             "You are a friendly doctor. The user is a patient describing symptoms. "
             "Ask about their health, symptoms, duration. Stay in character. "
@@ -172,8 +194,8 @@ ROLEPLAY_SCENARIOS = {
     },
     "hotel": {
         "emoji": "🏨",
-        "title": {"bn": "হোটেল", "en": "Hotel Check-in", "hi": "होटल"},
-        "desc": {"bn": "হোটেলে চেক-ইন", "en": "Hotel check-in", "hi": "होटल चेक-इन"},
+        "title": {"bn": "হোটেল", "en": "Hotel Check-in", "hi": "होटल", "ru": "Отель"},
+        "desc": {"bn": "হোটেলে চেক-ইন", "en": "Hotel check-in", "hi": "होटल चेक-इन", "ru": "Заселение в отель"},
         "system": (
             "You are a hotel receptionist. The user is a guest checking in. "
             "Ask for reservation, ID, room preference. Stay in character. "
@@ -282,374 +304,610 @@ WORD_GAME_LIST = [
 ]
 
 
+# ==========================================================
+# ★ NEW: CONTENT POOLS (যাতে প্রতিবার নতুন content আসে)
+# ==========================================================
+LEARN_TOPICS = [
+    "Greetings and introductions", "Ordering food at a restaurant",
+    "Asking for directions", "Talking about hobbies", "Making small talk",
+    "Shopping vocabulary", "Describing people", "Weather and seasons",
+    "Daily routine", "At the doctor's office", "Job interview basics",
+    "Travel and airport", "Making phone calls", "At the bank",
+    "Emergency situations", "Making appointments", "Describing your hometown",
+    "Sports and games", "Music and entertainment", "Technology and gadgets",
+    "Family and relationships", "Food and cooking", "Health and fitness",
+    "Education and school", "Money and banking", "Emotions and feelings",
+    "Transportation", "Housing and apartments", "Festivals and celebrations",
+    "Nature and environment", "Body and health", "Colors and shapes",
+    "Numbers and counting", "Time and dates", "Holidays and traditions",
+    "Work and office", "Public transportation", "Restaurant conversation",
+    "Hotel booking", "Customer service", "At the supermarket",
+    "Post office vocabulary", "Airport immigration", "Using public transport",
+    "Meeting new people", "Compliments and responses", "Apologies and forgiveness",
+    "Expressing opinions", "Giving advice", "Making suggestions",
+]
+
+VOCAB_WORDS = [
+    "abundant", "beneficial", "coherent", "diligent", "eloquent", "fascinating",
+    "grateful", "humble", "innovative", "jubilant", "keen", "lucid",
+    "magnificent", "notable", "optimistic", "persistent", "quaint", "resilient",
+    "sincere", "tenacious", "unique", "vibrant", "witty", "yearn", "zealous",
+    "articulate", "benevolent", "candid", "dynamic", "empathy", "fluent",
+    "genuine", "harmony", "insight", "kindle", "legacy", "meticulous",
+    "nostalgic", "obstinate", "pragmatic", "quell", "robust", "serene",
+    "tranquil", "ubiquitous", "versatile", "wary", "yield", "zeal",
+    "affable", "brisk", "concur", "dwindle", "exemplary", "fervent",
+    "gregarious", "hinder", "immaculate", "juxtapose", "lament",
+    "mirth", "nurture", "obscure", "placid", "quintessential",
+    "relish", "succinct", "tangible", "unravel", "vivid", "yearning",
+]
+
+GRAMMAR_TOPICS = [
+    "Present Simple vs Present Continuous",
+    "Past Simple vs Past Continuous",
+    "Present Perfect vs Past Simple",
+    "Future forms (will / going to)",
+    "Articles (a, an, the)",
+    "Prepositions of time (in, on, at)",
+    "Prepositions of place",
+    "Modal verbs (can, could, should, must)",
+    "Conditionals (zero, first, second, third)",
+    "Passive voice",
+    "Reported speech",
+    "Gerunds vs infinitives",
+    "Comparatives and superlatives",
+    "Countable vs uncountable nouns",
+    "Some vs any",
+    "Much vs many",
+    "Relative clauses (who, which, that)",
+    "Phrasal verbs basics",
+    "Question tags",
+    "Used to vs would",
+    "Verb patterns",
+    "Adverbs of frequency",
+    "Conjunctions (and, but, or, because)",
+    "Reflexive pronouns",
+    "Possessives (my, mine, yours)",
+    "Question words (WH- questions)",
+    "Negative sentences",
+    "There is / There are",
+    "This / That / These / Those",
+    "Subject-verb agreement",
+    "Adjective order",
+    "Direct vs indirect objects",
+    "Articles with geographic names",
+    "Time clauses (when, while, before, after)",
+    "Purpose clauses (to, in order to)",
+]
+
+WRITING_TASKS = [
+    "Write a 5-sentence paragraph about your favorite place.",
+    "Write an email to a friend inviting them to a party.",
+    "Write a short diary entry about your day.",
+    "Write a 5-sentence description of your best friend.",
+    "Write an apology message to your teacher.",
+    "Write about your future goals in 5 sentences.",
+    "Write a thank-you note to someone who helped you.",
+    "Write a short review of a movie you watched.",
+    "Write about your daily routine in 8-10 sentences.",
+    "Write a message asking for directions to a place.",
+    "Write a short paragraph about your hometown.",
+    "Write about what you did last weekend.",
+    "Write a complaint letter about a bad product.",
+    "Write a 5-sentence story with a surprise ending.",
+    "Write about a memorable trip you took.",
+    "Write about a person you admire.",
+    "Write a letter to your younger self.",
+    "Write about your dream job.",
+    "Write about a hobby you enjoy.",
+    "Write about the best day of your life.",
+    "Write about a mistake you learned from.",
+    "Write about your favorite food and how to make it.",
+    "Write about a skill you want to learn.",
+    "Write about your favorite season.",
+    "Write a short story about a lost key.",
+    "Write about a festival you celebrate.",
+    "Write about a book that changed your mind.",
+    "Write an email applying for a job.",
+    "Write about your role model.",
+    "Write a letter to your future self.",
+    "Write about a challenge you overcame.",
+    "Write about your favorite teacher.",
+    "Write about a place you want to visit.",
+    "Write about your ideal weekend.",
+    "Write about a funny incident.",
+]
+
+DAILY_TOPICS = [
+    "Business English phrases", "Travel English", "Cooking vocabulary",
+    "Sports idioms", "Weather expressions", "At the airport",
+    "Doctor's visit", "Shopping phrases", "Phone conversations",
+    "Email writing", "Job interview", "Daily routine",
+    "Emotions & feelings", "Health & fitness", "Technology",
+    "Social media", "Education", "Money & banking",
+    "Restaurant ordering", "Directions", "Family & relationships",
+    "Weather & seasons", "Sports & hobbies", "Music & movies",
+    "Holidays & celebrations", "Transportation", "Nature & environment",
+    "Books & reading", "Art & culture", "Science & innovation",
+    "Time management", "Problem solving", "Making decisions",
+    "Customer service", "Public speaking",
+    "At the pharmacy", "Banking terms", "Real estate",
+    "Online shopping", "Emergency vocabulary",
+]
+
+WORD_OF_DAY_POOL = [
+    "serendipity", "ephemeral", "resilience", "ubiquitous", "paradigm",
+    "eloquent", "ambiguous", "benevolent", "candid", "diligent",
+    "empathy", "fluent", "grateful", "harmony", "innovative",
+    "jubilant", "kindle", "lucid", "magnificent", "nostalgia",
+    "optimistic", "pragmatic", "quaint", "robust", "serene",
+    "tenacious", "unique", "versatile", "witty", "zealous",
+    "articulate", "brisk", "coherent", "dynamic", "exemplary",
+    "fascinating", "genuine", "humble", "insight", "journey",
+    "keen", "legacy", "meticulous", "notable", "obstinate",
+    "persistent", "quell", "resilient", "sincere", "tranquil",
+    "affable", "concise", "deliberate", "elaborate", "formidable",
+    "gregarious", "hinder", "immaculate", "jovial", "lament",
+    "mirth", "nurture", "obscure", "placid", "quintessential",
+    "relish", "succinct", "tangible", "unravel", "vivid",
+    "yearning", "zeal", "abundant", "coherent", "deliberate",
+]
+
+
+def get_next_item(uid, pool_name, pool, context):
+    """Get next UNUSED item from pool. Resets when all used."""
+    used_key = f"used_{pool_name}"
+    used = list(context.user_data.get(used_key, []))
+    available = [x for x in pool if x not in used]
+    if not available:
+        used = []
+        available = list(pool)
+    choice = random.choice(available)
+    used.append(choice)
+    # Keep last N items to prevent repeats in recent history
+    context.user_data[used_key] = used[-len(pool):]
+    return choice
+
+
 T = {
     "welcome": {
         "bn": "👋 স্বাগতম {name}!\n\n🎓 আমি EduMate AI - আপনার ২৪/৭ ইংরেজি শিক্ষক।\n\n📖 যা করতে পারি:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 অনুবাদ\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 ছবি বিশ্লেষণ\n• 📄 PDF বিশ্লেষণ\n• 🎤 ভয়েস সাপোর্ট\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 নিচের বাটন থেকে বেছে নিন।",
         "en": "👋 Welcome {name}!\n\n🎓 I am EduMate AI - your 24/7 English teacher.\n\n📖 What I can do:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 Translation\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 Photo analysis\n• 📄 PDF analysis\n• 🎤 Voice support\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 Choose from below.",
         "hi": "👋 स्वागत है {name}!\n\n🎓 मैं EduMate AI हूँ - आपका 24/7 English शिक्षक।\n\n📖 मैं क्या कर सकता हूँ:\n• 📚 Vocabulary\n• 📝 Grammar\n• 🎯 Quiz\n• 💬 अनुवाद\n• ✍️ Writing\n• 🎭 Role-Play\n• 📸 फोटो विश्लेषण\n• 📄 PDF विश्लेषण\n• 🎤 वॉइस सपोर्ट\n• 🔁 Spaced Review\n• 🔥 Daily Lesson\n• 🎁 Invite & Earn\n\n👉 नीचे से चुनें।",
+        "ru": "👋 Добро пожаловать, {name}!\n\n🎓 Я EduMate AI — твой учитель английского 24/7.\n\n📖 Что я умею:\n• 📚 Словарь\n• 📝 Грамматика\n• 🎯 Викторина\n• 💬 Перевод\n• ✍️ Письмо\n• 🎭 Ролевая игра\n• 📸 Анализ фото\n• 📄 Анализ PDF\n• 🎤 Голос\n• 🔁 Повторение\n• 🔥 Урок дня\n• 🎁 Пригласи друга\n\n👉 Выберите кнопку ниже.",
     },
-    "main_menu": {"bn": "🏠 মেইন মেনু:", "en": "🏠 Main Menu:", "hi": "🏠 मुख्य मेनू:"},
-    "menu_btn": {"bn": "🏠 মেইন মেনু", "en": "🏠 Main Menu", "hi": "🏠 मुख्य मेनू"},
-    "loading": {"bn": "⏳ তৈরি হচ্ছে...", "en": "⏳ Generating...", "hi": "⏳ बना रहा हूँ..."},
-    "ai_error": {"bn": "⚠️ এখন AI-তে সমস্যা হচ্ছে। আবার চেষ্টা করুন।", "en": "⚠️ AI is having issues. Please try again.", "hi": "⚠️ AI में समस्या है। कृपया पुनः प्रयास करें।"},
-    "profile_title": {"bn": "👤 আপনার প্রোফাইল", "en": "👤 Your Profile", "hi": "👤 आपकी प्रोफ़ाइल"},
-    "name": {"bn": "📛 নাম", "en": "📛 Name", "hi": "📛 नाम"},
-    "level": {"bn": "🎓 লেভেল", "en": "🎓 Level", "hi": "🎓 स्तर"},
-    "coins": {"bn": "🪙 কয়েন", "en": "🪙 Coins", "hi": "🪙 सिक्के"},
-    "streak": {"bn": "🔥 Streak", "en": "🔥 Streak", "hi": "🔥 स्ट्रीक"},
-    "words_learned": {"bn": "📚 শেখা শব্দ", "en": "📚 Words learned", "hi": "📚 सीखे शब्द"},
-    "quizzes": {"bn": "🎯 কুইজ", "en": "🎯 Quizzes", "hi": "🎯 क्विज़"},
-    "score": {"bn": "⭐ স্কোর", "en": "⭐ Score", "hi": "⭐ स्कोर"},
-    "premium_status": {"bn": "💎 Premium", "en": "💎 Premium", "hi": "💎 Premium"},
-    "active": {"bn": "✅ সক্রিয়", "en": "✅ Active", "hi": "✅ सक्रिय"},
-    "inactive": {"bn": "❌ নিষ্ক্রিয়", "en": "❌ Inactive", "hi": "❌ निष्क्रिय"},
-    "language_set": {"bn": "✅ ভাষা সেট হয়েছে: বাংলা", "en": "✅ Language set: English", "hi": "✅ भाषा सेट: हिन्दी"},
+    "main_menu": {
+        "bn": "🏠 মেইন মেনু:", "en": "🏠 Main Menu:", "hi": "🏠 मुख्य मेनू:", "ru": "🏠 Главное меню:"
+    },
+    "menu_btn": {
+        "bn": "🏠 মেইন মেনু", "en": "🏠 Main Menu", "hi": "🏠 मुख्य मेनू", "ru": "🏠 Главное меню"
+    },
+    "loading": {
+        "bn": "⏳ তৈরি হচ্ছে...", "en": "⏳ Generating...", "hi": "⏳ बना रहा हूँ...", "ru": "⏳ Генерирую..."
+    },
+    "ai_error": {
+        "bn": "⚠️ এখন AI-তে সমস্যা হচ্ছে। আবার চেষ্টা করুন।",
+        "en": "⚠️ AI is having issues. Please try again.",
+        "hi": "⚠️ AI में समस्या है। कृपया पुनः प्रयास करें।",
+        "ru": "⚠️ Проблема с AI. Попробуйте снова."
+    },
+    "profile_title": {
+        "bn": "👤 আপনার প্রোফাইল", "en": "👤 Your Profile", "hi": "👤 आपकी प्रोफ़ाइल", "ru": "👤 Ваш профиль"
+    },
+    "name": {"bn": "📛 নাম", "en": "📛 Name", "hi": "📛 नाम", "ru": "📛 Имя"},
+    "level": {"bn": "🎓 লেভেল", "en": "🎓 Level", "hi": "🎓 स्तर", "ru": "🎓 Уровень"},
+    "coins": {"bn": "🪙 কয়েন", "en": "🪙 Coins", "hi": "🪙 सिक्के", "ru": "🪙 Монеты"},
+    "streak": {"bn": "🔥 Streak", "en": "🔥 Streak", "hi": "🔥 स्ट्रीक", "ru": "🔥 Серия"},
+    "words_learned": {
+        "bn": "📚 শেখা শব্দ", "en": "📚 Words learned", "hi": "📚 सीखे शब्द", "ru": "📚 Слов изучено"
+    },
+    "quizzes": {"bn": "🎯 কুইজ", "en": "🎯 Quizzes", "hi": "🎯 क्विज़", "ru": "🎯 Викторины"},
+    "score": {"bn": "⭐ স্কোর", "en": "⭐ Score", "hi": "⭐ स्कोर", "ru": "⭐ Очки"},
+    "premium_status": {"bn": "💎 Premium", "en": "💎 Premium", "hi": "💎 Premium", "ru": "💎 Premium"},
+    "active": {"bn": "✅ সক্রিয়", "en": "✅ Active", "hi": "✅ सक्रिय", "ru": "✅ Активен"},
+    "inactive": {"bn": "❌ নিষ্ক্রিয়", "en": "❌ Inactive", "hi": "❌ निष्क्रिय", "ru": "❌ Неактивен"},
+    "language_set": {
+        "bn": "✅ ভাষা সেট হয়েছে: বাংলা",
+        "en": "✅ Language set: English",
+        "hi": "✅ भाषा सेट: हिन्दी",
+        "ru": "✅ Язык установлен: Русский",
+    },
     "choose_lang": {
-        "bn": "🌍 ভাষা নির্বাচন করুন:\n\nChoose your language:\n\nअपनी भाषा चुनें:",
-        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा चुनें:",
-        "hi": "🌍 अपनी भाषा चुनें:\n\nChoose your language:\n\nআপনার ভাষা নির্বাচন করুন:",
+        "bn": "🌍 ভাষা নির্বাচন করুন:\n\nChoose your language:\n\nअपनी भाषा चुनें:\n\nВыберите язык:",
+        "en": "🌍 Choose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा चुनें:\n\nВыберите язык:",
+        "hi": "🌍 अपनी भाषा चुनें:\n\nChoose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nВыберите язык:",
+        "ru": "🌍 Выберите язык:\n\nChoose your language:\n\nআপনার ভাষা নির্বাচন করুন:\n\nअपनी भाषा चुनें:",
     },
-    "reset_done": {"bn": "🔄 চ্যাট ক্লিয়ার হয়েছে। /start দিন।", "en": "🔄 Chat cleared. Send /start.", "hi": "🔄 चैट साफ। /start भेजें।"},
-    "start_first": {"bn": "❌ আগে /start দিন।", "en": "❌ Please /start first.", "hi": "❌ पहले /start करें।"},
-    "daily_title": {"bn": "🔥 Daily Lesson", "en": "🔥 Daily Lesson", "hi": "🔥 Daily Lesson"},
-    "bonus_coins": {"bn": "🎁 বোনাস", "en": "🎁 Bonus", "hi": "🎁 बोनस"},
-    "days": {"bn": "দিন", "en": "days", "hi": "दिन"},
-    "leaderboard_title": {"bn": "🏆 টপ ১০ লিডারবোর্ড", "en": "🏆 Top 10 Leaderboard", "hi": "🏆 टॉप 10 लीडरबोर्ड"},
-    "no_users": {"bn": "এখনো কোনো ইউজার নেই।", "en": "No users yet.", "hi": "अभी कोई उपयोगकर्ता नहीं।"},
-    "word_title": {"bn": "📖 Word of the Day", "en": "📖 Word of the Day", "hi": "📖 आज का शब्द"},
-    "quiz_title": {"bn": "🎯 Quiz", "en": "🎯 Quiz", "hi": "🎯 Quiz"},
-    "quiz_more": {"bn": "🎯 আরেকটি কুইজ", "en": "🎯 Another Quiz", "hi": "🎯 एक और Quiz"},
-    "translate_hint": {"bn": "যেকোনো বাংলা বা ইংরেজি বাক্য লিখে পাঠান।", "en": "Send any Bangla or English sentence.", "hi": "कोई भी Bangla या English वाक्य भेजें।"},
-    "invite_title": {"bn": "🎁 Invite & Earn", "en": "🎁 Invite & Earn", "hi": "🎁 Invite & Earn"},
-    "invite_hint": {"bn": "💡 প্রতি ইনভাইটে {n} কয়েন পাবেন!", "en": "💡 Earn {n} coins per invite!", "hi": "💡 हर invite पर {n} सिक्के!"},
-    "premium_title": {"bn": "💎 Premium Membership", "en": "💎 Premium Membership", "hi": "💎 Premium Membership"},
-    "premium_buy": {"bn": "⭐ কিনুন ({n} Stars)", "en": "⭐ Buy ({n} Stars)", "hi": "⭐ खरीदें ({n} Stars)"},
-    "premium_already": {"bn": "💎 আপনি ইতিমধ্যে Premium!", "en": "💎 You are already Premium!", "hi": "💎 आप पहले से Premium हैं!"},
-    "premium_success": {"bn": "🎉 অভিনন্দন! আপনি Premium হয়েছেন!\n✅ {days} দিনের জন্য সক্রিয়।\n\n🎁 এখন পাবেন:\n• আনলিমিটেড ছবি\n• আনলিমিটেড ভয়েস\n• Voice reply\n• আনলিমিটেড PDF\n• 🎤 Pronunciation Coach\n• 🎯 IELTS Speaking Simulator\n• 🧠 Quiz from PDF", "en": "🎉 Congratulations! You are now Premium!\n✅ Active for {days} days.\n\n🎁 Now you get:\n• Unlimited photos\n• Unlimited voice\n• Voice replies\n• Unlimited PDFs\n• 🎤 Pronunciation Coach\n• 🎯 IELTS Speaking Simulator\n• 🧠 Quiz from PDF", "hi": "🎉 बधाई! आप अब Premium हैं!\n✅ {days} दिनों के लिए सक्रिय।"},
-    "achievements_title": {"bn": "🏅 Achievements", "en": "🏅 Achievements", "hi": "🏅 Achievements"},
-    "mistakes_title": {"bn": "📚 সাম্প্রতিক ভুল", "en": "📚 Recent Mistakes", "hi": "📚 हाल की गलतियाँ"},
-    "mistakes_none": {"bn": "✅ কোনো ভুল নেই!", "en": "✅ No mistakes!", "hi": "✅ कोई गलती नहीं!"},
-    "reminder_title": {"bn": "🔔 কখন রিমাইন্ডার পেতে চান?", "en": "🔔 When do you want a reminder?", "hi": "🔔 कब reminder चाहिए?"},
-    "reminder_off": {"bn": "🔕 রিমাইন্ডার বন্ধ।", "en": "🔕 Reminder off.", "hi": "🔕 Reminder बंद।"},
-    "reminder_set": {"bn": "🔔 রিমাইন্ডার সেট: {t}", "en": "🔔 Reminder set: {t}", "hi": "🔔 Reminder सेट: {t}"},
-    "level_set": {"bn": "✅ লেভেল সেট: {lvl}", "en": "✅ Level set: {lvl}", "hi": "✅ स्तर सेट: {lvl}"},
-    "choose_level": {"bn": "🎓 আপনার লেভেল সেট করুন:", "en": "🎓 Set your level:", "hi": "🎓 अपना स्तर चुनें:"},
-    "new_achievement": {"bn": "🎉 নতুন অ্যাচিভমেন্ট!", "en": "🎉 New Achievement!", "hi": "🎉 नई उपलब्धि!"},
-    "referral_bonus": {"bn": "🎁 আপনি {n} কয়েন পেয়েছেন বন্ধু ইনভাইটের জন্য!", "en": "🎁 You earned {n} coins for referring a friend!", "hi": "🎁 दोस्त को invite करने पर {n} सिक्के मिले!"},
-    "force_sub_title": {"bn": "🔒 বট ব্যবহার করতে হলে আমাদের গ্রুপে জয়েন করুন", "en": "🔒 Please join our group to use this bot", "hi": "🔒 इस बॉट का उपयोग करने के लिए हमारे ग्रुप से जुड़ें"},
-    "force_sub_desc": {"bn": "আমাদের Friendship Hub কমিউনিটিতে জয়েন করুন। জয়েন করার পর নিচের বাটনে ক্লিক করুন।", "en": "Join our Friendship Hub community. After joining, tap the button below.", "hi": "हमारे Friendship Hub से जुड़ें। जुड़ने के बाद नीचे के बटन पर क्लिक करें।"},
-    "force_sub_join_btn": {"bn": "👥 গ্রুপে জয়েন করুন", "en": "👥 Join Group", "hi": "👥 ग्रुप जॉइन करें"},
-    "force_sub_check_btn": {"bn": "✅ জয়েন করেছি, চেক করুন", "en": "✅ I Joined, Check", "hi": "✅ जुड़ गया, चेक करें"},
-    "force_sub_not_joined": {"bn": "❌ আপনি এখনো গ্রুপে জয়েন করেননি। জয়েন করে আবার চেক করুন।", "en": "❌ You haven't joined the group yet.", "hi": "❌ आपने अभी तक ग्रुप जॉइन नहीं किया।"},
-    "force_sub_thanks": {"bn": "✅ ধন্যবাদ! এখন আপনি বট ব্যবহার করতে পারবেন।", "en": "✅ Thank you! You can now use the bot.", "hi": "✅ धन्यवाद! अब आप बॉट का उपयोग कर सकते हैं।"},
-    "voice_limit": {"bn": "🎤 ফ্রি ইউজাররা দিনে {n}টি ভয়েস পাঠাতে পারেন।\n\n⭐ Premium নিলে আনলিমিটেড + Voice Reply পাবেন।", "en": "🎤 Free users can send {n} voice messages per day.\n\n⭐ Get Premium for unlimited + voice replies.", "hi": "🎤 फ्री यूज़र्स दिन में {n} वॉइस भेज सकते हैं।\n\n⭐ Premium लें unlimited के लिए।"},
-    "img_limit": {"bn": "📸 ফ্রি ইউজাররা দিনে {n}টি ছবি পাঠাতে পারেন।\n\n⭐ Premium নিলে আনলিমিটেড পাবেন।", "en": "📸 Free users can send {n} photos per day.\n\n⭐ Get Premium for unlimited.", "hi": "📸 फ्री यूज़र्स दिन में {n} फोटो भेज सकते हैं।\n\n⭐ Premium लें।"},
-    "pdf_limit": {"bn": "📄 ফ্রি ইউজাররা দিনে {n}টি PDF পাঠাতে পারেন।\n\n⭐ Premium নিলে আনলিমিটেড পাবেন।", "en": "📄 Free users can send {n} PDFs per day.\n\n⭐ Get Premium for unlimited.", "hi": "📄 फ्री यूज़र्स दिन में {n} PDF भेज सकते हैं।\n\n⭐ Premium लें।"},
-    "processing_voice": {"bn": "🎤 ভয়েস প্রসেস হচ্ছে...", "en": "🎤 Processing voice...", "hi": "🎤 वॉइस प्रोसेस हो रही है..."},
-    "processing_img": {"bn": "📸 ছবি বিশ্লেষণ হচ্ছে...", "en": "📸 Analyzing image...", "hi": "📸 फोटो विश्लेषण हो रहा है..."},
-    "processing_pdf": {"bn": "📄 PDF পড়া হচ্ছে...", "en": "📄 Reading PDF...", "hi": "📄 PDF पढ़ रहा हूँ..."},
-    "pdf_analyzing": {"bn": "🤖 PDF বিশ্লেষণ করা হচ্ছে...", "en": "🤖 Analyzing PDF...", "hi": "🤖 PDF विश्लेषण हो रहा है..."},
-    "pdf_fail": {"bn": "❌ PDF পড়তে পারিনি। টেক্সট-ভিত্তিক PDF পাঠান (স্ক্যান করা নয়)।", "en": "❌ Could not read PDF. Please send a text-based PDF (not scanned).", "hi": "❌ PDF नहीं पढ़ सका। टेक्स्ट-बेस्ड PDF भेजें।"},
-    "pdf_too_big": {"bn": "📄 PDF বড়, প্রথম {n} পৃষ্ঠা পড়া হয়েছে।", "en": "📄 PDF is large. First {n} pages were read.", "hi": "📄 PDF बड़ा है। पहले {n} पेज पढ़े गए।"},
-    "pdf_too_large": {"bn": "❌ ফাইলটি খুব বড়। সর্বোচ্চ {n} MB পাঠাতে পারবেন।", "en": "❌ File is too large. Max {n} MB allowed.", "hi": "❌ फाइल बहुत बड़ी है। अधिकतम {n} MB।"},
-    "voice_heard": {"bn": "📝 আপনি বলেছেন: {text}", "en": "📝 You said: {text}", "hi": "📝 आपने कहा: {text}"},
-    "voice_fail": {"bn": "❌ ভয়েস বুঝতে পারিনি। আবার পাঠান।", "en": "❌ Could not understand voice.", "hi": "❌ वॉइस समझ नहीं आई।"},
-    "img_fail": {"bn": "❌ ছবি বুঝতে পারিনি। আবার পাঠান।", "en": "❌ Could not analyze image.", "hi": "❌ फोटो समझ नहीं आई।"},
-    "feedback_thanks": {"bn": "🙏 ধন্যবাদ আপনার মতামতের জন্য!", "en": "🙏 Thanks for your feedback!", "hi": "🙏 फीडबैक के लिए धन्यवाद!"},
-    "practice_title": {"bn": "🎭 Role-Play Practice", "en": "🎭 Role-Play Practice", "hi": "🎭 Role-Play अभ्यास"},
-    "practice_desc": {"bn": "একটা পরিস্থিতি বেছে নিন:", "en": "Choose a scenario:", "hi": "एक परिस्थिति चुनें:"},
-    "rp_started": {"bn": "🎭 {title} শুরু হয়েছে!\n\nবন্ধ করতে /endroleplay দিন।", "en": "🎭 {title} started!\n\nSend /endroleplay to stop.", "hi": "🎭 {title} शुरू!\n\nरोकने के लिए /endroleplay भेजें।"},
-    "rp_ended": {"bn": "🎭 Role-Play শেষ। আবার শুরু করতে /practice দিন।", "en": "🎭 Role-Play ended. Send /practice to start again.", "hi": "🎭 Role-Play खत्म। फिर से /practice भेजें।"},
-    "rp_active": {"bn": "⚠️ আপনি এখনো Role-Play মোডে আছেন। /endroleplay দিয়ে বন্ধ করুন।", "en": "⚠️ You're in Role-Play mode. Send /endroleplay to stop.", "hi": "⚠️ आप Role-Play में हैं। /endroleplay भेजें।"},
-    "rp_not_in": {"bn": "⚠️ আপনি Role-Play মোডে নেই।", "en": "⚠️ You are not in Role-Play mode.", "hi": "⚠️ आप Role-Play मोड में नहीं हैं।"},
-    "review_title": {"bn": "🔁 Spaced Review", "en": "🔁 Spaced Review", "hi": "🔁 Spaced Review"},
-    "review_none": {"bn": "✅ আজ কোনো রিভিউ নেই! আরও ভুল করতে থাকুন 😊", "en": "✅ No reviews today! Keep practicing.", "hi": "✅ आज कोई रिव्यू नहीं!"},
-    "review_prompt": {"bn": "🔁 মনে আছে?\n\n❌ আগের ভুল: {wrong}\n\n✅ সঠিকটা লিখুন:", "en": "🔁 Remember?\n\n❌ Old mistake: {wrong}\n\n✅ Write the correct version:", "hi": "🔁 याद है?\n\n❌ पुरानी गलती: {wrong}\n\n✅ सही लिखें:"},
-    "review_correct": {"bn": "🎉 একদম সঠিক! আজকের রিভিউ শেষ।", "en": "🎉 Perfect! Review complete for today.", "hi": "🎉 बिल्कुल सही! रिव्यू पूरा।"},
-    "review_wrong": {"bn": "❌ এটা ঠিক হয়নি।\n\n✅ সঠিক: {correct}\n\nআবার চেষ্টা করুন কাল।", "en": "❌ Not quite.\n\n✅ Correct: {correct}\n\nTry again tomorrow.", "hi": "❌ सही नहीं।\n\n✅ सही: {correct}\n\nकल फिर कोशिश करें।"},
-    "memory_title": {"bn": "🧠 আমি যা মনে রেখেছি", "en": "🧠 What I Remember", "hi": "🧠 मुझे याद है"},
-    "review_saved": {"bn": "✅ রিভিউ লিস্টে যোগ হয়েছে!", "en": "✅ Added to review list!", "hi": "✅ रिव्यू लिस्ट में जोड़ा गया!"},
-    "cancel_payment_btn": {"bn": "❌ পেমেন্ট বাতিল করুন", "en": "❌ Cancel Payment", "hi": "❌ भुगतान रद्द करें"},
-    "copy_btn": {"bn": "📋 কপি করুন", "en": "📋 Copy", "hi": "📋 कॉपी करें"},
-    "copy_hint": {"bn": "👇 ট্যাপ করে কপি করুন।", "en": "👇 Tap to copy.", "hi": "👇 टैप करके कॉपी करें।"},
-    "pay_bkash_title": {"bn": "💳 bKash পেমেন্ট", "en": "💳 bKash Payment", "hi": "💳 bKash भुगतान"},
+    "reset_done": {
+        "bn": "🔄 চ্যাট ক্লিয়ার হয়েছে। /start দিন।",
+        "en": "🔄 Chat cleared. Send /start.",
+        "hi": "🔄 चैट साफ। /start भेजें।",
+        "ru": "🔄 Чат очищен. Отправьте /start."
+    },
+    "start_first": {
+        "bn": "❌ আগে /start দিন।", "en": "❌ Please /start first.",
+        "hi": "❌ पहले /start करें।", "ru": "❌ Сначала отправьте /start."
+    },
+    "daily_title": {"bn": "🔥 Daily Lesson", "en": "🔥 Daily Lesson", "hi": "🔥 Daily Lesson", "ru": "🔥 Урок дня"},
+    "bonus_coins": {"bn": "🎁 বোনাস", "en": "🎁 Bonus", "hi": "🎁 बोनस", "ru": "🎁 Бонус"},
+    "days": {"bn": "দিন", "en": "days", "hi": "दिन", "ru": "дней"},
+    "leaderboard_title": {
+        "bn": "🏆 টপ ১০ লিডারবোর্ড", "en": "🏆 Top 10 Leaderboard",
+        "hi": "🏆 टॉप 10 लीडरबोर्ड", "ru": "🏆 Топ-10"
+    },
+    "no_users": {"bn": "এখনো কোনো ইউজার নেই।", "en": "No users yet.", "hi": "अभी कोई उपयोगकर्ता नहीं।", "ru": "Пока нет пользователей."},
+    "word_title": {"bn": "📖 Word of the Day", "en": "📖 Word of the Day", "hi": "📖 आज का शब्द", "ru": "📖 Слово дня"},
+    "quiz_title": {"bn": "🎯 Quiz", "en": "🎯 Quiz", "hi": "🎯 Quiz", "ru": "🎯 Викторина"},
+    "quiz_more": {"bn": "🎯 আরেকটি কুইজ", "en": "🎯 Another Quiz", "hi": "🎯 एक और Quiz", "ru": "🎯 Ещё викторина"},
+    "translate_hint": {
+        "bn": "যেকোনো বাংলা বা ইংরেজি বাক্য লিখে পাঠান।",
+        "en": "Send any Bangla or English sentence.",
+        "hi": "कोई भी Bangla या English वाक्य भेजें।",
+        "ru": "Отправьте предложение на бенгальском или английском."
+    },
+    "invite_title": {"bn": "🎁 Invite & Earn", "en": "🎁 Invite & Earn", "hi": "🎁 Invite & Earn", "ru": "🎁 Пригласи друга"},
+    "invite_hint": {
+        "bn": "💡 প্রতি ইনভাইটে {n} কয়েন পাবেন!",
+        "en": "💡 Earn {n} coins per invite!",
+        "hi": "💡 हर invite पर {n} सिक्के!",
+        "ru": "💡 Получите {n} монет за приглашение!"
+    },
+    "premium_title": {"bn": "💎 Premium Membership", "en": "💎 Premium Membership", "hi": "💎 Premium Membership", "ru": "💎 Premium-подписка"},
+    "premium_buy": {"bn": "⭐ কিনুন ({n} Stars)", "en": "⭐ Buy ({n} Stars)", "hi": "⭐ खरीदें ({n} Stars)", "ru": "⭐ Купить ({n} Stars)"},
+    "premium_already": {
+        "bn": "💎 আপনি ইতিমধ্যে Premium!", "en": "💎 You are already Premium!",
+        "hi": "💎 आप पहले से Premium हैं!", "ru": "💎 У вас уже есть Premium!"
+    },
+    "premium_success": {
+        "bn": "🎉 অভিনন্দন! আপনি Premium হয়েছেন!\n✅ {days} দিনের জন্য সক্রিয়।\n\n🎁 এখন পাবেন:\n• আনলিমিটেড ছবি\n• আনলিমিটেড ভয়েস\n• Voice reply\n• আনলিমিটেড PDF\n• 🎤 Pronunciation Coach\n• 🎯 IELTS Speaking Simulator\n• 🧠 Quiz from PDF\n• 📂 সব Premium PDF ফাইল",
+        "en": "🎉 Congratulations! You are now Premium!\n✅ Active for {days} days.\n\n🎁 Now you get:\n• Unlimited photos\n• Unlimited voice\n• Voice replies\n• Unlimited PDFs\n• 🎤 Pronunciation Coach\n• 🎯 IELTS Speaking Simulator\n• 🧠 Quiz from PDF\n• 📂 ALL Premium PDF Files",
+        "hi": "🎉 बधाई! आप अब Premium हैं!\n✅ {days} दिनों के लिए सक्रिय।",
+        "ru": "🎉 Поздравляем! Вы теперь Premium!\n✅ Активно {days} дней.\n\n🎁 Теперь доступно:\n• Безлимитные фото\n• Безлимитные голосовые\n• Голосовые ответы\n• Безлимитные PDF\n• 🎤 Тренажёр произношения\n• 🎯 IELTS Speaking\n• 🧠 Викторина из PDF\n• 📂 Все Premium PDF",
+    },
+    "achievements_title": {"bn": "🏅 Achievements", "en": "🏅 Achievements", "hi": "🏅 Achievements", "ru": "🏅 Достижения"},
+    "mistakes_title": {"bn": "📚 সাম্প্রতিক ভুল", "en": "📚 Recent Mistakes", "hi": "📚 हाल की गलतियाँ", "ru": "📚 Недавние ошибки"},
+    "mistakes_none": {"bn": "✅ কোনো ভুল নেই!", "en": "✅ No mistakes!", "hi": "✅ कोई गलती नहीं!", "ru": "✅ Ошибок нет!"},
+    "reminder_title": {
+        "bn": "🔔 কখন রিমাইন্ডার পেতে চান?", "en": "🔔 When do you want a reminder?",
+        "hi": "🔔 कब reminder चाहिए?", "ru": "🔔 Когда напомнить?"
+    },
+    "reminder_off": {"bn": "🔕 রিমাইন্ডার বন্ধ।", "en": "🔕 Reminder off.", "hi": "🔕 Reminder बंद।", "ru": "🔕 Напоминание отключено."},
+    "reminder_set": {"bn": "🔔 রিমাইন্ডার সেট: {t}", "en": "🔔 Reminder set: {t}", "hi": "🔔 Reminder सेट: {t}", "ru": "🔔 Напоминание: {t}"},
+    "level_set": {"bn": "✅ লেভেল সেট: {lvl}", "en": "✅ Level set: {lvl}", "hi": "✅ स्तर सेट: {lvl}", "ru": "✅ Уровень: {lvl}"},
+    "choose_level": {"bn": "🎓 আপনার লেভেল সেট করুন:", "en": "🎓 Set your level:", "hi": "🎓 अपना स्तर चुनें:", "ru": "🎓 Выберите уровень:"},
+    "new_achievement": {"bn": "🎉 নতুন অ্যাচিভমেন্ট!", "en": "🎉 New Achievement!", "hi": "🎉 नई उपलब्धि!", "ru": "🎉 Новое достижение!"},
+    "referral_bonus": {
+        "bn": "🎁 আপনি {n} কয়েন পেয়েছেন বন্ধু ইনভাইটের জন্য!",
+        "en": "🎁 You earned {n} coins for referring a friend!",
+        "hi": "🎁 दोस्त को invite करने पर {n} सिक्के मिले!",
+        "ru": "🎁 Вы получили {n} монет за приглашение!"
+    },
+    "voice_limit": {
+        "bn": "🎤 ফ্রি ইউজাররা দিনে {n}টি ভয়েস পাঠাতে পারেন।\n\n⭐ Premium নিলে আনলিমিটেড + Voice Reply পাবেন।",
+        "en": "🎤 Free users can send {n} voice messages per day.\n\n⭐ Get Premium for unlimited + voice replies.",
+        "hi": "🎤 फ्री यूज़र्स दिन में {n} वॉइस भेज सकते हैं।\n\n⭐ Premium लें unlimited के लिए।",
+        "ru": "🎤 Бесплатно {n} голосовых в день.\n\n⭐ Premium = безлимит + голосовые ответы."
+    },
+    "img_limit": {
+        "bn": "📸 ফ্রি ইউজাররা দিনে {n}টি ছবি পাঠাতে পারেন।\n\n⭐ Premium নিলে আনলিমিটেড পাবেন।",
+        "en": "📸 Free users can send {n} photos per day.\n\n⭐ Get Premium for unlimited.",
+        "hi": "📸 फ्री यूज़र्स दिन में {n} फोटो भेज सकते हैं।\n\n⭐ Premium लें।",
+        "ru": "📸 Бесплатно {n} фото в день.\n\n⭐ Premium = безлимит."
+    },
+    "pdf_limit": {
+        "bn": "📄 ফ্রি ইউজাররা দিনে {n}টি PDF পাঠাতে পারেন।\n\n⭐ Premium নিলে আনলিমিটেড পাবেন।",
+        "en": "📄 Free users can send {n} PDFs per day.\n\n⭐ Get Premium for unlimited.",
+        "hi": "📄 फ्री यूज़र्स दिन में {n} PDF भेज सकते हैं।\n\n⭐ Premium लें।",
+        "ru": "📄 Бесплатно {n} PDF в день.\n\n⭐ Premium = безлимит."
+    },
+    "processing_voice": {"bn": "🎤 ভয়েস প্রসেস হচ্ছে...", "en": "🎤 Processing voice...", "hi": "🎤 वॉइस प्रोसेस हो रही है...", "ru": "🎤 Обрабатываю голос..."},
+    "processing_img": {"bn": "📸 ছবি বিশ্লেষণ হচ্ছে...", "en": "📸 Analyzing image...", "hi": "📸 फोटो विश्लेषण हो रहा है...", "ru": "📸 Анализирую фото..."},
+    "processing_pdf": {"bn": "📄 PDF পড়া হচ্ছে...", "en": "📄 Reading PDF...", "hi": "📄 PDF पढ़ रहा हूँ...", "ru": "📄 Читаю PDF..."},
+    "pdf_analyzing": {"bn": "🤖 PDF বিশ্লেষণ করা হচ্ছে...", "en": "🤖 Analyzing PDF...", "hi": "🤖 PDF विश्लेषण हो रहा है...", "ru": "🤖 Анализирую PDF..."},
+    "pdf_fail": {
+        "bn": "❌ PDF পড়তে পারিনি। টেক্সট-ভিত্তিক PDF পাঠান (স্ক্যান করা নয়)।",
+        "en": "❌ Could not read PDF. Please send a text-based PDF (not scanned).",
+        "hi": "❌ PDF नहीं पढ़ सका। टेक्स्ट-बेस्ड PDF भेजें।",
+        "ru": "❌ Не удалось прочитать PDF. Отправьте текстовый PDF."
+    },
+    "pdf_too_big": {"bn": "📄 PDF বড়, প্রথম {n} পৃষ্ঠা পড়া হয়েছে।", "en": "📄 PDF is large. First {n} pages were read.", "hi": "📄 PDF बड़ा है।", "ru": "📄 PDF большой. Прочитаны первые {n} страниц."},
+    "pdf_too_large": {"bn": "❌ ফাইলটি খুব বড়। সর্বোচ্চ {n} MB পাঠাতে পারবেন।", "en": "❌ File is too large. Max {n} MB allowed.", "hi": "❌ फाइल बहुत बड़ी है।", "ru": "❌ Файл слишком большой. Макс {n} MB."},
+    "voice_heard": {"bn": "📝 আপনি বলেছেন: {text}", "en": "📝 You said: {text}", "hi": "📝 आपने कहा: {text}", "ru": "📝 Вы сказали: {text}"},
+    "voice_fail": {"bn": "❌ ভয়েস বুঝতে পারিনি। আবার পাঠান।", "en": "❌ Could not understand voice.", "hi": "❌ वॉइस समझ नहीं आई।", "ru": "❌ Не удалось распознать голос."},
+    "img_fail": {"bn": "❌ ছবি বুঝতে পারিনি। আবার পাঠান।", "en": "❌ Could not analyze image.", "hi": "❌ फोटो समझ नहीं आई।", "ru": "❌ Не удалось проанализировать фото."},
+    "feedback_thanks": {"bn": "🙏 ধন্যবাদ আপনার মতামতের জন্য!", "en": "🙏 Thanks for your feedback!", "hi": "🙏 फीडबैक के लिए धन्यवाद!", "ru": "🙏 Спасибо за отзыв!"},
+    "practice_title": {"bn": "🎭 Role-Play Practice", "en": "🎭 Role-Play Practice", "hi": "🎭 Role-Play अभ्यास", "ru": "🎭 Ролевая игра"},
+    "practice_desc": {"bn": "একটা পরিস্থিতি বেছে নিন:", "en": "Choose a scenario:", "hi": "एक परिस्थिति चुनें:", "ru": "Выберите сценарий:"},
+    "rp_started": {
+        "bn": "🎭 {title} শুরু হয়েছে!\n\nবন্ধ করতে /endroleplay দিন।",
+        "en": "🎭 {title} started!\n\nSend /endroleplay to stop.",
+        "hi": "🎭 {title} शुरू!\n\nरोकने के लिए /endroleplay भेजें।",
+        "ru": "🎭 {title} начато!\n\nОтправьте /endroleplay для остановки."
+    },
+    "rp_ended": {"bn": "🎭 Role-Play শেষ।", "en": "🎭 Role-Play ended.", "hi": "🎭 Role-Play खत्म।", "ru": "🎭 Ролевая игра завершена."},
+    "rp_active": {"bn": "⚠️ আপনি Role-Play মোডে আছেন।", "en": "⚠️ You're in Role-Play mode.", "hi": "⚠️ आप Role-Play में हैं।", "ru": "⚠️ Вы в режиме ролевой игры."},
+    "rp_not_in": {"bn": "⚠️ আপনি Role-Play মোডে নেই।", "en": "⚠️ You are not in Role-Play mode.", "hi": "⚠️ आप Role-Play मोड में नहीं हैं।", "ru": "⚠️ Вы не в режиме ролевой игры."},
+    "review_title": {"bn": "🔁 Spaced Review", "en": "🔁 Spaced Review", "hi": "🔁 Spaced Review", "ru": "🔁 Повторение"},
+    "review_none": {
+        "bn": "✅ আজ কোনো রিভিউ নেই! আরও ভুল করতে থাকুন 😊",
+        "en": "✅ No reviews today! Keep practicing.",
+        "hi": "✅ आज कोई रिव्यू नहीं!",
+        "ru": "✅ Сегодня повторений нет! Продолжайте практику."
+    },
+    "review_prompt": {
+        "bn": "🔁 মনে আছে?\n\n❌ আগের ভুল: {wrong}\n\n✅ সঠিকটা লিখুন:",
+        "en": "🔁 Remember?\n\n❌ Old mistake: {wrong}\n\n✅ Write the correct version:",
+        "hi": "🔁 याद है?\n\n❌ पुरानी गलती: {wrong}\n\n✅ सही लिखें:",
+        "ru": "🔁 Помните?\n\n❌ Ошибка: {wrong}\n\n✅ Напишите правильно:"
+    },
+    "review_correct": {"bn": "🎉 একদম সঠিক!", "en": "🎉 Perfect!", "hi": "🎉 बिल्कुल सही!", "ru": "🎉 Идеально!"},
+    "review_wrong": {
+        "bn": "❌ এটা ঠিক হয়নি।\n\n✅ সঠিক: {correct}",
+        "en": "❌ Not quite.\n\n✅ Correct: {correct}",
+        "hi": "❌ सही नहीं।\n\n✅ सही: {correct}",
+        "ru": "❌ Не совсем.\n\n✅ Правильно: {correct}"
+    },
+    "memory_title": {"bn": "🧠 আমি যা মনে রেখেছি", "en": "🧠 What I Remember", "hi": "🧠 मुझे याद है", "ru": "🧠 Что я помню"},
+    "review_saved": {"bn": "✅ রিভিউ লিস্টে যোগ হয়েছে!", "en": "✅ Added to review list!", "hi": "✅ रिव्यू लिस्ट में जोड़ा गया!", "ru": "✅ Добавлено в повторение!"},
+    "cancel_payment_btn": {"bn": "❌ পেমেন্ট বাতিল করুন", "en": "❌ Cancel Payment", "hi": "❌ भुगतान रद्द करें", "ru": "❌ Отменить оплату"},
+    "copy_btn": {"bn": "📋 কপি করুন", "en": "📋 Copy", "hi": "📋 कॉपी करें", "ru": "📋 Копировать"},
+    "copy_hint": {"bn": "👇 ট্যাপ করে কপি করুন।", "en": "👇 Tap to copy.", "hi": "👇 टैप करके कॉपी करें।", "ru": "👇 Нажмите, чтобы скопировать."},
+    "pay_bkash_title": {"bn": "💳 bKash পেমেন্ট", "en": "💳 bKash Payment", "hi": "💳 bKash भुगतान", "ru": "💳 Оплата через bKash"},
     "pay_bkash_desc": {
-        "bn": "১. আপনার bKash এপ থেকে Send Money করুন।\n২. নাম্বার: `{number}`\n৩. এমাউন্ট: `{amount}` টাকা\n৪. টাকা পাঠানোর পর Transaction ID (TrxID) এবং স্ক্রিনশট এই চ্যাটে পাঠান।\n\n✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।",
-        "en": "1. Send Money from your bKash app.\n2. Number: `{number}`\n3. Amount: `{amount}` BDT\n4. After sending, send the Transaction ID (TrxID) and screenshot to this chat.\n\n✅ Admin will verify and activate your premium within 5 minutes.",
-        "hi": "1. अपने bKash ऐप से Send Money करें।\n2. नंबर: `{number}`\n3. राशि: `{amount}` BDT\n4. भेजने के बाद Transaction ID (TrxID) और स्क्रीनशॉट इस चैट में भेजें।\n\n✅ एडमिन 5 मिनट के भीतर आपका प्रीमियम एक्टिवेट कर देगा।"
+        "bn": "১. আপনার bKash এপ থেকে Send Money করুন।\n২. নাম্বার: `{number}`\n৩. এমাউন্ট: `{amount}` টাকা\n৪. টাকা পাঠানোর পর TrxID এবং স্ক্রিনশট এই চ্যাটে পাঠান।\n\n✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।",
+        "en": "1. Send Money from your bKash app.\n2. Number: `{number}`\n3. Amount: `{amount}` BDT\n4. After sending, send the TrxID and screenshot to this chat.\n\n✅ Admin will verify and activate within 5 minutes.",
+        "hi": "1. अपने bKash ऐप से Send Money करें।\n2. नंबर: `{number}`\n3. राशि: `{amount}` BDT\n4. भेजने के बाद TrxID और स्क्रीनशॉट भेजें।",
+        "ru": "1. Отправьте через bKash Send Money.\n2. Номер: `{number}`\n3. Сумма: `{amount}` BDT\n4. После отправки пришлите TrxID и скриншот в этот чат.\n\n✅ Админ проверит и активирует в течение 5 минут."
     },
-    "pay_rocket_title": {"bn": "💳 Rocket পেমেন্ট", "en": "💳 Rocket Payment", "hi": "💳 Rocket भुगतान"},
+    "pay_rocket_title": {"bn": "💳 Rocket পেমেন্ট", "en": "💳 Rocket Payment", "hi": "💳 Rocket भुगतान", "ru": "💳 Оплата через Rocket"},
     "pay_rocket_desc": {
-        "bn": "১. আপনার Rocket এপ থেকে Send Money করুন।\n২. নাম্বার: `{number}`\n৩. এমাউন্ট: `{amount}` টাকা\n৪. টাকা পাঠানোর পর Transaction ID (TrxID) এবং স্ক্রিনশট এই চ্যাটে পাঠান।\n\n✅ অ্যাডমিন চেক করে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।",
-        "en": "1. Send Money from your Rocket app.\n2. Number: `{number}`\n3. Amount: `{amount}` BDT\n4. After sending, send the Transaction ID (TrxID) and screenshot to this chat.\n\n✅ Admin will verify and activate your premium within 5 minutes.",
-        "hi": "1. अपने Rocket ऐप से Send Money करें।\n2. नंबर: `{number}`\n3. राशि: `{amount}` BDT\n4. भेजने के बाद Transaction ID (TrxID) और स्क्रीनशॉट इस चैट में भेजें।\n\n✅ एडमिन 5 मिनट के भीतर आपका प्रीमियम एक्टिवेट कर देगा।"
+        "bn": "১. আপনার Rocket এপ থেকে Send Money করুন।\n২. নাম্বার: `{number}`\n৩. এমাউন্ট: `{amount}` টাকা\n৪. TrxID এবং স্ক্রিনশট এই চ্যাটে পাঠান।",
+        "en": "1. Send Money from your Rocket app.\n2. Number: `{number}`\n3. Amount: `{amount}` BDT\n4. Send TrxID and screenshot to this chat.",
+        "hi": "1. अपने Rocket ऐप से Send Money करें।\n2. नंबर: `{number}`\n3. राशि: `{amount}` BDT",
+        "ru": "1. Отправьте через Rocket Send Money.\n2. Номер: `{number}`\n3. Сумма: `{amount}` BDT\n4. Пришлите TrxID и скриншот."
     },
-    "pay_trc20_title": {"bn": "🪙 ক্রিপ্টো পেমেন্ট (USDT TRC20)", "en": "🪙 Crypto Payment (USDT TRC20)", "hi": "🪙 क्रिप्टो भुगतान (USDT TRC20)"},
+    "pay_trc20_title": {"bn": "🪙 ক্রিপ্টো পেমেন্ট (USDT TRC20)", "en": "🪙 Crypto Payment (USDT TRC20)", "hi": "🪙 क्रिप्टो भुगतान", "ru": "🪙 USDT (TRC20)"},
     "pay_trc20_desc": {
-        "bn": "১. আপনার ওয়ালেট থেকে `{amount}` USDT (TRC20) পাঠান।\n২. TRC20 অ্যাড্রেস: `{address}`\n৩. টাকা পাঠানোর পর Transaction Hash (TxID) এবং স্ক্রিনশট এই চ্যাটে পাঠান।\n\n✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।",
-        "en": "1. Send `{amount}` USDT (TRC20) from your wallet.\n2. TRC20 Address: `{address}`\n3. After sending, send the Transaction Hash (TxID) and screenshot to this chat.\n\n✅ Admin will verify and activate your premium within 10 minutes.",
-        "hi": "1. अपने वॉलेट से `{amount}` USDT (TRC20) भेजें।\n2. TRC20 एड्रेस: `{address}`\n3. भेजने के बाद Transaction Hash (TxID) और स्क्रीनशॉट इस चैट में भेजें।\n\n✅ एडमिन 10 मिनट के भीतर आपका प्रीमियम एक्टिवेट कर देगा।"
+        "bn": "১. `{amount}` USDT (TRC20) পাঠান।\n২. অ্যাড্রেস: `{address}`\n৩. TxID এবং স্ক্রিনশট এই চ্যাটে পাঠান।",
+        "en": "1. Send `{amount}` USDT (TRC20).\n2. Address: `{address}`\n3. Send TxID and screenshot to this chat.",
+        "hi": "1. `{amount}` USDT (TRC20) भेजें।\n2. एड्रेस: `{address}`",
+        "ru": "1. Отправьте `{amount}` USDT (TRC20).\n2. Адрес: `{address}`\n3. Пришлите TxID и скриншот."
     },
-    "pay_bsc20_title": {"bn": "🪙 ক্রিপ্টো পেমেন্ট (USDT BSC20)", "en": "🪙 Crypto Payment (USDT BSC20)", "hi": "🪙 क्रिप्टो भुगतान (USDT BSC20)"},
+    "pay_bsc20_title": {"bn": "🪙 ক্রিপ্টো পেমেন্ট (USDT BSC20)", "en": "🪙 Crypto Payment (USDT BSC20)", "hi": "🪙 क्रिप्टो भुगतान", "ru": "🪙 USDT (BSC20)"},
     "pay_bsc20_desc": {
-        "bn": "১. আপনার ওয়ালেট থেকে `{amount}` USDT (BSC20) পাঠান।\n২. BSC20 অ্যাড্রেস: `{address}`\n৩. টাকা পাঠানোর পর Transaction Hash (TxID) এবং স্ক্রিনশট এই চ্যাটে পাঠান।\n\n✅ অ্যাডমিন চেক করে ১০ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেবে।",
-        "en": "1. Send `{amount}` USDT (BSC20) from your wallet.\n2. BSC20 Address: `{address}`\n3. After sending, send the Transaction Hash (TxID) and screenshot to this chat.\n\n✅ Admin will verify and activate your premium within 10 minutes.",
-        "hi": "1. अपने वॉलेट से `{amount}` USDT (BSC20) भेजें।\n2. BSC20 एड्रेस: `{address}`\n3. भेजने के बाद Transaction Hash (TxID) और स्क्रीनशॉट इस चैट में भेजें।\n\n✅ एडमिन 10 मिनट के भीतर आपका प्रीमियम एक्टिवेट कर देगा।"
+        "bn": "১. `{amount}` USDT (BSC20) পাঠান।\n২. অ্যাড্রেস: `{address}`\n৩. TxID এবং স্ক্রিনশট এই চ্যাটে পাঠান।",
+        "en": "1. Send `{amount}` USDT (BSC20).\n2. Address: `{address}`\n3. Send TxID and screenshot.",
+        "hi": "1. `{amount}` USDT (BSC20) भेजें।\n2. एड्रेस: `{address}`",
+        "ru": "1. Отправьте `{amount}` USDT (BSC20).\n2. Адрес: `{address}`\n3. Пришлите TxID и скриншот."
     },
-    "support_title": {"bn": "🆘 সাপোর্ট", "en": "🆘 Support", "hi": "🆘 सहायता"},
+    "support_title": {"bn": "🆘 সাপোর্ট", "en": "🆘 Support", "hi": "🆘 सहायता", "ru": "🆘 Поддержка"},
     "support_desc": {
-        "bn": "আপনার কোনো সমস্যা, প্রশ্ন বা সাজেশন থাকলে নিচে লিখে পাঠান।\n\n📩 আপনার মেসেজটি সরাসরি অ্যাডমিনের কাছে পাঠানো হবে এবং শীঘ্রই উত্তর দেওয়া হবে।\n\n📞 বিকল্প যোগাযোগ: @asikul_echo",
-        "en": "If you have any problem, question, or suggestion, write it below.\n\n📩 Your message will be sent directly to the admin and you will get a reply soon.\n\n📞 Alternative contact: @asikul_echo",
-        "hi": "यदि आपको कोई समस्या, प्रश्न या सुझाव है तो नीचे लिखें।\n\n📩 आपका संदेश सीधे एडमिन को भेजा जाएगा और जल्द ही उत्तर दिया जाएगा।\n\n📞 वैकल्पिक संपर्क: @asikul_echo"
+        "bn": "আপনার সমস্যা, প্রশ্ন বা সাজেশন থাকলে নিচে লিখে পাঠান।\n\n📩 আপনার মেসেজ সরাসরি অ্যাডমিনের কাছে যাবে।\n\n📞 বিকল্প: @asikul_echo",
+        "en": "If you have any problem, question, or suggestion, write it below.\n\n📩 Your message will be sent directly to the admin.\n\n📞 Alternative: @asikul_echo",
+        "hi": "अगर आपको कोई समस्या, प्रश्न या सुझाव है तो नीचे लिखें।\n\n📩 आपका संदेश एडमिन को भेजा जाएगा।",
+        "ru": "Если у вас проблема, вопрос или предложение — напишите ниже.\n\n📩 Сообщение будет отправлено админу.\n\n📞 Альтернатива: @asikul_echo"
     },
-    "support_sent": {"bn": "✅ আপনার মেসেজ অ্যাডমিনের কাছে পাঠানো হয়েছে। শীঘ্রই উত্তর পাবেন।", "en": "✅ Your message has been sent to the admin. You will get a reply soon.", "hi": "✅ आपका संदेश एडमिन को भेज दिया गया है। जल्द ही उत्तर मिलेगा।"},
-    "support_btn": {"bn": "🆘 সাপোর্ট", "en": "🆘 Support", "hi": "🆘 सहायता"},
-    "support_cancel": {"bn": "❌ বাতিল করুন", "en": "❌ Cancel", "hi": "❌ रद्द करें"},
-    "support_cancelled": {"bn": "✅ সাপোর্ট মোড বাতিল করা হয়েছে।", "en": "✅ Support mode cancelled.", "hi": "✅ सहायता मोड रद्द कर दिया गया।"},
-    "payment_proof_sent": {"bn": "✅ আপনার পেমেন্ট প্রুফ অ্যাডমিনের কাছে পাঠানো হয়েছে।\nভেরিফিকেশন শেষ হলে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেওয়া হবে।", "en": "✅ Your payment proof has been sent to the admin.\nPremium will be activated within 5 minutes after verification.", "hi": "✅ आपका भुगतान प्रमाण एडमिन को भेज दिया गया है।"},
-    "payment_info_sent": {"bn": "✅ আপনার পেমেন্ট ইনফো অ্যাডমিনের কাছে পাঠানো হয়েছে।\nভেরিফিকেশন শেষ হলে ৫ মিনিটের মধ্যে আপনার প্রিমিয়াম চালু করে দেওয়া হবে।", "en": "✅ Your payment info has been sent to the admin.\nPremium will be activated within 5 minutes after verification.", "hi": "✅ आपकी भुगतान जानकारी एडमिन को भेज दी गई है।"},
-    "suggestion_expired": {"bn": "⚠️ এক্সপায়ার হয়ে গেছে। আবার চেষ্টা করুন।", "en": "⚠️ This option has expired. Please try again.", "hi": "⚠️ यह विकल्प समाप्त हो गया है। फिर प्रयास करें।"},
-    "game_title": {"bn": "🎮 Word Scramble Game", "en": "🎮 Word Scramble Game", "hi": "🎮 Word Scramble Game"},
-    "game_scrambled": {"bn": "🔤 এলোমেলো শব্দ: `{word}`", "en": "🔤 Scrambled word: `{word}`", "hi": "🔤 अव्यवस्थित शब्द: `{word}`"},
-    "game_prompt": {"bn": "👉 সঠিক ইংরেজি শব্দটি চ্যাটে লিখে পাঠান।", "en": "👉 Type the correct English word in chat.", "hi": "👉 सही अंग्रेजी शब्द चैट में लिखें।"},
-    "game_score": {"bn": "🏆 আপনার স্কোর: {score}", "en": "🏆 Your score: {score}", "hi": "🏆 आपका स्कोर: {score}"},
-    "game_stop_hint": {"bn": "❌ খেলা বন্ধ করতে: /endgame", "en": "❌ To stop: /endgame", "hi": "❌ रोकने के लिए: /endgame"},
-    "game_skip_btn": {"bn": "⏭️ Skip / Next Word", "en": "⏭️ Skip / Next Word", "hi": "⏭️ Skip / अगला शब्द"},
-    "game_correct": {"bn": "🎉 একদম সঠিক! আপনি ৫ কয়েন পেয়েছেন।", "en": "🎉 Correct! You earned 5 coins.", "hi": "🎉 बिल्कुल सही! आपने 5 सिक्के कमाए।"},
-    "game_next_word": {"bn": "🔤 পরের শব্দ: `{word}`", "en": "🔤 Next word: `{word}`", "hi": "🔤 अगला शब्द: `{word}`"},
-    "game_wrong": {"bn": "❌ ভুল হয়েছে!", "en": "❌ Wrong!", "hi": "❌ गलत!"},
-    "game_hint": {"bn": "💡 হিন্ট: প্রথম অক্ষর `{first}`, শব্দটির {length}টি অক্ষর।", "en": "💡 Hint: first letter `{first}`, {length} letters.", "hi": "💡 संकेत: पहला अक्षर `{first}`, {length} अक्षर।"},
-    "game_try_again": {"bn": "👉 আবার চেষ্টা করুন।", "en": "👉 Try again.", "hi": "👉 फिर कोशिश करें।"},
-    "game_over_title": {"bn": "🎮 গেম শেষ!", "en": "🎮 Game Over!", "hi": "🎮 गेम खत्म!"},
-    "game_total_score": {"bn": "🏆 আপনার মোট স্কোর: {score}", "en": "🏆 Your total score: {score}", "hi": "🏆 आपका कुल स्कोर: {score}"},
-    "game_play_again": {"bn": "আবার খেলতে মেইন মেনু থেকে 🎮 Word Game এ ক্লিক করুন।", "en": "To play again, tap 🎮 Word Game from main menu.", "hi": "फिर से खेलने के लिए मुख्य मेनू से 🎮 Word Game पर टैप करें।"},
-    "game_not_in": {"bn": "⚠️ আপনি এখন কোনো গেমে নেই।", "en": "⚠️ You're not in a game.", "hi": "⚠️ आप किसी गेम में नहीं हैं।"},
-    "game_new_word": {"bn": "নতুন শব্দ আসছে...", "en": "Loading new word...", "hi": "नया शब्द आ रहा है..."},
-    "fc_title": {"bn": "📇 ডেইলি Vocabulary Flashcards", "en": "📇 Daily Vocabulary Flashcards", "hi": "📇 डेली Vocabulary Flashcards"},
-    "fc_choose_level": {"bn": "আপনি কোন লেভেলের শব্দ শিখতে চান?\nনিচের বাটন থেকে বেছে নিন:", "en": "Which level of words do you want to learn?\nChoose from below:", "hi": "आप किस स्तर के शब्द सीखना चाहते हैं?\nनीचे से चुनें:"},
-    "fc_easy": {"bn": "🟢 Easy - সহজ শব্দ", "en": "🟢 Easy words", "hi": "🟢 Easy - आसान शब्द"},
-    "fc_medium": {"bn": "🟡 Medium - মাঝারি শব্দ", "en": "🟡 Medium words", "hi": "🟡 Medium - मध्यम शब्द"},
-    "fc_hard": {"bn": "🔴 Hard - কঠিন শব্দ", "en": "🔴 Hard words", "hi": "🔴 Hard - कठिन शब्द"},
-    "fc_word": {"bn": "📇 শব্দ: {word}", "en": "📇 Word: {word}", "hi": "📇 शब्द: {word}"},
-    "fc_pron": {"bn": "🔊 উচ্চারণ: {pron}", "en": "🔊 Pronunciation: {pron}", "hi": "🔊 उच्चारण: {pron}"},
-    "fc_ask": {"bn": "👉 আপনি কি শব্দটির অর্থ জানেন?\nনিচের বাটনে ক্লিক করে উত্তর দেখুন।", "en": "👉 Do you know the meaning of this word?\nTap below to see the answer.", "hi": "👉 क्या आपको इस शब्द का अर्थ पता है?\nनीचे टैप करके उत्तर देखें।"},
-    "fc_show_btn": {"bn": "✅ উত্তর দেখুন", "en": "✅ Show Answer", "hi": "✅ उत्तर देखें"},
-    "fc_next_btn": {"bn": "⏭️ পরের শব্দ", "en": "⏭️ Next Word", "hi": "⏭️ अगला शब्द"},
-    "fc_meaning": {"bn": "📝 অর্থ: {meaning}", "en": "📝 Meaning: {meaning}", "hi": "📝 अर्थ: {meaning}"},
-    "fc_example": {"bn": "✏️ উদাহরণ: {ex}", "en": "✏️ Example: {ex}", "hi": "✏️ उदाहरण: {ex}"},
-    "fc_remember_hint": {"bn": "🎯 এই শব্দটি মনে রাখার চেষ্টা করুন।", "en": "🎯 Try to remember this word.", "hi": "🎯 इस शब्द को याद रखने की कोशिश करें।"},
-    "fc_change_level": {"bn": "🔙 লেভেল পরিবর্তন", "en": "🔙 Change Level", "hi": "🔙 स्तर बदलें"},
-    "premium_body": {
-        "bn": (
-            "💎 Premium Membership\n\n"
-            "⭐ {stars} Telegram Stars → {days} দিন\n"
-            "💳 bKash/Rocket: {bdt} BDT → {days} দিন\n"
-            "🪙 Crypto: {usdt} USDT → {days} দিন\n\n"
-            "🎁 Benefits:\n"
-            "• Unlimited AI\n"
-            "• 📸 Unlimited photos\n"
-            "• 🎤 Unlimited voices + Voice replies\n"
-            "• 📄 Unlimited PDFs\n"
-            "• 🎭 Unlimited role-plays\n"
-            "• 🎤 Pronunciation Coach (স্কোর সহ)\n"
-            "• 🎯 IELTS Speaking Simulator\n"
-            "• 🧠 Quiz from PDF\n"
-            "• 📂 ALL Premium PDF Files (IELTS, Spoken, Grammar, Idioms)\n"
-            "• Detailed Lessons\n"
-            "• Priority Response"
-        ),
-        "en": (
-            "💎 Premium Membership\n\n"
-            "⭐ {stars} Telegram Stars → {days} days\n"
-            "💳 bKash/Rocket: {bdt} BDT → {days} days\n"
-            "🪙 Crypto: {usdt} USDT → {days} days\n\n"
-            "🎁 Benefits:\n"
-            "• Unlimited AI\n"
-            "• 📸 Unlimited photos\n"
-            "• 🎤 Unlimited voices + Voice replies\n"
-            "• 📄 Unlimited PDFs\n"
-            "• 🎭 Unlimited role-plays\n"
-            "• 🎤 Pronunciation Coach (with score)\n"
-            "• 🎯 IELTS Speaking Simulator\n"
-            "• 🧠 Quiz from PDF\n"
-            "• 📂 ALL Premium PDF Files (IELTS, Spoken, Grammar, Idioms)\n"
-            "• Detailed Lessons\n"
-            "• Priority Response"
-        ),
-        "hi": (
-            "💎 Premium Membership\n\n"
-            "⭐ {stars} Telegram Stars → {days} दिन\n"
-            "💳 bKash/Rocket: {bdt} BDT → {days} दिन\n"
-            "🪙 Crypto: {usdt} USDT → {days} दिन\n\n"
-            "🎁 Benefits:\n"
-            "• Unlimited AI\n"
-            "• 📸 Unlimited photos\n"
-            "• 🎤 Unlimited voices + Voice replies\n"
-            "• 📄 Unlimited PDFs\n"
-            "• 🎭 Unlimited role-plays\n"
-            "• 🎤 Pronunciation Coach\n"
-            "• 🎯 IELTS Speaking Simulator\n"
-            "• 🧠 Quiz from PDF\n"
-            "• 📂 ALL Premium PDF Files\n"
-            "• Detailed Lessons\n"
-            "• Priority Response"
-        ),
+    "support_sent": {"bn": "✅ মেসেজ অ্যাডমিনের কাছে পাঠানো হয়েছে।", "en": "✅ Message sent to admin.", "hi": "✅ संदेश एडमिन को भेजा गया।", "ru": "✅ Сообщение отправлено админу."},
+    "support_btn": {"bn": "🆘 সাপোর্ট", "en": "🆘 Support", "hi": "🆘 सहायता", "ru": "🆘 Поддержка"},
+    "support_cancel": {"bn": "❌ বাতিল করুন", "en": "❌ Cancel", "hi": "❌ रद्द करें", "ru": "❌ Отмена"},
+    "support_cancelled": {"bn": "✅ সাপোর্ট মোড বাতিল।", "en": "✅ Support mode cancelled.", "hi": "✅ सहायता मोड रद्द।", "ru": "✅ Режим поддержки отменён."},
+    "payment_proof_sent": {
+        "bn": "✅ পেমেন্ট প্রুফ অ্যাডমিনের কাছে পাঠানো হয়েছে।\nভেরিফিকেশন শেষে ৫ মিনিটে প্রিমিয়াম চালু হবে।",
+        "en": "✅ Payment proof sent to admin.\nPremium will be activated within 5 minutes.",
+        "hi": "✅ भुगतान प्रमाण भेज दिया गया।",
+        "ru": "✅ Доказательство оплаты отправлено админу.\nPremium активируется в течение 5 минут."
     },
-    "premium_bkash_btn": {"bn": "💳 bKash ({n}৳)", "en": "💳 bKash ({n}৳)", "hi": "💳 bKash ({n}৳)"},
-    "premium_rocket_btn": {"bn": "💳 Rocket ({n}৳)", "en": "💳 Rocket ({n}৳)", "hi": "💳 Rocket ({n}৳)"},
-    "premium_trc20_btn": {"bn": "🪙 USDT (TRC20)", "en": "🪙 USDT (TRC20)", "hi": "🪙 USDT (TRC20)"},
-    "premium_bsc20_btn": {"bn": "🪙 USDT (BSC20)", "en": "🪙 USDT (BSC20)", "hi": "🪙 USDT (BSC20)"},
-    "payment_cancelled": {"bn": "✅ পেমেন্ট বাতিল করা হয়েছে।", "en": "✅ Payment cancelled.", "hi": "✅ भुगतान रद्द कर दिया गया।"},
-    "payment_fail": {"bn": "❌ পেমেন্ট ব্যর্থ হয়েছে", "en": "❌ Payment failed", "hi": "❌ भुगतान विफल"},
-    "vocab_book_title": {"bn": "📘 Sir English Vocabulary Book", "en": "📘 Sir English Vocabulary Book", "hi": "📘 Sir English Vocabulary Book"},
+    "payment_info_sent": {
+        "bn": "✅ পেমেন্ট ইনফো অ্যাডমিনের কাছে পাঠানো হয়েছে।",
+        "en": "✅ Payment info sent to admin.",
+        "hi": "✅ भुगतान जानकारी भेज दी गई।",
+        "ru": "✅ Информация об оплате отправлена админу."
+    },
+    "suggestion_expired": {"bn": "⚠️ এক্সপায়ার হয়ে গেছে।", "en": "⚠️ This option has expired.", "hi": "⚠️ यह विकल्प समाप्त हो गया।", "ru": "⚠️ Опция устарела."},
+    "game_title": {"bn": "🎮 Word Scramble Game", "en": "🎮 Word Scramble Game", "hi": "🎮 Word Scramble Game", "ru": "🎮 Игра «Собери слово»"},
+    "game_scrambled": {"bn": "🔤 এলোমেলো শব্দ: `{word}`", "en": "🔤 Scrambled word: `{word}`", "hi": "🔤 अव्यवस्थित शब्द: `{word}`", "ru": "🔤 Перепутанное слово: `{word}`"},
+    "game_prompt": {"bn": "👉 সঠিক ইংরেজি শব্দটি লিখুন।", "en": "👉 Type the correct English word.", "hi": "👉 सही अंग्रेजी शब्द लिखें।", "ru": "👉 Напишите правильное слово."},
+    "game_score": {"bn": "🏆 স্কোর: {score}", "en": "🏆 Score: {score}", "hi": "🏆 स्कोर: {score}", "ru": "🏆 Очки: {score}"},
+    "game_stop_hint": {"bn": "❌ বন্ধ করতে: /endgame", "en": "❌ To stop: /endgame", "hi": "❌ रोकने के लिए: /endgame", "ru": "❌ Остановить: /endgame"},
+    "game_skip_btn": {"bn": "⏭️ Skip", "en": "⏭️ Skip", "hi": "⏭️ Skip", "ru": "⏭️ Пропустить"},
+    "game_correct": {"bn": "🎉 সঠিক! +৫ কয়েন", "en": "🎉 Correct! +5 coins", "hi": "🎉 सही! +5 सिक्के", "ru": "🎉 Правильно! +5 монет"},
+    "game_next_word": {"bn": "🔤 পরের শব্দ: `{word}`", "en": "🔤 Next word: `{word}`", "hi": "🔤 अगला शब्द: `{word}`", "ru": "🔤 Следующее слово: `{word}`"},
+    "game_wrong": {"bn": "❌ ভুল হয়েছে!", "en": "❌ Wrong!", "hi": "❌ गलत!", "ru": "❌ Неверно!"},
+    "game_hint": {"bn": "💡 হিন্ট: প্রথম অক্ষর `{first}`, {length}টি অক্ষর।", "en": "💡 Hint: first letter `{first}`, {length} letters.", "hi": "💡 संकेत: पहला अक्षर `{first}`, {length} अक्षर।", "ru": "💡 Подсказка: первая буква `{first}`, {length} букв."},
+    "game_try_again": {"bn": "👉 আবার চেষ্টা করুন।", "en": "👉 Try again.", "hi": "👉 फिर कोशिश करें।", "ru": "👉 Попробуйте снова."},
+    "game_over_title": {"bn": "🎮 গেম শেষ!", "en": "🎮 Game Over!", "hi": "🎮 गेम खत्म!", "ru": "🎮 Игра окончена!"},
+    "game_total_score": {"bn": "🏆 মোট স্কোর: {score}", "en": "🏆 Total score: {score}", "hi": "🏆 कुल स्कोर: {score}", "ru": "🏆 Итог: {score}"},
+    "game_play_again": {"bn": "আবার খেলতে 🎮 Word Game এ ক্লিক করুন।", "en": "Tap 🎮 Word Game to play again.", "hi": "फिर खेलने के लिए 🎮 Word Game पर टैप करें।", "ru": "Нажмите 🎮 Word Game чтобы играть снова."},
+    "game_not_in": {"bn": "⚠️ আপনি গেমে নেই।", "en": "⚠️ Not in a game.", "hi": "⚠️ गेम में नहीं।", "ru": "⚠️ Вы не в игре."},
+    "game_new_word": {"bn": "নতুন শব্দ আসছে...", "en": "Loading new word...", "hi": "नया शब्द आ रहा है...", "ru": "Загружаю новое слово..."},
+    "fc_title": {"bn": "📇 ডেইলি Flashcards", "en": "📇 Daily Flashcards", "hi": "📇 डेली Flashcards", "ru": "📇 Карточки слов"},
+    "fc_choose_level": {"bn": "কোন লেভেলের শব্দ শিখতে চান?", "en": "Which level of words?", "hi": "किस स्तर के शब्द?", "ru": "Какой уровень слов?"},
+    "fc_easy": {"bn": "🟢 Easy", "en": "🟢 Easy", "hi": "🟢 Easy", "ru": "🟢 Лёгкий"},
+    "fc_medium": {"bn": "🟡 Medium", "en": "🟡 Medium", "hi": "🟡 Medium", "ru": "🟡 Средний"},
+    "fc_hard": {"bn": "🔴 Hard", "en": "🔴 Hard", "hi": "🔴 Hard", "ru": "🔴 Сложный"},
+    "fc_word": {"bn": "📇 শব্দ: {word}", "en": "📇 Word: {word}", "hi": "📇 शब्द: {word}", "ru": "📇 Слово: {word}"},
+    "fc_pron": {"bn": "🔊 উচ্চারণ: {pron}", "en": "🔊 Pronunciation: {pron}", "hi": "🔊 उच्चारण: {pron}", "ru": "🔊 Произношение: {pron}"},
+    "fc_ask": {"bn": "👉 অর্থ জানেন? উত্তর দেখুন।", "en": "👉 Know the meaning? Show answer.", "hi": "👉 अर्थ जानते हैं? उत्तर देखें।", "ru": "👉 Знаете значение? Показать ответ."},
+    "fc_show_btn": {"bn": "✅ উত্তর দেখুন", "en": "✅ Show Answer", "hi": "✅ उत्तर देखें", "ru": "✅ Показать ответ"},
+    "fc_next_btn": {"bn": "⏭️ পরের শব্দ", "en": "⏭️ Next Word", "hi": "⏭️ अगला शब्द", "ru": "⏭️ Следующее"},
+    "fc_meaning": {"bn": "📝 অর্থ: {meaning}", "en": "📝 Meaning: {meaning}", "hi": "📝 अर्थ: {meaning}", "ru": "📝 Значение: {meaning}"},
+    "fc_example": {"bn": "✏️ উদাহরণ: {ex}", "en": "✏️ Example: {ex}", "hi": "✏️ उदाहरण: {ex}", "ru": "✏️ Пример: {ex}"},
+    "fc_remember_hint": {"bn": "🎯 এই শব্দটি মনে রাখুন।", "en": "🎯 Try to remember this word.", "hi": "🎯 इस शब्द को याद रखें।", "ru": "🎯 Постарайтесь запомнить."},
+    "fc_change_level": {"bn": "🔙 লেভেল পরিবর্তন", "en": "🔙 Change Level", "hi": "🔙 स्तर बदलें", "ru": "🔙 Изменить уровень"},
+    "premium_bkash_btn": {"bn": "💳 bKash ({n}৳)", "en": "💳 bKash ({n}৳)", "hi": "💳 bKash ({n}৳)", "ru": "💳 bKash ({n}৳)"},
+    "premium_rocket_btn": {"bn": "💳 Rocket ({n}৳)", "en": "💳 Rocket ({n}৳)", "hi": "💳 Rocket ({n}৳)", "ru": "💳 Rocket ({n}৳)"},
+    "premium_trc20_btn": {"bn": "🪙 USDT (TRC20)", "en": "🪙 USDT (TRC20)", "hi": "🪙 USDT (TRC20)", "ru": "🪙 USDT (TRC20)"},
+    "premium_bsc20_btn": {"bn": "🪙 USDT (BSC20)", "en": "🪙 USDT (BSC20)", "hi": "🪙 USDT (BSC20)", "ru": "🪙 USDT (BSC20)"},
+    "payment_cancelled": {"bn": "✅ পেমেন্ট বাতিল।", "en": "✅ Payment cancelled.", "hi": "✅ भुगतान रद्द।", "ru": "✅ Оплата отменена."},
+    "payment_fail": {"bn": "❌ পেমেন্ট ব্যর্থ।", "en": "❌ Payment failed", "hi": "❌ भुगतान विफल", "ru": "❌ Ошибка оплаты"},
+    "vocab_book_title": {"bn": "📘 Sir English Vocabulary Book", "en": "📘 Sir English Vocabulary Book", "hi": "📘 Sir English Vocabulary Book", "ru": "📘 Sir English Vocabulary Book"},
     "vocab_book_desc": {
-        "bn": "✨ ৫০০+ শব্দ, ২০টি সেকশন\n📖 অর্থ, উচ্চারণ ও উদাহরণসহ\n\n👇 নিচে থেকে ডাউনলোড করুন:",
+        "bn": "✨ ৫০০+ শব্দ, ২০টি সেকশন\n📖 অর্থ, উচ্চারণ ও উদাহরণসহ\n\n👇 ডাউনলোড করুন:",
         "en": "✨ 500+ words, 20 sections\n📖 With meaning, pronunciation & examples\n\n👇 Download below:",
-        "hi": "✨ 500+ शब्द, 20 सेक्शन\n📖 अर्थ, उच्चारण और उदाहरण के साथ\n\n👇 नीचे से डाउनलोड करें:"
+        "hi": "✨ 500+ शब्द, 20 सेक्शन\n📖 अर्थ, उच्चारण और उदाहरण के साथ\n\n👇 डाउनलोड करें:",
+        "ru": "✨ 500+ слов, 20 разделов\n📖 Со значением, произношением и примерами\n\n👇 Скачайте ниже:"
     },
-    "files_menu_title": {"bn": "📂 ফাইল ও রিসোর্স", "en": "📂 Files & Resources", "hi": "📂 फाइल्स और रिसोर्स"},
-    "files_menu_desc": {"bn": "নিচের ফাইলগুলো থেকে বেছে নিন:", "en": "Choose from the files below:", "hi": "नीचे दी गई फाइल्स से चुनें:"},
-    "files_none": {"bn": "📂 এখনো কোনো ফাইল আপলোড করা হয়নি।", "en": "📂 No files uploaded yet.", "hi": "📂 अभी तक कोई फाइल अपलोड नहीं की गई।"},
-    "file_sending": {"bn": "📤 পাঠানো হচ্ছে...", "en": "📤 Sending...", "hi": "📤 भेजा जा रहा है..."},
-    "file_not_found": {"bn": "❌ ফাইল পাওয়া যায়নি।", "en": "❌ File not found.", "hi": "❌ फाइल नहीं मिली।"},
-    "file_send_fail": {"bn": "❌ ফাইল পাঠাতে সমস্যা হচ্ছে। পরে আবার চেষ্টা করুন।", "en": "❌ Failed to send file. Please try again later.", "hi": "❌ फाइल भेजने में समस्या।"},
-    "admin_only": {"bn": "⛔ শুধু অ্যাডমিন।", "en": "⛔ Admin only.", "hi": "⛔ केवल एडमिन।"},
-    "addfile_mode": {"bn": "📎 File Upload Mode চালু হয়েছে!\n\nএখন যেকোনো PDF, DOC বা ফাইল এই চ্যাটে পাঠান।\n\nবাতিল করতে: /cancel", "en": "📎 File Upload Mode ON!\n\nSend any PDF, DOC or file to this chat.\n\nTo cancel: /cancel", "hi": "📎 File Upload Mode चालू!\n\nअब कोई PDF, DOC या फाइल इस चैट में भेजें।\n\nरद्द करने के लिए: /cancel"},
-    "addfile_received": {"bn": "📎 File received: {name}\n\nএখন একটি caption লিখুন (বা caption ছাড়াই সেভ করতে /skip পাঠান)।", "en": "📎 File received: {name}\n\nNow type a caption (or send /skip to save without caption).", "hi": "📎 फाइल मिली: {name}\n\nअब कैप्शन लिखें (या /skip भेजें)।"},
-    "addfile_saved": {"bn": "✅ File সেভ হয়েছে!\n📎 {name}\n📝 Caption: {caption}\n\nইউজাররা এখন 📂 Files মেনু থেকে এটি পাবে।", "en": "✅ File saved!\n📎 {name}\n📝 Caption: {caption}\n\nUsers can now get it from 📂 Files menu.", "hi": "✅ फाइल सेव हो गई!\n📎 {name}\n📝 कैप्शन: {caption}"},
-    "addfile_saved_no_caption": {"bn": "✅ Caption ছাড়াই সেভ হয়েছে!\n📎 {name}", "en": "✅ Saved without caption!\n📎 {name}", "hi": "✅ कैप्शन के बिना सेव!\n📎 {name}"},
-    "addfile_save_fail": {"bn": "❌ সেভ করতে ব্যর্থ হয়েছে।", "en": "❌ Save failed.", "hi": "❌ सेव विफल।"},
-    "addfile_cancel": {"bn": "✅ File upload বাতিল করা হয়েছে।", "en": "✅ File upload cancelled.", "hi": "✅ फाइल अपलोड रद्द।"},
-    "addfile_nothing": {"bn": "⚠️ কোনো pending ফাইল নেই।", "en": "⚠️ No pending file.", "hi": "⚠️ कोई पेंडिंग फाइल नहीं।"},
-    "listfiles_empty": {"bn": "📂 এখনো কোনো ফাইল নেই। /addfile দিয়ে যোগ করুন।", "en": "📂 No files yet. Add with /addfile.", "hi": "📂 कोई फाइल नहीं। /addfile से जोड़ें।"},
-    "listfiles_header": {"bn": "📂 Saved Files:", "en": "📂 Saved Files:", "hi": "📂 सेव की गई फाइल्स:"},
-    "listfiles_footer": {"bn": "মুছতে: /delfile <id>", "en": "To delete: /delfile <id>", "hi": "डिलीट करने के लिए: /delfile <id>"},
-    "delfile_usage": {"bn": "Usage: /delfile <id>\n\nআইডি দেখতে: /listfiles", "en": "Usage: /delfile <id>\n\nSee IDs: /listfiles", "hi": "Usage: /delfile <id>"},
-    "delfile_done": {"bn": "✅ File {id} মুছে ফেলা হয়েছে।", "en": "✅ File {id} deleted.", "hi": "✅ फाइल {id} डिलीट हो गई।"},
-    "delfile_fail": {"bn": "❌ Delete failed.", "en": "❌ Delete failed.", "hi": "❌ डिलीट विफल।"},
-
-    # ★ NEW: Premium Files System keys
-    "files_free_title": {
-        "bn": "🆓 ফ্রি ফাইল (সবার জন্য)",
-        "en": "🆓 Free Files (For Everyone)",
-        "hi": "🆓 मुफ्त फाइलें (सभी के लिए)"
+    "files_menu_title": {"bn": "📂 ফাইল ও রিসোর্স", "en": "📂 Files & Resources", "hi": "📂 फाइल्स और रिसोर्स", "ru": "📂 Файлы и ресурсы"},
+    "files_menu_desc": {"bn": "নিচের ফাইল থেকে বেছে নিন:", "en": "Choose from the files below:", "hi": "नीचे दी गई फाइल्स से चुनें:", "ru": "Выберите из файлов ниже:"},
+    "files_none": {"bn": "📂 এখনো কোনো ফাইল নেই।", "en": "📂 No files uploaded yet.", "hi": "📂 अभी तक कोई फाइल नहीं।", "ru": "📂 Файлов пока нет."},
+    "file_sending": {"bn": "📤 পাঠানো হচ্ছে...", "en": "📤 Sending...", "hi": "📤 भेजा जा रहा है...", "ru": "📤 Отправляю..."},
+    "file_not_found": {"bn": "❌ ফাইল পাওয়া যায়নি।", "en": "❌ File not found.", "hi": "❌ फाइल नहीं मिली।", "ru": "❌ Файл не найден."},
+    "file_send_fail": {"bn": "❌ ফাইল পাঠাতে সমস্যা।", "en": "❌ Failed to send file.", "hi": "❌ फाइल भेजने में समस्या।", "ru": "❌ Не удалось отправить файл."},
+    "admin_only": {"bn": "⛔ শুধু অ্যাডমিন।", "en": "⛔ Admin only.", "hi": "⛔ केवल एडमिन।", "ru": "⛔ Только для админа."},
+    "addfile_mode": {
+        "bn": "📎 File Upload Mode চালু!\n\nএখন PDF/DOC পাঠান।\n\nবাতিল: /cancel",
+        "en": "📎 File Upload Mode ON!\n\nSend any PDF/DOC.\n\nTo cancel: /cancel",
+        "hi": "📎 File Upload Mode चालू!",
+        "ru": "📎 Режим загрузки файлов включён!\n\nОтправьте PDF/DOC.\n\nОтмена: /cancel"
     },
-    "files_premium_title": {
-        "bn": "🔐 প্রিমিয়াম ফাইল",
-        "en": "🔐 Premium Files",
-        "hi": "🔐 प्रीमियम फाइलें"
-    },
+    "addfile_received": {"bn": "📎 ফাইল পেয়েছি: {name}\n\nCaption লিখুন (বা /skip)।", "en": "📎 File received: {name}\n\nType caption (or /skip).", "hi": "📎 फाइल मिली: {name}", "ru": "📎 Файл получен: {name}\n\nВведите подпись (или /skip)."},
+    "addfile_saved": {"bn": "✅ সেভ হয়েছে!\n📎 {name}\n📝 {caption}", "en": "✅ Saved!\n📎 {name}\n📝 {caption}", "hi": "✅ सेव!", "ru": "✅ Сохранено!\n📎 {name}\n📝 {caption}"},
+    "addfile_saved_no_caption": {"bn": "✅ সেভ!\n📎 {name}", "en": "✅ Saved!\n📎 {name}", "hi": "✅ सेव!", "ru": "✅ Сохранено!\n📎 {name}"},
+    "addfile_save_fail": {"bn": "❌ সেভ ব্যর্থ।", "en": "❌ Save failed.", "hi": "❌ सेव विफल।", "ru": "❌ Ошибка сохранения."},
+    "addfile_cancel": {"bn": "✅ বাতিল।", "en": "✅ Cancelled.", "hi": "✅ रद्द।", "ru": "✅ Отменено."},
+    "addfile_nothing": {"bn": "⚠️ কোনো pending ফাইল নেই।", "en": "⚠️ No pending file.", "hi": "⚠️ कोई पेंडिंग फाइल नहीं।", "ru": "⚠️ Нет ожидающего файла."},
+    "listfiles_empty": {"bn": "📂 কোনো ফাইল নেই।", "en": "📂 No files yet.", "hi": "📂 कोई फाइल नहीं।", "ru": "📂 Файлов нет."},
+    "listfiles_header": {"bn": "📂 Saved Files:", "en": "📂 Saved Files:", "hi": "📂 सेव की गई फाइल्स:", "ru": "📂 Сохранённые файлы:"},
+    "listfiles_footer": {"bn": "মুছতে: /delfile <id>", "en": "To delete: /delfile <id>", "hi": "डिलीट: /delfile <id>", "ru": "Удалить: /delfile <id>"},
+    "delfile_usage": {"bn": "Usage: /delfile <id>", "en": "Usage: /delfile <id>", "hi": "Usage: /delfile <id>", "ru": "Использование: /delfile <id>"},
+    "delfile_done": {"bn": "✅ File {id} মুছে ফেলা হয়েছে।", "en": "✅ File {id} deleted.", "hi": "✅ फाइल {id} डिलीट।", "ru": "✅ Файл {id} удалён."},
+    "delfile_fail": {"bn": "❌ Delete failed.", "en": "❌ Delete failed.", "hi": "❌ डिलीट विफल।", "ru": "❌ Ошибка удаления."},
+    "files_free_title": {"bn": "🆓 ফ্রি ফাইল (সবার জন্য)", "en": "🆓 Free Files (For Everyone)", "hi": "🆓 मुफ्त फाइलें", "ru": "🆓 Бесплатные файлы"},
+    "files_premium_title": {"bn": "🔐 প্রিমিয়াম ফাইল", "en": "🔐 Premium Files", "hi": "🔐 प्रीमियम फाइलें", "ru": "🔐 Premium файлы"},
     "premium_file_locked": {
-        "bn": "🔐 এই ফাইলটি প্রিমিয়াম!\n\n📂 {name}\n\n💎 প্রিমিয়াম মেম্বারশিপ নিয়ে সব প্রিমিয়াম ফাইল আনলক করুন:\n• IELTS Guide\n• Spoken English\n• Grammar Guide\n• Idioms & Phrases\n\n💰 মাত্র ৳{bdt} বা {stars} Stars\n⏳ ভ্যালিডিটি: {days} দিন\n\n👇 পেমেন্ট করুন:",
-        "en": "🔐 This is a Premium file!\n\n📂 {name}\n\n💎 Unlock ALL premium files with Premium Membership:\n• IELTS Guide\n• Spoken English\n• Grammar Guide\n• Idioms & Phrases\n\n💰 Only ৳{bdt} or {stars} Stars\n⏳ Validity: {days} days\n\n👇 Pay now:",
-        "hi": "🔐 यह एक प्रीमियम फाइल है!\n\n📂 {name}\n\n💰 केवल ৳{bdt}\n\n👇 अभी भुगतान करें:"
+        "bn": "🔐 এই ফাইলটি প্রিমিয়াম!\n\n📂 {name}\n\n💎 প্রিমিয়াম নিয়ে সব প্রিমিয়াম ফাইল আনলক করুন।\n\n💰 প্ল্যান দেখতে /premium লিখুন বা নিচের বাটনে ক্লিক করুন।\n\n👇 পেমেন্ট:",
+        "en": "🔐 This is a Premium file!\n\n📂 {name}\n\n💎 Unlock ALL premium files with Premium Membership.\n\n💰 See plans below:\n\n👇 Pay now:",
+        "hi": "🔐 यह एक प्रीमियम फाइल है!\n\n📂 {name}",
+        "ru": "🔐 Это Premium файл!\n\n📂 {name}\n\n💎 Разблокируйте все Premium файлы.\n\n👇 Оплатить:"
     },
     "premium_files_sent": {
-        "bn": "🎉 অভিনন্দন! আপনার প্রিমিয়াম চালু হয়েছে।\n\n📦 সব প্রিমিয়াম ফাইল পাঠানো হচ্ছে...",
-        "en": "🎉 Congratulations! Premium activated.\n\n📦 Sending all premium files...",
-        "hi": "🎉 बधाई! Premium एक्टिवेट हो गया।\n\n📦 सभी प्रीमियम फाइलें भेज रहे हैं..."
+        "bn": "🎉 প্রিমিয়াম চালু! সব ফাইল পাঠানো হচ্ছে...",
+        "en": "🎉 Premium activated! Sending all files...",
+        "hi": "🎉 Premium एक्टिवेट! फाइलें भेज रहे हैं...",
+        "ru": "🎉 Premium активирован! Отправляю все файлы..."
     },
     "premium_no_files": {
-        "bn": "⚠️ এখনো কোনো প্রিমিয়াম ফাইল আপলোড করা হয়নি। অ্যাডমিনকে জানান।",
-        "en": "⚠️ No premium files uploaded yet. Contact admin.",
-        "hi": "⚠️ अभी कोई प्रीमियम फाइल नहीं है।"
+        "bn": "⚠️ এখনো প্রিমিয়াম ফাইল আপলোড করা হয়নি।",
+        "en": "⚠️ No premium files uploaded yet.",
+        "hi": "⚠️ अभी कोई प्रीमियम फाइल नहीं।",
+        "ru": "⚠️ Premium файлов пока нет."
     },
     "addfile_ask_type": {
         "bn": "📎 ফাইল পেয়েছি: {name}\n\n❓ এটি কি ফ্রি না প্রিমিয়াম?",
         "en": "📎 File received: {name}\n\n❓ Is this Free or Premium?",
-        "hi": "📎 फाइल मिली: {name}\n\n❓ यह Free है या Premium?"
+        "hi": "📎 फाइल मिली: {name}\n\n❓ यह Free है या Premium?",
+        "ru": "📎 Файл получен: {name}\n\n❓ Бесплатный или Premium?"
     },
-    "addfile_free_btn": {
-        "bn": "🆓 Free ফাইল",
-        "en": "🆓 Free File",
-        "hi": "🆓 Free फाइल"
-    },
-    "addfile_premium_btn": {
-        "bn": "🔐 Premium ফাইল",
-        "en": "🔐 Premium File",
-        "hi": "🔐 Premium फाइल"
-    },
+    "addfile_free_btn": {"bn": "🆓 Free ফাইল", "en": "🆓 Free File", "hi": "🆓 Free फाइल", "ru": "🆓 Бесплатный"},
+    "addfile_premium_btn": {"bn": "🔐 Premium ফাইল", "en": "🔐 Premium File", "hi": "🔐 Premium फाइल", "ru": "🔐 Premium"},
     "addfile_type_saved": {
         "bn": "✅ সেভ হয়েছে!\n📎 {name}\n🏷️ ধরন: {type}\n📝 Caption: {caption}",
         "en": "✅ Saved!\n📎 {name}\n🏷️ Type: {type}\n📝 Caption: {caption}",
-        "hi": "✅ सेव!\n📎 {name}\n🏷️ प्रकार: {type}"
+        "hi": "✅ सेव!\n📎 {name}\n🏷️ प्रकार: {type}",
+        "ru": "✅ Сохранено!\n📎 {name}\n🏷️ Тип: {type}\n📝 Подпись: {caption}"
+    },
+
+    # ★ NEW: Premium plan selection
+    "premium_choose": {
+        "bn": "💎 আপনার প্ল্যান বেছে নিন:",
+        "en": "💎 Choose your premium plan:",
+        "hi": "💎 अपना प्लान चुनें:",
+        "ru": "💎 Выберите тарифный план:"
+    },
+    "premium_plan_body": {
+        "bn": "💎 Premium — {label}\n\n💰 bKash/Rocket: ৳{bdt}\n⭐ Stars: {stars}\n🪙 USDT: {usdt}\n⏳ Duration: {days} days\n\n👇 পেমেন্ট পদ্ধতি বেছে নিন:",
+        "en": "💎 Premium — {label}\n\n💰 bKash/Rocket: ৳{bdt}\n⭐ Stars: {stars}\n🪙 USDT: {usdt}\n⏳ Duration: {days} days\n\n👇 Choose payment method:",
+        "hi": "💎 Premium — {label}\n\n💰 bKash/Rocket: ৳{bdt}\n⭐ Stars: {stars}\n🪙 USDT: {usdt}\n⏳ Duration: {days} days\n\n👇 भुगतान विधि चुनें:",
+        "ru": "💎 Premium — {label}\n\n💰 bKash/Rocket: ৳{bdt}\n⭐ Stars: {stars}\n🪙 USDT: {usdt}\n⏳ Период: {days} дней\n\n👇 Выберите способ оплаты:"
+    },
+    "premium_plan_btn": {
+        "bn": "{label} — ৳{bdt} / {stars}⭐",
+        "en": "{label} — ৳{bdt} / {stars}⭐",
+        "hi": "{label} — ৳{bdt} / {stars}⭐",
+        "ru": "{label} — ৳{bdt} / {stars}⭐"
     },
 
     # ===== PRONUNCIATION =====
     "pron_premium": {
-        "bn": "🎤 Pronunciation Coach\n\n✨ এটি একটি Premium ফিচার!\n\n🎯 আপনার উচ্চারণ AI দিয়ে বিশ্লেষণ করুন এবং স্কোর পান।\n📊 ভুল শব্দগুলো দেখুন\n🔊 সঠিক উচ্চারণ শুনুন\n\n⭐ Premium কিনে আনলক করুন!",
-        "en": "🎤 Pronunciation Coach\n\n✨ This is a Premium feature!\n\n🎯 Practice your English pronunciation and get instant scores.\n📊 See which words to improve\n🔊 Listen to the correct pronunciation\n\n⭐ Buy Premium to unlock!",
-        "hi": "🎤 Pronunciation Coach\n\n✨ यह एक Premium फीचर है!\n\n🎯 अपना उच्चारण सुधारें और स्कोर पाएं।\n📊 गलत शब्द देखें\n🔊 सही उच्चारण सुनें\n\n⭐ Premium खरीदें!"
+        "bn": "🎤 Pronunciation Coach\n\n✨ Premium ফিচার!\n\n🎯 আপনার উচ্চারণ AI বিশ্লেষণ করবে এবং স্কোর দেবে।\n📊 ভুল শব্দ দেখাবে\n🔊 সঠিক উচ্চারণ শোনাবে\n\n⭐ Premium কিনুন!",
+        "en": "🎤 Pronunciation Coach\n\n✨ Premium feature!\n\n🎯 Practice your pronunciation and get instant scores.\n📊 See which words to improve\n🔊 Listen to the correct pronunciation\n\n⭐ Buy Premium!",
+        "hi": "🎤 Pronunciation Coach\n\n✨ Premium फीचर!\n\n🎯 अपना उच्चारण सुधारें।\n\n⭐ Premium खरीदें!",
+        "ru": "🎤 Тренажёр произношения\n\n✨ Premium функция!\n\n🎯 Практикуйте произношение и получайте оценки.\n📊 Смотрите, что улучшить\n🔊 Слушайте правильное произношение\n\n⭐ Купите Premium!"
     },
-    "pron_title": {"bn": "🎤 Pronunciation Coach", "en": "🎤 Pronunciation Coach", "hi": "🎤 Pronunciation Coach"},
-    "pron_read": {"bn": "📝 এই বাক্যটি জোরে পড়ুন:", "en": "📝 Read this sentence aloud:", "hi": "📝 यह वाक्य जोर से पढ़ें:"},
-    "pron_send_voice": {"bn": "🎙️ এখন একটি VOICE message পাঠান বাক্যটি পড়ে।", "en": "🎙️ Now send a VOICE message reading it.", "hi": "🎙️ अब VOICE message भेजें।"},
-    "pron_cancel_hint": {"bn": "❌ বাতিল করতে: /cancelpronounce", "en": "❌ To cancel: /cancelpronounce", "hi": "❌ रद्द करने के लिए: /cancelpronounce"},
-    "pron_new_sentence": {"bn": "🔄 নতুন বাক্য", "en": "🔄 New Sentence", "hi": "🔄 नया वाक्य"},
-    "pron_processing": {"bn": "🎤 আপনার উচ্চারণ প্রসেস হচ্ছে...", "en": "🎤 Processing your pronunciation...", "hi": "🎤 आपका उच्चारण प्रोसेस हो रहा है..."},
-    "pron_result": {"bn": "🎤 উচ্চারণের স্কোর", "en": "🎤 Pronunciation Score", "hi": "🎤 उच्चारण स्कोर"},
-    "pron_target": {"bn": "📝 মূল বাক্য", "en": "📝 Target", "hi": "📝 लक्ष्य"},
-    "pron_said": {"bn": "🗣️ আপনি বলেছেন", "en": "🗣️ You said", "hi": "🗣️ आपने कहा"},
-    "pron_improve": {"bn": "⚠️ উন্নতির জন্য শব্দ", "en": "⚠️ Words to improve", "hi": "⚠️ सुधार के लिए शब्द"},
-    "pron_listen_again": {"bn": "🔊 শুনুন এবং আবার বলুন।", "en": "🔊 Listen and repeat.", "hi": "🔊 सुनें और दोहराएं।"},
-    "pron_excellent": {"bn": "🏆 অসাধারণ!", "en": "🏆 Excellent!", "hi": "🏆 शानदार!"},
-    "pron_very_good": {"bn": "🎉 খুব ভালো!", "en": "🎉 Very Good!", "hi": "🎉 बहुत अच्छा!"},
-    "pron_good": {"bn": "👍 ভালো", "en": "👍 Good", "hi": "👍 अच्छा"},
-    "pron_keep_practicing": {"bn": "📚 প্র্যাকটিস চালিয়ে যান", "en": "📚 Keep Practicing", "hi": "📚 अभ्यास जारी रखें"},
-    "pron_try_again": {"bn": "🔁 আবার চেষ্টা করুন", "en": "🔁 Try Again", "hi": "🔁 फिर कोशिश करें"},
-    "pron_cancelled": {"bn": "✅ Pronunciation mode বাতিল।", "en": "✅ Pronunciation mode cancelled.", "hi": "✅ उच्चारण मोड रद्द।"},
-    "pron_not_in": {"bn": "⚠️ আপনি Pronunciation mode-এ নেই।", "en": "⚠️ Not in pronunciation mode.", "hi": "⚠️ Pronunciation मोड में नहीं।"},
+    "pron_title": {"bn": "🎤 Pronunciation Coach", "en": "🎤 Pronunciation Coach", "hi": "🎤 Pronunciation Coach", "ru": "🎤 Тренажёр произношения"},
+    "pron_read": {"bn": "📝 এই বাক্যটি জোরে পড়ুন:", "en": "📝 Read this sentence aloud:", "hi": "📝 यह वाक्य जोर से पढ़ें:", "ru": "📝 Прочитайте вслух:"},
+    "pron_send_voice": {"bn": "🎙️ এখন একটি VOICE message পাঠান।", "en": "🎙️ Now send a VOICE message.", "hi": "🎙️ अब VOICE message भेजें।", "ru": "🎙️ Отправьте ГОЛОСОВОЕ сообщение."},
+    "pron_cancel_hint": {"bn": "❌ বাতিল: /cancelpronounce", "en": "❌ Cancel: /cancelpronounce", "hi": "❌ रद्द: /cancelpronounce", "ru": "❌ Отмена: /cancelpronounce"},
+    "pron_new_sentence": {"bn": "🔄 নতুন বাক্য", "en": "🔄 New Sentence", "hi": "🔄 नया वाक्य", "ru": "🔄 Новое предложение"},
+    "pron_processing": {"bn": "🎤 প্রসেস হচ্ছে...", "en": "🎤 Processing...", "hi": "🎤 प्रोसेस हो रहा है...", "ru": "🎤 Обрабатываю..."},
+    "pron_result": {"bn": "🎤 উচ্চারণের স্কোর", "en": "🎤 Pronunciation Score", "hi": "🎤 उच्चारण स्कोर", "ru": "🎤 Оценка произношения"},
+    "pron_target": {"bn": "📝 মূল বাক্য", "en": "📝 Target", "hi": "📝 लक्ष्य", "ru": "📝 Оригинал"},
+    "pron_said": {"bn": "🗣️ আপনি বলেছেন", "en": "🗣️ You said", "hi": "🗣️ आपने कहा", "ru": "🗣️ Вы сказали"},
+    "pron_improve": {"bn": "⚠️ উন্নতির জন্য শব্দ", "en": "⚠️ Words to improve", "hi": "⚠️ सुधार के लिए शब्द", "ru": "⚠️ Слова для улучшения"},
+    "pron_listen_again": {"bn": "🔊 শুনুন এবং আবার বলুন।", "en": "🔊 Listen and repeat.", "hi": "🔊 सुनें और दोहराएं।", "ru": "🔊 Слушайте и повторяйте."},
+    "pron_excellent": {"bn": "🏆 অসাধারণ!", "en": "🏆 Excellent!", "hi": "🏆 शानदार!", "ru": "🏆 Отлично!"},
+    "pron_very_good": {"bn": "🎉 খুব ভালো!", "en": "🎉 Very Good!", "hi": "🎉 बहुत अच्छा!", "ru": "🎉 Очень хорошо!"},
+    "pron_good": {"bn": "👍 ভালো", "en": "👍 Good", "hi": "👍 अच्छा", "ru": "👍 Хорошо"},
+    "pron_keep_practicing": {"bn": "📚 চালিয়ে যান", "en": "📚 Keep Practicing", "hi": "📚 अभ्यास जारी रखें", "ru": "📚 Продолжайте практику"},
+    "pron_try_again": {"bn": "🔁 আবার চেষ্টা করুন", "en": "🔁 Try Again", "hi": "🔁 फिर कोशिश करें", "ru": "🔁 Попробуйте снова"},
+    "pron_cancelled": {"bn": "✅ বাতিল।", "en": "✅ Cancelled.", "hi": "✅ रद्द।", "ru": "✅ Отменено."},
+    "pron_not_in": {"bn": "⚠️ আপনি মোডে নেই।", "en": "⚠️ Not in mode.", "hi": "⚠️ मोड में नहीं।", "ru": "⚠️ Не в режиме."},
 
     # ===== IELTS SPEAKING =====
     "ielts_premium": {
-        "bn": "🎯 IELTS Speaking Simulator\n\n✨ এটি একটি Premium ফিচার!\n\n🎯 পূর্ণ IELTS Speaking Test (Part 1+2+3)\n📊 AI Band Score + Detailed Feedback\n🎤 ভয়েস বা টেক্সট — যেভাবে সুবিধা\n\n⭐ Premium কিনে আনলক করুন!",
-        "en": "🎯 IELTS Speaking Simulator\n\n✨ This is a Premium feature!\n\n🎯 Full IELTS Speaking Test (Part 1+2+3)\n📊 AI Band Score + Detailed Feedback\n🎤 Voice or Text — your choice\n\n⭐ Buy Premium to unlock!",
-        "hi": "🎯 IELTS Speaking Simulator\n\n✨ यह एक Premium फीचर है!\n\n🎯 पूरा IELTS Speaking Test\n📊 AI Band Score + Feedback\n\n⭐ Premium खरीदें!"
+        "bn": "🎯 IELTS Speaking Simulator\n\n✨ Premium ফিচার!\n\n🎯 পূর্ণ IELTS Speaking Test (Part 1+2+3)\n📊 AI Band Score + Detailed Feedback\n🎤 ভয়েস বা টেক্সট\n\n⭐ Premium কিনুন!",
+        "en": "🎯 IELTS Speaking Simulator\n\n✨ Premium feature!\n\n🎯 Full IELTS Speaking Test (Part 1+2+3)\n📊 AI Band Score + Detailed Feedback\n🎤 Voice or Text\n\n⭐ Buy Premium!",
+        "hi": "🎯 IELTS Speaking Simulator\n\n✨ Premium फीचर!\n\n⭐ Premium खरीदें!",
+        "ru": "🎯 IELTS Speaking Simulator\n\n✨ Premium функция!\n\n🎯 Полный тест IELTS Speaking (Part 1+2+3)\n📊 AI оценка + подробный отзыв\n🎤 Голос или текст\n\n⭐ Купите Premium!"
     },
-    "ielts_title": {"bn": "🎯 IELTS Speaking Simulator", "en": "🎯 IELTS Speaking Simulator", "hi": "🎯 IELTS Speaking Simulator"},
+    "ielts_title": {"bn": "🎯 IELTS Speaking Simulator", "en": "🎯 IELTS Speaking Simulator", "hi": "🎯 IELTS Speaking Simulator", "ru": "🎯 IELTS Speaking Simulator"},
     "ielts_welcome": {
-        "bn": "🎯 IELTS Speaking Simulator\n\nস্বাগতম! এই টেস্টে ৩টি অংশ থাকবে:\n• Part 1: পরিচিতি (৫টি প্রশ্ন)\n• Part 2: Cue Card (১টি টপিক, ২ মিনিট)\n• Part 3: আলোচনা (৪টি প্রশ্ন)\n\n⏱️ মোট সময়: ১০-১৫ মিনিট\n\nশেষে আপনি পাবেন:\n📊 Band Score (০-৯)\n📈 Fluency, Vocabulary, Grammar, Pronunciation — আলাদা স্কোর\n💡 উন্নতির পরামর্শ\n\n👉 আপনি Text বা Voice — যেভাবেই উত্তর দিতে পারবেন।\n\nচলুন শুরু করি!",
-        "en": "🎯 IELTS Speaking Simulator\n\nWelcome! The test has 3 parts:\n• Part 1: Interview (5 questions)\n• Part 2: Cue Card (1 topic, 2 minutes)\n• Part 3: Discussion (4 questions)\n\n⏱️ Total time: 10-15 minutes\n\nAt the end you will get:\n📊 Band Score (0-9)\n📈 Fluency, Vocabulary, Grammar, Pronunciation — separate scores\n💡 Personalized feedback\n\n👉 You can answer by Text or Voice.\n\nLet's begin!",
-        "hi": "🎯 IELTS Speaking Simulator\n\nस्वागत! 3 भाग होंगे:\n• Part 1: Interview (5 प्रश्न)\n• Part 2: Cue Card\n• Part 3: Discussion (4 प्रश्न)\n\nशुरू करें!"
+        "bn": "🎯 IELTS Speaking Simulator\n\n৩টি অংশ থাকবে:\n• Part 1: Interview (৫টি প্রশ্ন)\n• Part 2: Cue Card (২ মিনিট)\n• Part 3: Discussion (৪টি প্রশ্ন)\n\nশেষে: Band Score + Detailed Feedback\n\nচলুন শুরু করি!",
+        "en": "🎯 IELTS Speaking Simulator\n\n3 parts:\n• Part 1: Interview (5 questions)\n• Part 2: Cue Card (2 minutes)\n• Part 3: Discussion (4 questions)\n\nEnd: Band Score + Detailed Feedback\n\nLet's begin!",
+        "hi": "🎯 IELTS Speaking Simulator\n\n3 भाग:\n• Part 1: Interview\n• Part 2: Cue Card\n• Part 3: Discussion\n\nशुरू करें!",
+        "ru": "🎯 IELTS Speaking Simulator\n\n3 части:\n• Part 1: Интервью (5 вопросов)\n• Part 2: Cue Card (2 минуты)\n• Part 3: Обсуждение (4 вопроса)\n\nВ конце: Band Score + отзыв\n\nНачнём!"
     },
-    "ielts_part1_start": {"bn": "📍 Part 1 — Interview\n\nপ্রশ্ন {n}/৫:", "en": "📍 Part 1 — Interview\n\nQuestion {n}/5:", "hi": "📍 Part 1 — Interview\n\nप्रश्न {n}/5:"},
+    "ielts_part1_start": {"bn": "📍 Part 1 — Interview\n\nপ্রশ্ন {n}/৫:", "en": "📍 Part 1 — Interview\n\nQuestion {n}/5:", "hi": "📍 Part 1 — Interview\n\nप्रश्न {n}/5:", "ru": "📍 Part 1 — Интервью\n\nВопрос {n}/5:"},
     "ielts_part2_start": {
-        "bn": "📍 Part 2 — Cue Card\n\n⏱️ আপনার ১ মিনিট প্রস্তুতির সময় আছে।\n🎙️ তারপর ২ মিনিট বলুন।\n\n📋 আপনার টপিক:\n\n{cue}\n\nপ্রস্তুতি নিয়ে শুরু করুন।",
-        "en": "📍 Part 2 — Cue Card\n\n⏱️ You have 1 minute to prepare.\n🎙️ Then speak for 2 minutes.\n\n📋 Your topic:\n\n{cue}\n\nTake your time and begin.",
-        "hi": "📍 Part 2 — Cue Card\n\n⏱️ 1 मिनट तैयारी करें।\n🎙️ फिर 2 मिनट बोलें।\n\n📋 आपका टॉपिक:\n\n{cue}"
+        "bn": "📍 Part 2 — Cue Card\n\n⏱️ ১ মিনিট প্রস্তুতি, তারপর ২ মিনিট বলুন।\n\n📋 টপিক:\n\n{cue}",
+        "en": "📍 Part 2 — Cue Card\n\n⏱️ 1 minute prep, then 2 minutes speaking.\n\n📋 Topic:\n\n{cue}",
+        "hi": "📍 Part 2 — Cue Card\n\n📋 टॉपिक:\n\n{cue}",
+        "ru": "📍 Part 2 — Cue Card\n\n⏱️ 1 минута подготовки, затем 2 минуты речи.\n\n📋 Тема:\n\n{cue}"
     },
-    "ielts_part3_start": {"bn": "📍 Part 3 — Discussion\n\nপ্রশ্ন {n}/৪:", "en": "📍 Part 3 — Discussion\n\nQuestion {n}/4:", "hi": "📍 Part 3 — Discussion\n\nप्रश्न {n}/4:"},
-    "ielts_analyzing": {"bn": "📊 আপনার স্পিকিং বিশ্লেষণ করা হচ্ছে...", "en": "📊 Analyzing your speaking...", "hi": "📊 आपकी स्पीकिंग का विश्लेषण हो रहा है..."},
-    "ielts_done": {"bn": "✅ IELTS Speaking Test সম্পন্ন!", "en": "✅ IELTS Speaking Test Complete!", "hi": "✅ IELTS Speaking Test पूरा!"},
-    "ielts_cancel": {"bn": "❌ টেস্ট বাতিল করতে: /cancelielts", "en": "❌ To cancel: /cancelielts", "hi": "❌ रद्द करने के लिए: /cancelielts"},
-    "ielts_cancelled": {"bn": "✅ IELTS Test বাতিল করা হয়েছে।", "en": "✅ IELTS test cancelled.", "hi": "✅ IELTS टेस्ट रद्द।"},
-    "ielts_not_in": {"bn": "⚠️ আপনি IELTS test-এ নেই।", "en": "⚠️ Not in IELTS test.", "hi": "⚠️ IELTS टेस्ट में नहीं।"},
-    "ielts_answer_too_short": {"bn": "⚠️ একটু বড় উত্তর দিন (অন্তত ২-৩ লাইন)।", "en": "⚠️ Please give a longer answer (2-3 sentences).", "hi": "⚠️ लंबा उत्तर दें।"},
-    "ielts_end_btn": {"bn": "🛑 Test শেষ করুন", "en": "🛑 End Test", "hi": "🛑 टेस्ट खत्म करें"},
+    "ielts_part3_start": {"bn": "📍 Part 3 — Discussion\n\nপ্রশ্ন {n}/৪:", "en": "📍 Part 3 — Discussion\n\nQuestion {n}/4:", "hi": "📍 Part 3 — Discussion\n\nप्रश्न {n}/4:", "ru": "📍 Part 3 — Обсуждение\n\nВопрос {n}/4:"},
+    "ielts_analyzing": {"bn": "📊 বিশ্লেষণ করা হচ্ছে...", "en": "📊 Analyzing...", "hi": "📊 विश्लेषण हो रहा है...", "ru": "📊 Анализирую..."},
+    "ielts_done": {"bn": "✅ IELTS Speaking Test সম্পন্ন!", "en": "✅ IELTS Speaking Test Complete!", "hi": "✅ IELTS Speaking Test पूरा!", "ru": "✅ IELTS Speaking Test завершён!"},
+    "ielts_cancel": {"bn": "❌ বাতিল: /cancelielts", "en": "❌ Cancel: /cancelielts", "hi": "❌ रद्द: /cancelielts", "ru": "❌ Отмена: /cancelielts"},
+    "ielts_cancelled": {"bn": "✅ IELTS Test বাতিল।", "en": "✅ IELTS test cancelled.", "hi": "✅ IELTS टेस्ट रद्द।", "ru": "✅ IELTS тест отменён."},
+    "ielts_not_in": {"bn": "⚠️ আপনি টেস্টে নেই।", "en": "⚠️ Not in test.", "hi": "⚠️ टेस्ट में नहीं।", "ru": "⚠️ Не в тесте."},
+    "ielts_answer_too_short": {"bn": "⚠️ অন্তত ২-৩ লাইন লিখুন।", "en": "⚠️ Please write at least 2-3 sentences.", "hi": "⚠️ कम से कम 2-3 वाक्य लिखें।", "ru": "⚠️ Напишите хотя бы 2-3 предложения."},
+    "ielts_end_btn": {"bn": "🛑 Test শেষ করুন", "en": "🛑 End Test", "hi": "🛑 टेस्ट खत्म करें", "ru": "🛑 Завершить тест"},
 
     # ===== PDF QUIZ =====
     "pdfquiz_premium": {
-        "bn": "🧠 Quiz from Your PDF\n\n✨ এটি একটি Premium ফিচার!\n\n🎯 যেকোনো PDF পাঠান\n🤖 AI ১০টি MCQ বানাবে\n📊 আপনি উত্তর দিয়ে স্কোর পাবেন\n💡 প্রতিটি উত্তরের ব্যাখ্যা\n\n⭐ Premium কিনে আনলক করুন!",
-        "en": "🧠 Quiz from Your PDF\n\n✨ This is a Premium feature!\n\n🎯 Send any PDF\n🤖 AI creates 10 MCQs from it\n📊 Answer and get your score\n💡 Explanation for each answer\n\n⭐ Buy Premium to unlock!",
-        "hi": "🧠 Quiz from Your PDF\n\n✨ यह एक Premium फीचर है!\n\n🎯 कोई PDF भेजें\n🤖 AI 10 MCQ बनाएगा\n\n⭐ Premium खरीदें!"
+        "bn": "🧠 Quiz from PDF\n\n✨ Premium ফিচার!\n\n🎯 যেকোনো PDF পাঠান\n🤖 AI ১০টি MCQ বানাবে\n📊 উত্তর দিয়ে স্কোর পাবেন\n\n⭐ Premium কিনুন!",
+        "en": "🧠 Quiz from PDF\n\n✨ Premium feature!\n\n🎯 Send any PDF\n🤖 AI creates 10 MCQs\n📊 Answer and get your score\n\n⭐ Buy Premium!",
+        "hi": "🧠 Quiz from PDF\n\n✨ Premium फीचर!\n\n⭐ Premium खरीदें!",
+        "ru": "🧠 Викторина из PDF\n\n✨ Premium функция!\n\n🎯 Отправьте PDF\n🤖 AI создаст 10 вопросов\n📊 Отвечайте и получайте оценку\n\n⭐ Купите Premium!"
     },
-    "pdfquiz_title": {"bn": "🧠 Quiz from PDF", "en": "🧠 Quiz from PDF", "hi": "🧠 Quiz from PDF"},
+    "pdfquiz_title": {"bn": "🧠 Quiz from PDF", "en": "🧠 Quiz from PDF", "hi": "🧠 Quiz from PDF", "ru": "🧠 Викторина из PDF"},
     "pdfquiz_prompt": {
-        "bn": "🧠 Quiz from PDF\n\n📄 এখন আপনার PDF পাঠান।\n🤖 AI সেটা পড়ে ১০টি MCQ বানাবে।\n\n❌ বাতিল করতে: /cancelpdfquiz",
-        "en": "🧠 Quiz from PDF\n\n📄 Now send your PDF.\n🤖 AI will create 10 MCQs from it.\n\n❌ To cancel: /cancelpdfquiz",
-        "hi": "🧠 Quiz from PDF\n\n📄 अब PDF भेजें।\n🤖 AI 10 MCQ बनाएगा।\n\n❌ रद्द करें: /cancelpdfquiz"
+        "bn": "🧠 Quiz from PDF\n\n📄 এখন আপনার PDF পাঠান।\n\n❌ বাতিল: /cancelpdfquiz",
+        "en": "🧠 Quiz from PDF\n\n📄 Now send your PDF.\n\n❌ Cancel: /cancelpdfquiz",
+        "hi": "🧠 Quiz from PDF\n\n📄 अब PDF भेजें।\n\n❌ रद्द: /cancelpdfquiz",
+        "ru": "🧠 Викторина из PDF\n\n📄 Отправьте PDF.\n\n❌ Отмена: /cancelpdfquiz"
     },
-    "pdfquiz_processing": {"bn": "📄 PDF পড়া হচ্ছে...", "en": "📄 Reading PDF...", "hi": "📄 PDF पढ़ रहा हूँ..."},
-    "pdfquiz_generating": {"bn": "🤖 AI কুইজ তৈরি করছে...", "en": "🤖 AI is generating quiz...", "hi": "🤖 AI क्विज़ बना रहा है..."},
-    "pdfquiz_fail": {"bn": "❌ কুইজ তৈরি করতে পারিনি। অন্য PDF চেষ্টা করুন।", "en": "❌ Could not generate quiz. Try another PDF.", "hi": "❌ क्विज़ नहीं बना।"},
-    "pdfquiz_q": {"bn": "❓ প্রশ্ন {n}/10", "en": "❓ Question {n}/10", "hi": "❓ प्रश्न {n}/10"},
-    "pdfquiz_score": {"bn": "📊 আপনার স্কোর", "en": "📊 Your Score", "hi": "📊 आपका स्कोर"},
-    "pdfquiz_correct": {"bn": "✅ সঠিক!", "en": "✅ Correct!", "hi": "✅ सही!"},
-    "pdfquiz_wrong": {"bn": "❌ ভুল!", "en": "❌ Wrong!", "hi": "❌ गलत!"},
-    "pdfquiz_answer": {"bn": "✅ সঠিক উত্তর", "en": "✅ Correct answer", "hi": "✅ सही उत्तर"},
-    "pdfquiz_cancelled": {"bn": "✅ PDF Quiz বাতিল করা হয়েছে।", "en": "✅ PDF Quiz cancelled.", "hi": "✅ PDF Quiz रद्द।"},
-    "pdfquiz_not_in": {"bn": "⚠️ আপনি PDF Quiz mode-এ নেই।", "en": "⚠️ Not in PDF Quiz mode.", "hi": "⚠️ PDF Quiz में नहीं।"},
-    "pdfquiz_done": {"bn": "🎉 কুইজ শেষ!", "en": "🎉 Quiz Complete!", "hi": "🎉 क्विज़ पूरा!"},
+    "pdfquiz_processing": {"bn": "📄 PDF পড়া হচ্ছে...", "en": "📄 Reading PDF...", "hi": "📄 PDF पढ़ रहा हूँ...", "ru": "📄 Читаю PDF..."},
+    "pdfquiz_generating": {"bn": "🤖 AI কুইজ তৈরি করছে...", "en": "🤖 AI is generating quiz...", "hi": "🤖 AI क्विज़ बना रहा है...", "ru": "🤖 AI создаёт викторину..."},
+    "pdfquiz_fail": {"bn": "❌ কুইজ তৈরি করা যায়নি।", "en": "❌ Could not generate quiz.", "hi": "❌ क्विज़ नहीं बना।", "ru": "❌ Не удалось создать викторину."},
+    "pdfquiz_q": {"bn": "❓ প্রশ্ন {n}/10", "en": "❓ Question {n}/10", "hi": "❓ प्रश्न {n}/10", "ru": "❓ Вопрос {n}/10"},
+    "pdfquiz_score": {"bn": "📊 আপনার স্কোর", "en": "📊 Your Score", "hi": "📊 आपका स्कोर", "ru": "📊 Ваш результат"},
+    "pdfquiz_correct": {"bn": "✅ সঠিক!", "en": "✅ Correct!", "hi": "✅ सही!", "ru": "✅ Верно!"},
+    "pdfquiz_wrong": {"bn": "❌ ভুল!", "en": "❌ Wrong!", "hi": "❌ गलत!", "ru": "❌ Неверно!"},
+    "pdfquiz_answer": {"bn": "✅ সঠিক উত্তর", "en": "✅ Correct answer", "hi": "✅ सही उत्तर", "ru": "✅ Правильный ответ"},
+    "pdfquiz_cancelled": {"bn": "✅ PDF Quiz বাতিল।", "en": "✅ PDF Quiz cancelled.", "hi": "✅ PDF Quiz रद्द।", "ru": "✅ Викторина отменена."},
+    "pdfquiz_not_in": {"bn": "⚠️ আপনি PDF Quiz mode-এ নেই।", "en": "⚠️ Not in PDF Quiz mode.", "hi": "⚠️ PDF Quiz में नहीं।", "ru": "⚠️ Не в режиме PDF Quiz."},
+    "pdfquiz_done": {"bn": "🎉 কুইজ শেষ!", "en": "🎉 Quiz Complete!", "hi": "🎉 क्विज़ पूरा!", "ru": "🎉 Викторина завершена!"},
 }
 
 
@@ -673,7 +931,7 @@ groq_client = Groq(api_key=GROQ_API_KEY)
 
 PROMPT_BEGINNER = """
 You are EduMate AI, a patient English teacher for beginners.
-1. Language Rule: Reply in the SAME language the user wrote in. If English -> very simple English. If Bangla -> simple Bangla. DO NOT just translate the user's message.
+1. Language Rule: Reply in the SAME language the user wrote in. If English -> very simple English. If Bangla -> simple Bangla. If Russian -> simple Russian. DO NOT just translate the user's message.
 2. Formatting Rule: Use ONLY plain text and emojis. NEVER use asterisks (*), bold (**), or markdown.
 3. Tone: Be highly encouraging. Keep responses short (under 1500 characters).
 4. Chat naturally. DO NOT turn the conversation into a dictionary.
@@ -684,7 +942,7 @@ Format them EXACTLY like this at the very end: [SUGGESTIONS] Question 1 | Questi
 
 PROMPT_INTERMEDIATE = """
 You are EduMate AI, an English tutor for intermediate learners.
-1. Language Rule: Reply in the user's language. If English -> 90% English. If Bangla -> 50% Bangla, 50% English. Chat naturally, DO NOT just translate.
+1. Language Rule: Reply in the user's language. If English -> 90% English. If Bangla -> 50% Bangla, 50% English. If Russian -> 50% Russian, 50% English.
 2. Formatting Rule: Use ONLY plain text and emojis. NEVER use asterisks (*), bold (**), or markdown.
 3. Style: Moderate length (under 2500 characters), engaging, correct mistakes gently.
 
@@ -694,7 +952,7 @@ Format them EXACTLY like this at the very end: [SUGGESTIONS] Question 1 | Questi
 
 PROMPT_ADVANCED = """
 You are EduMate AI, a strict IELTS examiner.
-1. Language Rule: Reply ONLY in English, regardless of the user's language. If the user writes in Bangla, politely ask them to try English.
+1. Language Rule: Reply ONLY in English, regardless of the user's language.
 2. Formatting Rule: Use ONLY plain text and emojis. NEVER use asterisks (*), bold (**), or markdown.
 3. Style: Advanced vocabulary (under 3500 characters), strict error correction.
 
@@ -715,6 +973,8 @@ def build_user_context(user, include_name=True):
         parts.append(f"Streak: {user['streak']} days")
     if user.get("words_learned"):
         parts.append(f"Words learned: {user['words_learned']}")
+    if user.get("language"):
+        parts.append(f"Preferred language: {user['language']}")
     if not parts:
         return ""
     return "\nUSER CONTEXT: " + " | ".join(parts) + "\nUse this info naturally if relevant."
@@ -757,15 +1017,12 @@ def ask_groq(user_text, history=None, user=None, custom_system=None, json_mode=F
             parts = raw_text.split("[SUGGESTIONS]")
             answer = parts[0].strip()
             sug_raw = parts[1].strip()
-
             sug_clean = re.sub(r'[\|\n,]', '|||', sug_raw)
             sug_list = [s.strip() for s in sug_clean.split("|||") if s.strip()]
-
             for s in sug_list[:3]:
                 s = re.sub(r'^[\d\-\*\.\)\s]+', '', s).strip()
                 if s:
                     suggestions.append(s)
-
             return answer, suggestions
         return raw_text, []
     except Exception as e:
@@ -819,13 +1076,12 @@ def analyze_image_sync(image_path, prompt):
         system_rules = (
             "You analyze images for English learners. "
             "CRITICAL FORMATTING RULES: "
-            "1. NEVER use markdown (no *, **, __, ```, ###, ---). "
+            "1. NEVER use markdown. "
             "2. Use PLAIN TEXT only with emojis. "
-            "3. Use emojis as bullets: 🔷 👉 ✏️ 📝 ✅ ❌ 🎯 📚 💡 🔊 🔁 ⭐ 🔥. "
-            "4. Separate each item with a BLANK LINE. "
-            "5. Keep responses under 1500 characters. "
-            "6. Reply in the user's language (Bangla for Bangla users). "
-            "7. Start with a 1-line summary, then bullet points."
+            "3. Separate each item with a BLANK LINE. "
+            "4. Keep responses under 1500 characters. "
+            "5. Reply in the user's language. "
+            "6. Start with a 1-line summary, then bullet points."
         )
         response = groq_client.chat.completions.create(
             model=VISION_MODEL,
@@ -878,7 +1134,6 @@ def extract_pdf_text_sync(pdf_path, max_chars=6000):
 
 
 def calculate_pronunciation_score(target, said):
-    """Returns (score, wrong_words_list)"""
     def clean(s):
         return re.sub(r'[^\w\s]', ' ', s.lower()).split()
 
@@ -903,7 +1158,6 @@ def calculate_pronunciation_score(target, said):
 
 
 def parse_quiz_json(text):
-    """Extract JSON array from AI response"""
     if not text:
         return None
     match = re.search(r'\[\s*\{.*\}\s*\]', text, re.DOTALL)
@@ -955,7 +1209,7 @@ async def init_db():
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
 
-    logger.info(f"Attempting DB connect...")
+    logger.info("Attempting DB connect...")
 
     try:
         db_pool = await asyncio.wait_for(
@@ -1068,7 +1322,6 @@ async def init_db():
                     )
                 except Exception:
                     pass
-            # ★ NEW: ensure is_premium column exists in s_files for old DBs
             try:
                 await conn.execute(
                     "ALTER TABLE s_files ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE"
@@ -1266,7 +1519,6 @@ async def mark_reviewed(review_id):
         pass
 
 
-# ★ NEW: save_file with is_premium
 async def save_file(file_id, file_name, caption, uploaded_by, is_premium=False):
     if db_pool is None:
         return False
@@ -1283,7 +1535,6 @@ async def save_file(file_id, file_name, caption, uploaded_by, is_premium=False):
         return False
 
 
-# ★ NEW: get_all_files with is_premium
 async def get_all_files():
     if db_pool is None:
         return []
@@ -1298,19 +1549,16 @@ async def get_all_files():
         return []
 
 
-# ★ NEW: helper for free files
 async def get_free_files():
     files = await get_all_files()
     return [f for f in files if not f.get("is_premium")]
 
 
-# ★ NEW: helper for premium files
 async def get_premium_files():
     files = await get_all_files()
     return [f for f in files if f.get("is_premium")]
 
 
-# ★ NEW: get_file_by_db_id with is_premium
 async def get_file_by_db_id(fid):
     if db_pool is None:
         return None
@@ -1337,9 +1585,10 @@ async def delete_file(fid):
 
 
 # ==========================================================
-# FORCE SUBSCRIBE
+# FORCE SUBSCRIBE (Disabled by default)
 # ==========================================================
 async def is_user_joined(bot, user_id):
+    """Force-sub is disabled when FORCE_SUB_GROUP_ID is empty."""
     if not FORCE_SUB_GROUP_ID:
         return True
     try:
@@ -1355,7 +1604,7 @@ async def is_user_joined(bot, user_id):
 
 
 def force_sub_kb(lang="bn"):
-    join_url = FORCE_SUB_GROUP_LINK or "https://t.me/friendships_hub"
+    join_url = FORCE_SUB_GROUP_LINK or "https://t.me/"
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(t("force_sub_join_btn", lang), url=join_url)],
         [InlineKeyboardButton(t("force_sub_check_btn", lang), callback_data="forcesub_check")],
@@ -1436,7 +1685,8 @@ def lang_kb():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("🇧🇩 বাংলা", callback_data="setlang_bn"),
          InlineKeyboardButton("🇬🇧 English", callback_data="setlang_en")],
-        [InlineKeyboardButton("🇮🇳 हिन्दी", callback_data="setlang_hi")],
+        [InlineKeyboardButton("🇮🇳 हिन्दी", callback_data="setlang_hi"),
+         InlineKeyboardButton("🇷🇺 Русский", callback_data="setlang_ru")],
     ])
 
 
@@ -1766,6 +2016,24 @@ async def help_command(update, context):
             "/pdfquiz - 🧠 Quiz from PDF\n"
             "🆘 सहायता: @asikul_echo"
         )
+    elif lang == "ru":
+        text = (
+            "📖 Помощь\n\n"
+            "/start - Главное меню\n/menu - Меню\n/profile - Профиль\n"
+            "/practice - 🎭 Ролевая игра\n/review - 🔁 Повторение\n"
+            "/memory - 🧠 Что я помню\n/endroleplay - Закончить игру\n"
+            "/endgame - Остановить игру\n"
+            "/daily - Урок дня\n/leaderboard - Топ-10\n"
+            "/coins - Баланс\n/invite - Ссылка для приглашения\n"
+            "/mistakes - Ошибки\n/achievements - Достижения\n"
+            "/level - Уровень\n/reminder - Напоминание\n"
+            "/language - Язык\n/reset - Очистить чат\n"
+            "/pronounce - 🎤 Тренажёр произношения (Premium)\n"
+            "/ielts - 🎯 IELTS Speaking (Premium)\n"
+            "/pdfquiz - 🧠 Викторина из PDF (Premium)\n\n"
+            "📸 Фото, 🎤 голос, 📄 PDF, 👍👎 оценки\n"
+            "🆘 Помощь: @asikul_echo"
+        )
     else:
         text = (
             "📖 সাহায্য\n\n"
@@ -1816,6 +2084,7 @@ async def profile_command(update, context):
     )
 
 
+# ★ NEW: daily_command uses get_next_item
 async def daily_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
         await send_force_sub_message(update.message, "bn")
@@ -1826,20 +2095,22 @@ async def daily_command(update, context):
     bonus = DAILY_BONUS + (streak * STREAK_BONUS)
     await add_coins(uid, bonus)
     user = await get_user(uid)
+    topic = get_next_item(uid, "daily", DAILY_TOPICS, context)
     await update.message.chat.send_action("typing")
-    answer, suggestions = await asyncio.to_thread(
-        ask_groq,
-        "Give today's short English lesson: 1 new word (with meaning + pronunciation + example), "
-        "1 grammar tip with 2 examples, 1 practice question. Plain text.",
-        None, user
+    prompt = (
+        f"Give today's short English lesson on this EXACT topic: {topic}.\n"
+        f"Include: 1 new word (with meaning + pronunciation + example), "
+        f"1 grammar tip with 2 examples, 1 practice question. Plain text."
     )
+    answer, suggestions = await asyncio.to_thread(ask_groq, prompt, None, user)
     if not answer:
         answer = "📚 Word: Persistent - Meaning: continuing firmly\nExample: Be persistent."
     kb = suggestions_kb(suggestions, context)
     await safe_reply(
         update.message,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
-        f"{t('bonus_coins', lang)}: +{bonus}\n\n{answer}",
+        f"{t('bonus_coins', lang)}: +{bonus}\n"
+        f"📌 Topic: {topic}\n\n{answer}",
         reply_markup=kb
     )
 
@@ -2098,44 +2369,43 @@ async def broadcast_command(update, context):
     await update.message.reply_text(f"✅ Sent: {sent} | ❌ Failed: {failed}")
 
 
-# ★ NEW: approve_command sends all premium files
+# ★ UPDATED: approve_command accepts plan argument
 async def approve_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
         await update.message.reply_text(t("admin_only", "en"))
         return
     if not context.args:
-        await update.message.reply_text("Usage: /approve <user_id>")
+        await update.message.reply_text(
+            "Usage: /approve <user_id> [1m|3m|6m]\nDefault: 1m"
+        )
         return
     try:
         target_uid = int(context.args[0])
-        until = datetime.now() + timedelta(days=PREMIUM_DAYS)
+        plan_key = context.args[1] if len(context.args) > 1 else "1m"
+        plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
+        days = plan["days"]
+
+        until = datetime.now() + timedelta(days=days)
         await update_user(target_uid, is_premium=True, premium_until=until)
 
         target_lang = await get_user_lang(target_uid)
-        await update.message.reply_text(f"✅ User {target_uid} granted Premium!")
+        await update.message.reply_text(
+            f"✅ User {target_uid} granted Premium for {days} days ({plan_key})!"
+        )
 
         try:
             await context.bot.send_message(
                 target_uid,
-                t("premium_success", target_lang, days=PREMIUM_DAYS)
+                t("premium_success", target_lang, days=days)
             )
         except Exception:
             pass
 
         premium_files = await get_premium_files()
-        if not premium_files:
+        if premium_files:
             try:
-                await context.bot.send_message(
-                    target_uid, t("premium_no_files", target_lang)
-                )
-            except Exception:
-                pass
-        else:
-            try:
-                await context.bot.send_message(
-                    target_uid, t("premium_files_sent", target_lang)
-                )
+                await context.bot.send_message(target_uid, t("premium_files_sent", target_lang))
             except Exception:
                 pass
             for f in premium_files:
@@ -2148,6 +2418,11 @@ async def approve_command(update, context):
                     await asyncio.sleep(0.3)
                 except Exception as e:
                     logger.error(f"Premium file send to {target_uid} failed: {e}")
+        else:
+            try:
+                await context.bot.send_message(target_uid, t("premium_no_files", target_lang))
+            except Exception:
+                pass
 
         try:
             await check_achievements(target_uid)
@@ -2175,7 +2450,6 @@ async def reply_command(update, context):
         await update.message.reply_text(f"❌ Error: {e}")
 
 
-# ★ NEW: addfile_command clears pending_file_type
 async def addfile_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
@@ -2253,7 +2527,6 @@ async def skip_command(update, context):
     file_name = context.user_data.pop('pending_file_name', 'file')
     context.user_data.pop('awaiting_file_caption', None)
     if file_id:
-        # ★ NEW: after /skip also ask for free/premium
         context.user_data['pending_file_id_save'] = file_id
         context.user_data['pending_file_name_save'] = file_name
         context.user_data['pending_file_caption'] = ""
@@ -2379,9 +2652,7 @@ async def ielts_command(update, context):
     for k in ['pronunciation_mode', 'pdf_quiz', 'pdf_quiz_mode', 'roleplay', 'game_active']:
         context.user_data.pop(k, None)
     context.user_data['ielts_speaking'] = {
-        'stage': 1,
-        'q_index': 0,
-        'history': [],
+        'stage': 1, 'q_index': 0, 'history': [],
         'current_q': IELTS_PART1_QUESTIONS[0],
     }
     await update.message.reply_text(
@@ -2424,9 +2695,7 @@ async def cb_ielts_menu(update, context):
     for k in ['pronunciation_mode', 'pdf_quiz', 'pdf_quiz_mode', 'roleplay', 'game_active']:
         context.user_data.pop(k, None)
     context.user_data['ielts_speaking'] = {
-        'stage': 1,
-        'q_index': 0,
-        'history': [],
+        'stage': 1, 'q_index': 0, 'history': [],
         'current_q': IELTS_PART1_QUESTIONS[0],
     }
     await safe_edit(
@@ -2532,10 +2801,7 @@ async def process_ielts_answer(message, context, user, text):
         await message.reply_text(t("ielts_answer_too_short", lang))
         return
 
-    ielts['history'].append({
-        'q': ielts.get('current_q', ''),
-        'a': user_answer
-    })
+    ielts['history'].append({'q': ielts.get('current_q', ''), 'a': user_answer})
     ielts['q_index'] += 1
     qi = ielts['q_index']
     stage = ielts['stage']
@@ -2545,8 +2811,7 @@ async def process_ielts_answer(message, context, user, text):
             next_q = IELTS_PART1_QUESTIONS[qi]
             ielts['current_q'] = next_q
             await message.reply_text(
-                f"{t('ielts_part1_start', lang, n=qi+1)}\n\n"
-                f"❓ {next_q}",
+                f"{t('ielts_part1_start', lang, n=qi+1)}\n\n❓ {next_q}",
                 reply_markup=InlineKeyboardMarkup([
                     [InlineKeyboardButton(t("ielts_end_btn", lang), callback_data="ielts_end")],
                 ])
@@ -2705,10 +2970,7 @@ async def generate_pdf_quiz(message, context, uid, pdf_text, file_name, user):
         return
 
     context.user_data['pdf_quiz'] = {
-        'questions': quiz,
-        'current': 0,
-        'score': 0,
-        'answers': [],
+        'questions': quiz, 'current': 0, 'score': 0, 'answers': [],
     }
     context.user_data.pop('pdf_quiz_mode', None)
 
@@ -2756,17 +3018,13 @@ async def finish_quiz(message, context, uid, user):
     pct = int(score / total * 100) if total > 0 else 0
 
     if pct >= 80:
-        emoji = "🏆"
-        label = "Outstanding!"
+        emoji = "🏆"; label = "Outstanding!"
     elif pct >= 60:
-        emoji = "🎉"
-        label = "Very Good!"
+        emoji = "🎉"; label = "Very Good!"
     elif pct >= 40:
-        emoji = "👍"
-        label = "Good"
+        emoji = "👍"; label = "Good"
     else:
-        emoji = "📚"
-        label = "Keep Learning"
+        emoji = "📚"; label = "Keep Learning"
 
     text = (
         f"{t('pdfquiz_done', lang)}\n\n"
@@ -2868,6 +3126,16 @@ SPEAKING_QUESTIONS = [
     "Who is someone you really respect, and why?",
     "What is something new you learned recently?",
     "What makes you happy on a normal day?",
+    "Tell me about your best friend.",
+    "What is your favorite season and why?",
+    "Describe your daily routine.",
+    "What hobby would you like to learn?",
+    "What is your dream job?",
+    "Do you prefer mornings or evenings? Why?",
+    "What is the last movie you watched?",
+    "How do you relax after work?",
+    "What is your favorite childhood memory?",
+    "If you could travel anywhere, where would you go?",
 ]
 
 
@@ -2985,6 +3253,7 @@ async def cb_set_language(update, context):
         logger.error(f"lang reply fail: {e}")
 
 
+# ★ UPDATED: uses get_next_item for no-repeat content
 async def student_menu_callback(update, context):
     q = update.callback_query
     await q.answer()
@@ -2998,20 +3267,54 @@ async def student_menu_callback(update, context):
         return
     await update_user(uid, last_active=datetime.now())
     data = q.data
+
     if data == "student_speaking":
-        last_q = context.user_data.get("last_speaking_question")
-        avail = [x for x in SPEAKING_QUESTIONS if x != last_q]
-        question = random.choice(avail)
-        context.user_data["last_speaking_question"] = question
-        prompt = f"Start English speaking practice. Ask this exact question:\n\n{question}\n\nWait for the answer. Plain text."
+        question = get_next_item(uid, "speaking", SPEAKING_QUESTIONS, context)
+        prompt = (
+            f"Start English speaking practice. Ask this EXACT question:\n\n"
+            f"{question}\n\n"
+            f"Wait for the student's answer. Plain text."
+        )
     elif data == "student_tenses":
-        tense = random.choice(TENSES_LIST)
-        prompt = f"Teach ONE English tense: {tense}. Explain usage, structure, 2 examples, common mistake, 1 practice question. Plain text."
+        tense = get_next_item(uid, "tenses", TENSES_LIST, context)
+        prompt = (
+            f"Teach ONE English tense: {tense}.\n"
+            f"Explain: usage, structure, 2 examples, common mistake, 1 practice question. Plain text."
+        )
+    elif data == "student_learn":
+        topic = get_next_item(uid, "learn", LEARN_TOPICS, context)
+        prompt = (
+            f"Teach a short English lesson on this EXACT topic: {topic}.\n"
+            f"Explain simply, give 2 examples, then ONE practice question. Plain text."
+        )
+    elif data == "student_vocab":
+        word = get_next_item(uid, "vocab", VOCAB_WORDS, context)
+        prompt = (
+            f"Teach this EXACT English word: {word}.\n"
+            f"Include: meaning, pronunciation, part of speech, example sentence.\n"
+            f"Then ONE practice question. Plain text."
+        )
+    elif data == "student_grammar":
+        topic = get_next_item(uid, "grammar", GRAMMAR_TOPICS, context)
+        prompt = (
+            f"Teach this EXACT English grammar point: {topic}.\n"
+            f"Include: rule, explanation, 2 examples, common mistake, 1 practice question.\n"
+            f"Plain text."
+        )
+    elif data == "student_writing":
+        task = get_next_item(uid, "writing", WRITING_TASKS, context)
+        prompt = (
+            f"Give this EXACT English writing task to the student:\n\n"
+            f"{task}\n\n"
+            f"Wait for the student's answer. Plain text."
+        )
     else:
         prompt = STUDENT_PROMPTS.get(data)
+
     if not prompt:
         await q.answer("Unknown option", show_alert=False)
         return
+
     user = await get_user(uid)
     try:
         await q.edit_message_text(t("loading", lang))
@@ -3020,6 +3323,7 @@ async def student_menu_callback(update, context):
     answer, suggestions = await asyncio.to_thread(ask_groq, prompt, None, user)
     if not answer:
         answer = t("ai_error", lang)
+
     if data == "student_vocab":
         words = (user.get("words_learned") or 0) + 1 if user else 1
         await update_user(uid, words_learned=words)
@@ -3126,6 +3430,7 @@ async def cb_profile(update, context):
     await safe_edit(q, text, reply_markup=back_kb(lang))
 
 
+# ★ UPDATED: cb_daily uses get_next_item
 async def cb_daily(update, context):
     q = update.callback_query
     await q.answer()
@@ -3141,23 +3446,27 @@ async def cb_daily(update, context):
     bonus = DAILY_BONUS + (streak * STREAK_BONUS)
     await add_coins(uid, bonus)
     user = await get_user(uid)
+    topic = get_next_item(uid, "daily", DAILY_TOPICS, context)
     await q.edit_message_text(t("loading", lang))
-    answer, suggestions = await asyncio.to_thread(
-        ask_groq,
-        "Give today's short English lesson: 1 new word + meaning + example, 1 grammar tip, 1 practice question. Plain text.",
-        None, user
+    prompt = (
+        f"Give today's short English lesson on this EXACT topic: {topic}.\n"
+        f"Include: 1 new word (with meaning + pronunciation + example), "
+        f"1 grammar tip with 2 examples, 1 practice question. Plain text."
     )
+    answer, suggestions = await asyncio.to_thread(ask_groq, prompt, None, user)
     if not answer:
         answer = "📚 Word: Diligent - hardworking\nExample: She is a diligent student."
     kb = suggestions_kb(suggestions, context)
     await safe_edit(
         q,
         f"{t('daily_title', lang)} ({t('streak', lang)}: {streak} {t('days', lang)})\n"
-        f"{t('bonus_coins', lang)}: +{bonus}\n\n{answer}",
+        f"{t('bonus_coins', lang)}: +{bonus}\n"
+        f"📌 Topic: {topic}\n\n{answer}",
         reply_markup=merge_keyboards(kb, back_kb(lang)),
     )
 
 
+# ★ UPDATED: cb_word_of_day uses get_next_item
 async def cb_word_of_day(update, context):
     q = update.callback_query
     await q.answer()
@@ -3166,14 +3475,16 @@ async def cb_word_of_day(update, context):
     if not await is_user_joined(context.bot, uid):
         return
     user = await get_user(uid)
+    word = get_next_item(uid, "word_of_day", WORD_OF_DAY_POOL, context)
     await q.edit_message_text(t("loading", lang))
-    answer, suggestions = await asyncio.to_thread(
-        ask_groq,
-        "Give ONE advanced English word of the day. Include: word, meaning, pronunciation, part of speech, 2 examples, 2 synonyms. Plain text.",
-        None, user
+    prompt = (
+        f"Teach this EXACT English word: {word}.\n"
+        f"Include: word, meaning, pronunciation, part of speech, 2 examples, 2 synonyms.\n"
+        f"Plain text."
     )
+    answer, suggestions = await asyncio.to_thread(ask_groq, prompt, None, user)
     if not answer:
-        answer = "🔤 Word: Resilient\n📖 Meaning: able to recover quickly\n🔊 /riˈziliənt/"
+        answer = f"🔤 Word: {word}\n📖 Meaning: ..."
     kb = suggestions_kb(suggestions, context)
     await safe_edit(q, f"{t('word_title', lang)}\n\n{answer}", reply_markup=merge_keyboards(kb, back_kb(lang)))
 
@@ -3250,6 +3561,7 @@ async def cb_invite(update, context):
     )
 
 
+# ★ UPDATED: cb_premium shows plan selection
 async def cb_premium(update, context):
     q = update.callback_query
     await q.answer()
@@ -3264,35 +3576,68 @@ async def cb_premium(update, context):
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
     context.user_data.pop("awaiting_support", None)
+
+    rows = []
+    for plan_key, plan in PREMIUM_PLANS.items():
+        label = plan.get(f"label_{lang}") or plan["label_en"]
+        rows.append([InlineKeyboardButton(
+            f"💎 {label} — ৳{plan['bdt']} / {plan['stars']}⭐",
+            callback_data=f"plan_{plan_key}"
+        )])
+    rows.append([InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")])
+
     await safe_edit(
         q,
-        t("premium_body", lang, stars=PREMIUM_STARS, days=PREMIUM_DAYS,
-          bdt=PREMIUM_PRICE_BDT, usdt=USDT_AMOUNT),
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton(t("premium_buy", lang, n=PREMIUM_STARS), callback_data="buy_premium")],
-            [InlineKeyboardButton(t("premium_bkash_btn", lang, n=PREMIUM_PRICE_BDT), callback_data="pay_bkash")],
-            [InlineKeyboardButton(t("premium_rocket_btn", lang, n=PREMIUM_PRICE_BDT), callback_data="pay_rocket")],
-            [InlineKeyboardButton(t("premium_trc20_btn", lang), callback_data="pay_trc20")],
-            [InlineKeyboardButton(t("premium_bsc20_btn", lang), callback_data="pay_bsc20")],
-            [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")],
-        ]),
+        f"💎 Premium Membership\n\n{t('premium_choose', lang)}",
+        reply_markup=InlineKeyboardMarkup(rows),
     )
 
 
+# ★ NEW: cb_plan_selected - user picked a plan
+async def cb_plan_selected(update, context):
+    q = update.callback_query
+    await q.answer()
+    uid = q.from_user.id
+    lang = await get_user_lang(uid)
+    plan_key = q.data.replace("plan_", "")
+    plan = PREMIUM_PLANS.get(plan_key)
+    if not plan:
+        return
+    context.user_data["premium_plan"] = plan_key
+    label = plan.get(f"label_{lang}") or plan["label_en"]
+
+    await safe_edit(
+        q,
+        t("premium_plan_body", lang, label=label, bdt=plan["bdt"],
+          stars=plan["stars"], usdt=plan["usdt"], days=plan["days"]),
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton(f"⭐ Stars ({plan['stars']})", callback_data=f"buy_{plan_key}")],
+            [InlineKeyboardButton(f"💳 bKash ({plan['bdt']}৳)", callback_data=f"paybk_{plan_key}")],
+            [InlineKeyboardButton(f"💳 Rocket ({plan['bdt']}৳)", callback_data=f"payrk_{plan_key}")],
+            [InlineKeyboardButton("🪙 USDT (TRC20)", callback_data=f"paytrc_{plan_key}")],
+            [InlineKeyboardButton("🪙 USDT (BSC20)", callback_data=f"paybsc_{plan_key}")],
+            [InlineKeyboardButton("⬅️ Back", callback_data="m_premium")],
+        ])
+    )
+
+
+# ★ UPDATED: cb_buy_premium uses plan
 async def cb_buy_premium(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    plan_key = q.data.replace("buy_", "")
+    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
     try:
         await context.bot.send_invoice(
             chat_id=uid,
-            title="💎 EduMate Premium",
-            description=f"{PREMIUM_DAYS} days Premium",
-            payload=f"premium_{uid}",
+            title=f"💎 Premium — {plan['days']} days",
+            description=f"Premium access for {plan['days']} days",
+            payload=f"premium_{uid}_{plan_key}",
             provider_token="",
             currency="XTR",
-            prices=[LabeledPrice(label="Premium", amount=PREMIUM_STARS)],
+            prices=[LabeledPrice(label="Premium", amount=plan['stars'])],
         )
     except Exception as e:
         logger.error(f"Invoice error: {e}")
@@ -3319,7 +3664,6 @@ async def cb_vocab_book(update, context):
         await q.message.reply_text(f"📘 Sir English Vocabulary Book\n\n👇 Link:\n{PDF_URL}")
 
 
-# ★ NEW: cb_files_menu shows Free + Premium sections
 async def cb_files_menu(update, context):
     q = update.callback_query
     await q.answer()
@@ -3360,7 +3704,6 @@ async def cb_files_menu(update, context):
     )
 
 
-# ★ NEW: cb_file_send locks premium files
 async def cb_file_send(update, context):
     q = update.callback_query
     uid = q.from_user.id
@@ -3382,20 +3725,9 @@ async def cb_file_send(update, context):
             await q.answer()
             await safe_edit(
                 q,
-                t("premium_file_locked", lang,
-                  name=file['file_name'],
-                  bdt=PREMIUM_PRICE_BDT,
-                  stars=PREMIUM_STARS,
-                  days=PREMIUM_DAYS),
+                t("premium_file_locked", lang, name=file['file_name']),
                 reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton(t("premium_bkash_btn", lang, n=PREMIUM_PRICE_BDT),
-                                          callback_data="pay_bkash")],
-                    [InlineKeyboardButton(t("premium_rocket_btn", lang, n=PREMIUM_PRICE_BDT),
-                                          callback_data="pay_rocket")],
-                    [InlineKeyboardButton(t("premium_trc20_btn", lang), callback_data="pay_trc20")],
-                    [InlineKeyboardButton(t("premium_bsc20_btn", lang), callback_data="pay_bsc20")],
-                    [InlineKeyboardButton(t("premium_buy", lang, n=PREMIUM_STARS),
-                                          callback_data="buy_premium")],
+                    [InlineKeyboardButton("💎 View Premium Plans", callback_data="m_premium")],
                     [InlineKeyboardButton("⬅️ Files", callback_data="m_files")],
                     [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")],
                 ])
@@ -3412,7 +3744,6 @@ async def cb_file_send(update, context):
         await q.message.reply_text(t("file_send_fail", lang))
 
 
-# ★ NEW: cb_save_file_type - admin selects Free/Premium after uploading file
 async def cb_save_file_type(update, context):
     q = update.callback_query
     uid = q.from_user.id
@@ -3567,18 +3898,21 @@ async def cb_flashcard_show(update, context):
     await safe_edit(q, text, reply_markup=markup)
 
 
+# ★ UPDATED: cb_pay_bkash uses plan
 async def cb_pay_bkash(update, context):
     q = update.callback_query
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    plan_key = q.data.replace("paybk_", "")
+    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
     context.user_data['awaiting_payment'] = True
     context.user_data['payment_method'] = 'bKash'
-    text = f"{t('pay_bkash_title', lang)}\n\n{t('pay_bkash_desc', lang, number=BKASH_NUMBER, amount=PREMIUM_PRICE_BDT)}"
+    context.user_data['premium_plan'] = plan_key
+    text = f"{t('pay_bkash_title', lang)}\n\n{t('pay_bkash_desc', lang, number=BKASH_NUMBER, amount=plan['bdt'])}"
     markup = InlineKeyboardMarkup([
         [InlineKeyboardButton(t("copy_btn", lang), callback_data="copy_bkash")],
         [InlineKeyboardButton(t("cancel_payment_btn", lang), callback_data="cancel_payment")],
-        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -3588,13 +3922,15 @@ async def cb_pay_rocket(update, context):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    plan_key = q.data.replace("payrk_", "")
+    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
     context.user_data['awaiting_payment'] = True
     context.user_data['payment_method'] = 'Rocket'
-    text = f"{t('pay_rocket_title', lang)}\n\n{t('pay_rocket_desc', lang, number=ROCKET_NUMBER, amount=PREMIUM_PRICE_BDT)}"
+    context.user_data['premium_plan'] = plan_key
+    text = f"{t('pay_rocket_title', lang)}\n\n{t('pay_rocket_desc', lang, number=ROCKET_NUMBER, amount=plan['bdt'])}"
     markup = InlineKeyboardMarkup([
         [InlineKeyboardButton(t("copy_btn", lang), callback_data="copy_rocket")],
         [InlineKeyboardButton(t("cancel_payment_btn", lang), callback_data="cancel_payment")],
-        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -3604,13 +3940,15 @@ async def cb_pay_trc20(update, context):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    plan_key = q.data.replace("paytrc_", "")
+    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
     context.user_data['awaiting_payment'] = True
     context.user_data['payment_method'] = 'USDT (TRC20)'
-    text = f"{t('pay_trc20_title', lang)}\n\n{t('pay_trc20_desc', lang, amount=USDT_AMOUNT, address=TRC20_ADDRESS)}"
+    context.user_data['premium_plan'] = plan_key
+    text = f"{t('pay_trc20_title', lang)}\n\n{t('pay_trc20_desc', lang, amount=plan['usdt'], address=TRC20_ADDRESS)}"
     markup = InlineKeyboardMarkup([
         [InlineKeyboardButton(t("copy_btn", lang), callback_data="copy_trc20")],
         [InlineKeyboardButton(t("cancel_payment_btn", lang), callback_data="cancel_payment")],
-        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -3620,13 +3958,15 @@ async def cb_pay_bsc20(update, context):
     await q.answer()
     uid = q.from_user.id
     lang = await get_user_lang(uid)
+    plan_key = q.data.replace("paybsc_", "")
+    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
     context.user_data['awaiting_payment'] = True
     context.user_data['payment_method'] = 'USDT (BSC20)'
-    text = f"{t('pay_bsc20_title', lang)}\n\n{t('pay_bsc20_desc', lang, amount=USDT_AMOUNT, address=BSC20_ADDRESS)}"
+    context.user_data['premium_plan'] = plan_key
+    text = f"{t('pay_bsc20_title', lang)}\n\n{t('pay_bsc20_desc', lang, amount=plan['usdt'], address=BSC20_ADDRESS)}"
     markup = InlineKeyboardMarkup([
         [InlineKeyboardButton(t("copy_btn", lang), callback_data="copy_bsc20")],
         [InlineKeyboardButton(t("cancel_payment_btn", lang), callback_data="cancel_payment")],
-        [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")]
     ])
     await safe_edit(q, text, reply_markup=markup)
 
@@ -3663,6 +4003,7 @@ async def cb_cancel_payment(update, context):
     await q.answer(t("payment_cancelled", lang))
     context.user_data.pop("awaiting_payment", None)
     context.user_data.pop("payment_method", None)
+    context.user_data.pop("premium_plan", None)
     await safe_edit(q, t("main_menu", lang), reply_markup=main_menu_kb())
 
 
@@ -3694,13 +4035,26 @@ async def precheckout_cb(update, context):
     await update.pre_checkout_query.answer(ok=True)
 
 
-# ★ NEW: successful_payment_cb sends all premium files
+# ★ UPDATED: successful_payment_cb reads plan from payload
 async def successful_payment_cb(update, context):
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
-    until = datetime.now() + timedelta(days=PREMIUM_DAYS)
+    payload = ""
+    try:
+        payload = update.message.successful_payment.invoice_payload
+    except Exception:
+        pass
+    plan_key = "1m"
+    if payload and payload.startswith("premium_"):
+        parts = payload.split("_")
+        if len(parts) >= 3:
+            plan_key = parts[2]
+    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
+    days = plan["days"]
+
+    until = datetime.now() + timedelta(days=days)
     await update_user(uid, is_premium=True, premium_until=until)
-    await update.message.reply_text(t("premium_success", lang, days=PREMIUM_DAYS))
+    await update.message.reply_text(t("premium_success", lang, days=days))
 
     premium_files = await get_premium_files()
     if premium_files:
@@ -3889,6 +4243,16 @@ async def cb_help(update, context):
                 "🎤 Pronunciation, 🎯 IELTS Speaking, 🧠 Quiz from PDF\n\n"
                 "📸 फोटो, 🎤 वॉइस, 📄 PDF, 👍👎 रेटिंग\n"
                 "🆘 सहायता: @asikul_echo")
+    elif lang == "ru":
+        text = ("ℹ️ Помощь\n\n"
+                "🎓 Учить, 📚 Словарь, 📝 Грамматика, ⏱ Времена, 🗣 Разговор, ✍️ Письмо\n"
+                "🎭 Ролевая игра, 🔁 Повторение, 🎯 Викторина, 💬 Перевод\n"
+                "🔥 Урок дня, 📖 Слово дня, 📊 Прогресс, 🏆 Топ-10\n"
+                "🎁 Пригласи друга, ⭐ Premium, 📚 Ошибки, 🏅 Достижения\n"
+                "🧠 Память, 🔔 Напоминания, 🌍 Язык\n"
+                "🎤 Произношение, 🎯 IELTS Speaking, 🧠 Викторина из PDF\n\n"
+                "📸 Отправьте фото, 🎤 голос, 📄 PDF\n"
+                "🆘 Помощь: @asikul_echo")
     else:
         text = ("ℹ️ সাহায্য\n\n"
                 "🎓 Learn, 📚 Vocabulary, 📝 Grammar, ⏱ Tenses, 🗣 Speaking, ✍️ Writing\n"
@@ -3937,7 +4301,7 @@ async def handle_message(update, context):
     lang = user.get("language") or "bn"
     today = datetime.now().date()
 
-    # ★ NEW: ADMIN FILE UPLOAD — after caption, ask Free/Premium
+    # ===== ADMIN FILE UPLOAD =====
     if context.user_data.get('awaiting_file_caption') and uid in ADMIN_IDS and message.text:
         caption = message.text.strip()
         file_id = context.user_data.pop('pending_file_id', None)
@@ -3957,7 +4321,7 @@ async def handle_message(update, context):
             )
         return
 
-    # ================= IELTS SPEAKING MODE =================
+    # ===== IELTS SPEAKING =====
     ielts = context.user_data.get('ielts_speaking')
     if ielts:
         if message.text and not message.text.startswith("/"):
@@ -3983,7 +4347,7 @@ async def handle_message(update, context):
                 await msg.edit_text("❌ Error processing voice.")
             return
 
-    # ================= PRONUNCIATION COACH MODE =================
+    # ===== PRONUNCIATION MODE =====
     if context.user_data.get('pronunciation_mode'):
         if message.voice or message.audio:
             target = context.user_data['pronunciation_mode']['target']
@@ -4059,12 +4423,12 @@ async def handle_message(update, context):
         else:
             if message.text and not message.text.startswith("/"):
                 await message.reply_text(
-                    "🎤 Please send a VOICE message. Text won't work here.\n"
+                    "🎤 Please send a VOICE message.\n"
                     "❌ /cancelpronounce to exit."
                 )
                 return
 
-    # ================= PDF QUIZ MODE =================
+    # ===== PDF QUIZ MODE =====
     if context.user_data.get('pdf_quiz_mode') and message.document:
         doc = message.document
         file_size = doc.file_size or 0
@@ -4108,11 +4472,11 @@ async def handle_message(update, context):
     if pdf_quiz and message.text and not message.text.startswith("/"):
         await message.reply_text(
             "👆 Please click one of the option buttons above.\n"
-            "🛑 To stop the quiz, click the Stop button."
+            "🛑 To stop, click Stop Quiz."
         )
         return
 
-    # ================= ROLE-PLAY MODE =================
+    # ===== ROLE-PLAY =====
     rp = context.user_data.get("roleplay")
     if rp and message.text and not message.text.startswith("/"):
         user_text = message.text.strip()
@@ -4144,7 +4508,7 @@ async def handle_message(update, context):
                 pass
         return
 
-    # ================= WORD GAME MODE =================
+    # ===== WORD GAME =====
     if context.user_data.get('game_active') and message.text and not message.text.startswith("/"):
         user_answer = message.text.strip().lower()
         correct_word = context.user_data.get('game_word', '').lower()
@@ -4176,7 +4540,7 @@ async def handle_message(update, context):
             )
         return
 
-    # ================= REVIEW MODE =================
+    # ===== REVIEW MODE =====
     rq = context.user_data.get("review_queue")
     if rq and message.text and not message.text.startswith("/"):
         idx = context.user_data.get("review_index", 0)
@@ -4212,7 +4576,7 @@ async def handle_message(update, context):
             await message.reply_text(t("review_none", lang))
         return
 
-    # ================= VOICE =================
+    # ===== VOICE =====
     if message.voice or message.audio:
         if not user.get("is_premium"):
             last_date = user.get("last_voice_date")
@@ -4269,7 +4633,7 @@ async def handle_message(update, context):
             await msg.edit_text("❌ Error processing voice.")
         return
 
-    # ================= DOCUMENT =================
+    # ===== DOCUMENT =====
     if message.document:
         doc = message.document
         file_size = doc.file_size or 0
@@ -4325,16 +4689,14 @@ async def handle_message(update, context):
                 prompt = (
                     f"The user sent a PDF file named '{file_name}' with this request: {user_caption}\n\n"
                     f"PDF Content:\n{pdf_text}\n\n"
-                    f"Analyze the PDF and answer the user's request. If no specific request, summarize the PDF "
-                    f"and explain its key points in simple English (with Bangla explanation if the user's language is Bangla). "
-                    f"Use plain text and emojis only. No markdown."
+                    f"Analyze the PDF and answer the user's request."
                 )
             else:
                 prompt = (
                     f"The user sent a PDF file named '{file_name}'.\n\n"
                     f"PDF Content:\n{pdf_text}\n\n"
                     f"Please: 1) Give a short summary, 2) List 5-7 key points, "
-                    f"3) Suggest what the user can learn from it. Use plain text and emojis only."
+                    f"3) Suggest what the user can learn from it."
                 )
             answer, suggestions = await asyncio.to_thread(ask_groq, prompt, None, user)
             if not answer:
@@ -4356,10 +4718,12 @@ async def handle_message(update, context):
                 pass
         return
 
-    # ================= PHOTO =================
+    # ===== PHOTO =====
     if message.photo:
         if context.user_data.get('awaiting_payment'):
             method = context.user_data.get('payment_method', 'Unknown')
+            plan_key = context.user_data.get('premium_plan', '1m')
+            plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
             for admin_id in ADMIN_IDS:
                 try:
                     await context.bot.forward_message(
@@ -4370,14 +4734,16 @@ async def handle_message(update, context):
                         admin_id,
                         f"💰 {method} payment proof received!\n\n"
                         f"👤 User: {message.from_user.full_name}\n"
-                        f"🆔 User ID: `{uid}`\n\n"
-                        f"Approve with:\n`/approve {uid}`"
+                        f"🆔 User ID: `{uid}`\n"
+                        f"📦 Plan: {plan_key} ({plan['days']} days)\n\n"
+                        f"Approve with:\n`/approve {uid} {plan_key}`"
                     )
                 except Exception as e:
                     logger.error(f"Fwd proof fail: {e}")
             await message.reply_text(t("payment_proof_sent", lang))
             context.user_data.pop('awaiting_payment', None)
             context.user_data.pop('payment_method', None)
+            context.user_data.pop('premium_plan', None)
             return
 
         if not user.get("is_premium"):
@@ -4417,7 +4783,7 @@ async def handle_message(update, context):
             await msg.edit_text("❌ Error processing photo.")
         return
 
-    # ================= TEXT =================
+    # ===== TEXT =====
     if not message.text:
         return
 
@@ -4443,6 +4809,8 @@ async def handle_message(update, context):
 
     if context.user_data.get('awaiting_payment') and message.text and not message.text.startswith("/"):
         method = context.user_data.get('payment_method', 'Unknown')
+        plan_key = context.user_data.get('premium_plan', '1m')
+        plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS["1m"])
         for admin_id in ADMIN_IDS:
             try:
                 await context.bot.forward_message(
@@ -4453,14 +4821,16 @@ async def handle_message(update, context):
                     admin_id,
                     f"💰 {method} payment info (text)!\n\n"
                     f"👤 User: {message.from_user.full_name}\n"
-                    f"🆔 User ID: `{uid}`\n\n"
-                    f"Approve with: `/approve {uid}`"
+                    f"🆔 User ID: `{uid}`\n"
+                    f"📦 Plan: {plan_key} ({plan['days']} days)\n\n"
+                    f"Approve with: `/approve {uid} {plan_key}`"
                 )
             except Exception as e:
                 logger.error(f"Text fwd fail: {e}")
         await message.reply_text(t("payment_info_sent", lang))
         context.user_data.pop('awaiting_payment', None)
         context.user_data.pop('payment_method', None)
+        context.user_data.pop('premium_plan', None)
         return
 
     if chat.type == "private":
@@ -4661,14 +5031,15 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_vocab_book, pattern="^m_vocab_book$"))
         application.add_handler(CallbackQueryHandler(cb_files_menu, pattern="^m_files$"))
         application.add_handler(CallbackQueryHandler(cb_file_send, pattern="^fget_"))
-        # ★ NEW: admin Free/Premium selection
         application.add_handler(CallbackQueryHandler(cb_save_file_type, pattern="^savetype_"))
 
-        application.add_handler(CallbackQueryHandler(cb_buy_premium, pattern="^buy_premium$"))
-        application.add_handler(CallbackQueryHandler(cb_pay_bkash, pattern="^pay_bkash$"))
-        application.add_handler(CallbackQueryHandler(cb_pay_rocket, pattern="^pay_rocket$"))
-        application.add_handler(CallbackQueryHandler(cb_pay_trc20, pattern="^pay_trc20$"))
-        application.add_handler(CallbackQueryHandler(cb_pay_bsc20, pattern="^pay_bsc20$"))
+        # ★ NEW: Plan selection + plan-specific payment
+        application.add_handler(CallbackQueryHandler(cb_plan_selected, pattern="^plan_"))
+        application.add_handler(CallbackQueryHandler(cb_buy_premium, pattern="^buy_"))
+        application.add_handler(CallbackQueryHandler(cb_pay_bkash, pattern="^paybk_"))
+        application.add_handler(CallbackQueryHandler(cb_pay_rocket, pattern="^payrk_"))
+        application.add_handler(CallbackQueryHandler(cb_pay_trc20, pattern="^paytrc_"))
+        application.add_handler(CallbackQueryHandler(cb_pay_bsc20, pattern="^paybsc_"))
         application.add_handler(CallbackQueryHandler(cb_cancel_payment, pattern="^cancel_payment$"))
 
         application.add_handler(CallbackQueryHandler(cb_copy_bkash, pattern="^copy_bkash$"))
