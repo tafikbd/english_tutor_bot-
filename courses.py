@@ -1,3 +1,11 @@
+try:
+    from course_content_bn import BEGINNER_BN, get_static_lesson_bn
+    HAS_STATIC_BN = True
+except ImportError:
+    HAS_STATIC_BN = False
+    BEGINNER_BN = {}
+    def get_static_lesson_bn(k, d): return None
+        
 # courses.py
 # 📚 Course Mode — Beginner / Intermediate / Advanced
 # 3 courses × 30 days each
