@@ -4432,7 +4432,24 @@ async def cb_course_quiz(update, context):
         "course": course,
         "day": day,
     }
-    await send_cq_question(q, context, uid, lang, course, day)
+async def send_cq_question(q, context, uid, lang, course, day):
+    state = context.user_data.get(f"cq_{course}_{day}")
+    if not state:
+        return
+    idx = state["current"]
+    quiz = state["quiz"]
+
+    if idx >= len(quiz):
+        score = state["score"]
+        total = len(quiz)
+        pct = int(score / total * 100)
+
+        prog = await get_course_progress(uid, course)
+        current_day = (prog["current_day"] if prog else 0) or 0
+        if day > current_day:
+            await complete_course_day(uid, course, day)
+            await add_coins(uid, 10)
+
         if day == COURSE_TOTAL_DAYS:
             await complete_course(uid, course, score)
             text = (
@@ -4517,7 +4534,6 @@ async def cb_cq_answer(update, context):
 
     state["current"] += 1
     await send_cq_question(q, context, uid, lang, course, day)
-
 
 async def cb_course_cert(update, context):
     q = update.callback_query
