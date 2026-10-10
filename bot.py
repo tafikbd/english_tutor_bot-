@@ -1,3 +1,10 @@
+try:
+    from course_content_bn import get_static_lesson_bn, BEGINNER_BN
+    HAS_STATIC_BN = True
+except ImportError:
+    HAS_STATIC_BN = False
+    BEGINNER_BN = {}
+    def get_static_lesson_bn(k, d): return None
 import os
 import re
 import asyncio
@@ -4275,6 +4282,23 @@ async def cb_course_day(update, context):
 
     topic = get_topic_display(course, day, lang)
 
+    # ★ NEW: Static Bangla content for Beginner course
+if course == "beginner" and lang == "bn" and HAS_STATIC_BN:
+    lesson_text = get_static_lesson_bn(course, day)
+    if lesson_text:
+        pass  # Use static content — guaranteed Bangla
+    else:
+        # Fallback to AI
+        cached = await get_cached_lesson(course, day)
+        if cached:
+            lesson_text = cached
+        else:
+            await safe_edit(q, f"⏳ Lesson তৈরি হচ্ছে...", reply_markup=None)
+            prompt = build_lesson_prompt(course, day, lang)
+            lesson_text, _ = await asyncio.to_thread(ask_groq, prompt, None, None) if prompt else ("❌ Lesson error.", None)
+            if lesson_text:
+                await save_cached_lesson(course, day, lesson_text)
+else:
     cached = await get_cached_lesson(course, day)
     if cached:
         lesson_text = cached
