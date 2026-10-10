@@ -696,7 +696,7 @@ T = {
     "pdfquiz_cancelled": {"bn": "✅ বাতিল।", "en": "✅ Cancelled.", "hi": "✅ रद्द।", "ru": "✅ Отменено."},
     "pdfquiz_not_in": {"bn": "⚠️ মোডে নেই।", "en": "⚠️ Not in mode.", "hi": "⚠️ मोड में नहीं।", "ru": "⚠️ Не в режиме."},
     "pdfquiz_done": {"bn": "🎉 কুইজ শেষ!", "en": "🎉 Quiz Complete!", "hi": "🎉 पूरा!", "ru": "🎉 Завершено!"},
-}
+
 
 "force_sub_title": {
     "bn": "🔒 Force Subscribe প্রয়োজন",
@@ -733,7 +733,7 @@ T = {
     "en": "🎉 Thanks! You can now use the bot.",
     "hi": "🎉 धन्यवाद!",
     "ru": "🎉 Спасибо!",
-},
+}
 
 def t(key, lang="bn", **kwargs):
     entry = T.get(key)
