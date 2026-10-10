@@ -697,6 +697,7 @@ T = {
     "pdfquiz_not_in": {"bn": "⚠️ মোডে নেই।", "en": "⚠️ Not in mode.", "hi": "⚠️ मोड में नहीं।", "ru": "⚠️ Не в режиме."},
     "pdfquiz_done": {"bn": "🎉 কুইজ শেষ!", "en": "🎉 Quiz Complete!", "hi": "🎉 पूरा!", "ru": "🎉 Завершено!"},
 }
+
 "force_sub_title": {
     "bn": "🔒 Force Subscribe প্রয়োজন",
     "en": "🔒 Force Subscribe Required",
