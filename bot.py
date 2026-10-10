@@ -186,7 +186,7 @@ ROLEPLAY_SCENARIOS = {
 
 
 # ==========================================================
-# NEW: PRONUNCIATION COACH DATA
+# PRONUNCIATION COACH DATA
 # ==========================================================
 PRONUNCIATION_SENTENCES = [
     "The weather is beautiful today.",
@@ -209,7 +209,7 @@ PRONUNCIATION_SENTENCES = [
 
 
 # ==========================================================
-# NEW: IELTS SPEAKING SIMULATOR DATA
+# IELTS SPEAKING SIMULATOR DATA
 # ==========================================================
 IELTS_PART1_QUESTIONS = [
     "What is your full name?",
@@ -454,6 +454,7 @@ T = {
             "• 🎤 Pronunciation Coach (স্কোর সহ)\n"
             "• 🎯 IELTS Speaking Simulator\n"
             "• 🧠 Quiz from PDF\n"
+            "• 📂 ALL Premium PDF Files (IELTS, Spoken, Grammar, Idioms)\n"
             "• Detailed Lessons\n"
             "• Priority Response"
         ),
@@ -471,6 +472,7 @@ T = {
             "• 🎤 Pronunciation Coach (with score)\n"
             "• 🎯 IELTS Speaking Simulator\n"
             "• 🧠 Quiz from PDF\n"
+            "• 📂 ALL Premium PDF Files (IELTS, Spoken, Grammar, Idioms)\n"
             "• Detailed Lessons\n"
             "• Priority Response"
         ),
@@ -488,6 +490,7 @@ T = {
             "• 🎤 Pronunciation Coach\n"
             "• 🎯 IELTS Speaking Simulator\n"
             "• 🧠 Quiz from PDF\n"
+            "• 📂 ALL Premium PDF Files\n"
             "• Detailed Lessons\n"
             "• Priority Response"
         ),
@@ -524,8 +527,55 @@ T = {
     "delfile_usage": {"bn": "Usage: /delfile <id>\n\nআইডি দেখতে: /listfiles", "en": "Usage: /delfile <id>\n\nSee IDs: /listfiles", "hi": "Usage: /delfile <id>"},
     "delfile_done": {"bn": "✅ File {id} মুছে ফেলা হয়েছে।", "en": "✅ File {id} deleted.", "hi": "✅ फाइल {id} डिलीट हो गई।"},
     "delfile_fail": {"bn": "❌ Delete failed.", "en": "❌ Delete failed.", "hi": "❌ डिलीट विफल।"},
-    
-    # ===== NEW: PRONUNCIATION =====
+
+    # ★ NEW: Premium Files System keys
+    "files_free_title": {
+        "bn": "🆓 ফ্রি ফাইল (সবার জন্য)",
+        "en": "🆓 Free Files (For Everyone)",
+        "hi": "🆓 मुफ्त फाइलें (सभी के लिए)"
+    },
+    "files_premium_title": {
+        "bn": "🔐 প্রিমিয়াম ফাইল",
+        "en": "🔐 Premium Files",
+        "hi": "🔐 प्रीमियम फाइलें"
+    },
+    "premium_file_locked": {
+        "bn": "🔐 এই ফাইলটি প্রিমিয়াম!\n\n📂 {name}\n\n💎 প্রিমিয়াম মেম্বারশিপ নিয়ে সব প্রিমিয়াম ফাইল আনলক করুন:\n• IELTS Guide\n• Spoken English\n• Grammar Guide\n• Idioms & Phrases\n\n💰 মাত্র ৳{bdt} বা {stars} Stars\n⏳ ভ্যালিডিটি: {days} দিন\n\n👇 পেমেন্ট করুন:",
+        "en": "🔐 This is a Premium file!\n\n📂 {name}\n\n💎 Unlock ALL premium files with Premium Membership:\n• IELTS Guide\n• Spoken English\n• Grammar Guide\n• Idioms & Phrases\n\n💰 Only ৳{bdt} or {stars} Stars\n⏳ Validity: {days} days\n\n👇 Pay now:",
+        "hi": "🔐 यह एक प्रीमियम फाइल है!\n\n📂 {name}\n\n💰 केवल ৳{bdt}\n\n👇 अभी भुगतान करें:"
+    },
+    "premium_files_sent": {
+        "bn": "🎉 অভিনন্দন! আপনার প্রিমিয়াম চালু হয়েছে।\n\n📦 সব প্রিমিয়াম ফাইল পাঠানো হচ্ছে...",
+        "en": "🎉 Congratulations! Premium activated.\n\n📦 Sending all premium files...",
+        "hi": "🎉 बधाई! Premium एक्टिवेट हो गया।\n\n📦 सभी प्रीमियम फाइलें भेज रहे हैं..."
+    },
+    "premium_no_files": {
+        "bn": "⚠️ এখনো কোনো প্রিমিয়াম ফাইল আপলোড করা হয়নি। অ্যাডমিনকে জানান।",
+        "en": "⚠️ No premium files uploaded yet. Contact admin.",
+        "hi": "⚠️ अभी कोई प्रीमियम फाइल नहीं है।"
+    },
+    "addfile_ask_type": {
+        "bn": "📎 ফাইল পেয়েছি: {name}\n\n❓ এটি কি ফ্রি না প্রিমিয়াম?",
+        "en": "📎 File received: {name}\n\n❓ Is this Free or Premium?",
+        "hi": "📎 फाइल मिली: {name}\n\n❓ यह Free है या Premium?"
+    },
+    "addfile_free_btn": {
+        "bn": "🆓 Free ফাইল",
+        "en": "🆓 Free File",
+        "hi": "🆓 Free फाइल"
+    },
+    "addfile_premium_btn": {
+        "bn": "🔐 Premium ফাইল",
+        "en": "🔐 Premium File",
+        "hi": "🔐 Premium फाइल"
+    },
+    "addfile_type_saved": {
+        "bn": "✅ সেভ হয়েছে!\n📎 {name}\n🏷️ ধরন: {type}\n📝 Caption: {caption}",
+        "en": "✅ Saved!\n📎 {name}\n🏷️ Type: {type}\n📝 Caption: {caption}",
+        "hi": "✅ सेव!\n📎 {name}\n🏷️ प्रकार: {type}"
+    },
+
+    # ===== PRONUNCIATION =====
     "pron_premium": {
         "bn": "🎤 Pronunciation Coach\n\n✨ এটি একটি Premium ফিচার!\n\n🎯 আপনার উচ্চারণ AI দিয়ে বিশ্লেষণ করুন এবং স্কোর পান।\n📊 ভুল শব্দগুলো দেখুন\n🔊 সঠিক উচ্চারণ শুনুন\n\n⭐ Premium কিনে আনলক করুন!",
         "en": "🎤 Pronunciation Coach\n\n✨ This is a Premium feature!\n\n🎯 Practice your English pronunciation and get instant scores.\n📊 See which words to improve\n🔊 Listen to the correct pronunciation\n\n⭐ Buy Premium to unlock!",
@@ -549,8 +599,8 @@ T = {
     "pron_try_again": {"bn": "🔁 আবার চেষ্টা করুন", "en": "🔁 Try Again", "hi": "🔁 फिर कोशिश करें"},
     "pron_cancelled": {"bn": "✅ Pronunciation mode বাতিল।", "en": "✅ Pronunciation mode cancelled.", "hi": "✅ उच्चारण मोड रद्द।"},
     "pron_not_in": {"bn": "⚠️ আপনি Pronunciation mode-এ নেই।", "en": "⚠️ Not in pronunciation mode.", "hi": "⚠️ Pronunciation मोड में नहीं।"},
-    
-    # ===== NEW: IELTS SPEAKING =====
+
+    # ===== IELTS SPEAKING =====
     "ielts_premium": {
         "bn": "🎯 IELTS Speaking Simulator\n\n✨ এটি একটি Premium ফিচার!\n\n🎯 পূর্ণ IELTS Speaking Test (Part 1+2+3)\n📊 AI Band Score + Detailed Feedback\n🎤 ভয়েস বা টেক্সট — যেভাবে সুবিধা\n\n⭐ Premium কিনে আনলক করুন!",
         "en": "🎯 IELTS Speaking Simulator\n\n✨ This is a Premium feature!\n\n🎯 Full IELTS Speaking Test (Part 1+2+3)\n📊 AI Band Score + Detailed Feedback\n🎤 Voice or Text — your choice\n\n⭐ Buy Premium to unlock!",
@@ -576,8 +626,8 @@ T = {
     "ielts_not_in": {"bn": "⚠️ আপনি IELTS test-এ নেই।", "en": "⚠️ Not in IELTS test.", "hi": "⚠️ IELTS टेस्ट में नहीं।"},
     "ielts_answer_too_short": {"bn": "⚠️ একটু বড় উত্তর দিন (অন্তত ২-৩ লাইন)।", "en": "⚠️ Please give a longer answer (2-3 sentences).", "hi": "⚠️ लंबा उत्तर दें।"},
     "ielts_end_btn": {"bn": "🛑 Test শেষ করুন", "en": "🛑 End Test", "hi": "🛑 टेस्ट खत्म करें"},
-    
-    # ===== NEW: PDF QUIZ =====
+
+    # ===== PDF QUIZ =====
     "pdfquiz_premium": {
         "bn": "🧠 Quiz from Your PDF\n\n✨ এটি একটি Premium ফিচার!\n\n🎯 যেকোনো PDF পাঠান\n🤖 AI ১০টি MCQ বানাবে\n📊 আপনি উত্তর দিয়ে স্কোর পাবেন\n💡 প্রতিটি উত্তরের ব্যাখ্যা\n\n⭐ Premium কিনে আনলক করুন!",
         "en": "🧠 Quiz from Your PDF\n\n✨ This is a Premium feature!\n\n🎯 Send any PDF\n🤖 AI creates 10 MCQs from it\n📊 Answer and get your score\n💡 Explanation for each answer\n\n⭐ Buy Premium to unlock!",
@@ -682,15 +732,15 @@ def ask_groq(user_text, history=None, user=None, custom_system=None, json_mode=F
                 system = PROMPT_INTERMEDIATE
             else:
                 system = PROMPT_BEGINNER
-        
+
         if not json_mode:
             system += build_user_context(user, include_name=True)
-        
+
         messages = [{"role": "system", "content": system}]
         if history:
             messages.extend(history[-8:])
         messages.append({"role": "user", "content": user_text})
-        
+
         kwargs = {
             "model": GROQ_MODEL,
             "messages": messages,
@@ -701,21 +751,21 @@ def ask_groq(user_text, history=None, user=None, custom_system=None, json_mode=F
         raw_text = response.choices[0].message.content.strip()
         if not raw_text:
             return "", []
-        
+
         suggestions = []
         if "[SUGGESTIONS]" in raw_text:
             parts = raw_text.split("[SUGGESTIONS]")
             answer = parts[0].strip()
             sug_raw = parts[1].strip()
-            
+
             sug_clean = re.sub(r'[\|\n,]', '|||', sug_raw)
             sug_list = [s.strip() for s in sug_clean.split("|||") if s.strip()]
-            
+
             for s in sug_list[:3]:
                 s = re.sub(r'^[\d\-\*\.\)\s]+', '', s).strip()
                 if s:
                     suggestions.append(s)
-                    
+
             return answer, suggestions
         return raw_text, []
     except Exception as e:
@@ -831,18 +881,16 @@ def calculate_pronunciation_score(target, said):
     """Returns (score, wrong_words_list)"""
     def clean(s):
         return re.sub(r'[^\w\s]', ' ', s.lower()).split()
-    
+
     target_words = clean(target)
     said_words = clean(said)
-    
+
     if not target_words:
         return 0, []
-    
-    # Overall similarity
+
     matcher = difflib.SequenceMatcher(None, target_words, said_words)
     score = int(matcher.ratio() * 100)
-    
-    # Find wrong words
+
     wrong = []
     sm = difflib.SequenceMatcher(None, target_words, said_words)
     for tag, i1, i2, j1, j2 in sm.get_opcodes():
@@ -850,7 +898,7 @@ def calculate_pronunciation_score(target, said):
             wrong_segment = " ".join(target_words[i1:i2]).strip()
             if wrong_segment:
                 wrong.append(wrong_segment)
-    
+
     return score, wrong[:8]
 
 
@@ -865,7 +913,6 @@ def parse_quiz_json(text):
         data = json.loads(match.group(0))
         if not isinstance(data, list) or len(data) == 0:
             return None
-        # Validate structure
         for item in data:
             if not all(k in item for k in ("q", "options", "answer")):
                 return None
@@ -873,7 +920,7 @@ def parse_quiz_json(text):
                 return None
             if not isinstance(item["answer"], int):
                 return None
-        return data[:10]  # Max 10 questions
+        return data[:10]
     except Exception as e:
         logger.error(f"Quiz JSON parse error: {e}")
         return None
@@ -1006,7 +1053,8 @@ async def init_db():
                     file_name TEXT,
                     caption TEXT,
                     uploaded_by BIGINT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    is_premium BOOLEAN DEFAULT FALSE
                 )
             """)
             for col_name, col_def in [
@@ -1020,6 +1068,13 @@ async def init_db():
                     )
                 except Exception:
                     pass
+            # ★ NEW: ensure is_premium column exists in s_files for old DBs
+            try:
+                await conn.execute(
+                    "ALTER TABLE s_files ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE"
+                )
+            except Exception:
+                pass
         logger.info("*** ALL TABLES CREATED ***")
     except Exception as e:
         logger.error(f"*** TABLE CREATE FAILED: {e} ***")
@@ -1211,15 +1266,16 @@ async def mark_reviewed(review_id):
         pass
 
 
-async def save_file(file_id, file_name, caption, uploaded_by):
+# ★ NEW: save_file with is_premium
+async def save_file(file_id, file_name, caption, uploaded_by, is_premium=False):
     if db_pool is None:
         return False
     try:
         async with db_pool.acquire() as conn:
             await conn.execute(
-                "INSERT INTO s_files (file_id, file_name, caption, uploaded_by) "
-                "VALUES ($1, $2, $3, $4) ON CONFLICT (file_id) DO NOTHING",
-                file_id, file_name, caption, uploaded_by
+                "INSERT INTO s_files (file_id, file_name, caption, uploaded_by, is_premium) "
+                "VALUES ($1, $2, $3, $4, $5) ON CONFLICT (file_id) DO NOTHING",
+                file_id, file_name, caption, uploaded_by, is_premium
             )
         return True
     except Exception as e:
@@ -1227,26 +1283,42 @@ async def save_file(file_id, file_name, caption, uploaded_by):
         return False
 
 
+# ★ NEW: get_all_files with is_premium
 async def get_all_files():
     if db_pool is None:
         return []
     try:
         async with db_pool.acquire() as conn:
             rows = await conn.fetch(
-                "SELECT id, file_name, caption FROM s_files ORDER BY id DESC"
+                "SELECT id, file_name, caption, COALESCE(is_premium, FALSE) AS is_premium "
+                "FROM s_files ORDER BY id DESC"
             )
             return [dict(r) for r in rows]
     except Exception:
         return []
 
 
+# ★ NEW: helper for free files
+async def get_free_files():
+    files = await get_all_files()
+    return [f for f in files if not f.get("is_premium")]
+
+
+# ★ NEW: helper for premium files
+async def get_premium_files():
+    files = await get_all_files()
+    return [f for f in files if f.get("is_premium")]
+
+
+# ★ NEW: get_file_by_db_id with is_premium
 async def get_file_by_db_id(fid):
     if db_pool is None:
         return None
     try:
         async with db_pool.acquire() as conn:
             row = await conn.fetchrow(
-                "SELECT file_id, file_name, caption FROM s_files WHERE id = $1", fid
+                "SELECT file_id, file_name, caption, COALESCE(is_premium, FALSE) AS is_premium "
+                "FROM s_files WHERE id = $1", fid
             )
             return dict(row) if row else None
     except Exception:
@@ -1531,7 +1603,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for key in ["roleplay", "awaiting_payment", "payment_method", "awaiting_support",
                 "game_active", "awaiting_file", "awaiting_file_caption",
                 "pending_file_id", "pending_file_name", "pronunciation_mode",
-                "ielts_speaking", "pdf_quiz", "pdf_quiz_mode"]:
+                "ielts_speaking", "pdf_quiz", "pdf_quiz_mode",
+                "pending_file_caption", "pending_file_id_save", "pending_file_name_save"]:
         context.user_data.pop(key, None)
     if not await is_user_joined(context.bot, u.id):
         existing = await get_user(u.id)
@@ -2025,6 +2098,7 @@ async def broadcast_command(update, context):
     await update.message.reply_text(f"✅ Sent: {sent} | ❌ Failed: {failed}")
 
 
+# ★ NEW: approve_command sends all premium files
 async def approve_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
@@ -2037,12 +2111,49 @@ async def approve_command(update, context):
         target_uid = int(context.args[0])
         until = datetime.now() + timedelta(days=PREMIUM_DAYS)
         await update_user(target_uid, is_premium=True, premium_until=until)
+
+        target_lang = await get_user_lang(target_uid)
         await update.message.reply_text(f"✅ User {target_uid} granted Premium!")
+
         try:
-            target_lang = await get_user_lang(target_uid)
-            await context.bot.send_message(target_uid, t("premium_success", target_lang, days=PREMIUM_DAYS))
+            await context.bot.send_message(
+                target_uid,
+                t("premium_success", target_lang, days=PREMIUM_DAYS)
+            )
         except Exception:
             pass
+
+        premium_files = await get_premium_files()
+        if not premium_files:
+            try:
+                await context.bot.send_message(
+                    target_uid, t("premium_no_files", target_lang)
+                )
+            except Exception:
+                pass
+        else:
+            try:
+                await context.bot.send_message(
+                    target_uid, t("premium_files_sent", target_lang)
+                )
+            except Exception:
+                pass
+            for f in premium_files:
+                try:
+                    await context.bot.send_document(
+                        chat_id=target_uid,
+                        document=f['file_id'],
+                        caption=f.get('caption') or f.get('file_name') or ""
+                    )
+                    await asyncio.sleep(0.3)
+                except Exception as e:
+                    logger.error(f"Premium file send to {target_uid} failed: {e}")
+
+        try:
+            await check_achievements(target_uid)
+        except Exception:
+            pass
+
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -2064,6 +2175,7 @@ async def reply_command(update, context):
         await update.message.reply_text(f"❌ Error: {e}")
 
 
+# ★ NEW: addfile_command clears pending_file_type
 async def addfile_command(update, context):
     uid = update.effective_user.id
     if uid not in ADMIN_IDS:
@@ -2073,6 +2185,9 @@ async def addfile_command(update, context):
     context.user_data.pop('awaiting_file_caption', None)
     context.user_data.pop('pending_file_id', None)
     context.user_data.pop('pending_file_name', None)
+    context.user_data.pop('pending_file_caption', None)
+    context.user_data.pop('pending_file_id_save', None)
+    context.user_data.pop('pending_file_name_save', None)
     await update.message.reply_text(t("addfile_mode", "en"))
 
 
@@ -2087,7 +2202,8 @@ async def listfiles_command(update, context):
         return
     text = t("listfiles_header", "en") + "\n\n"
     for f in files:
-        text += f"🆔 {f['id']} — {f['file_name']}\n"
+        tag = "🔐" if f.get("is_premium") else "🆓"
+        text += f"🆔 {f['id']} {tag} — {f['file_name']}\n"
     text += "\n" + t("listfiles_footer", "en")
     await update.message.reply_text(text)
 
@@ -2116,7 +2232,8 @@ async def cancel_command(update, context):
     if uid not in ADMIN_IDS:
         return
     cleared = False
-    for k in ['awaiting_file', 'awaiting_file_caption', 'pending_file_id', 'pending_file_name']:
+    for k in ['awaiting_file', 'awaiting_file_caption', 'pending_file_id', 'pending_file_name',
+              'pending_file_caption', 'pending_file_id_save', 'pending_file_name_save']:
         if context.user_data.pop(k, None) is not None:
             cleared = True
     if cleared:
@@ -2136,15 +2253,22 @@ async def skip_command(update, context):
     file_name = context.user_data.pop('pending_file_name', 'file')
     context.user_data.pop('awaiting_file_caption', None)
     if file_id:
-        ok = await save_file(file_id, file_name, "", uid)
-        if ok:
-            await update.message.reply_text(t("addfile_saved_no_caption", "en", name=file_name))
-        else:
-            await update.message.reply_text(t("addfile_save_fail", "en"))
+        # ★ NEW: after /skip also ask for free/premium
+        context.user_data['pending_file_id_save'] = file_id
+        context.user_data['pending_file_name_save'] = file_name
+        context.user_data['pending_file_caption'] = ""
+        await update.message.reply_text(
+            t("addfile_ask_type", "en", name=file_name),
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton(t("addfile_free_btn", "en"), callback_data="savetype_free")],
+                [InlineKeyboardButton(t("addfile_premium_btn", "en"), callback_data="savetype_premium")],
+                [InlineKeyboardButton("❌ Cancel", callback_data="savetype_cancel")],
+            ])
+        )
 
 
 # ==========================================================
-# NEW: Pronunciation Commands
+# Pronunciation Commands
 # ==========================================================
 async def pronounce_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
@@ -2162,7 +2286,6 @@ async def pronounce_command(update, context):
             ])
         )
         return
-    # Cancel other modes
     for k in ['ielts_speaking', 'pdf_quiz', 'pdf_quiz_mode', 'roleplay', 'game_active']:
         context.user_data.pop(k, None)
     sentence = random.choice(PRONUNCIATION_SENTENCES)
@@ -2235,7 +2358,7 @@ async def cb_cancel_pronounce(update, context):
 
 
 # ==========================================================
-# NEW: IELTS Speaking Commands
+# IELTS Speaking Commands
 # ==========================================================
 async def ielts_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
@@ -2326,7 +2449,6 @@ async def cb_ielts_end(update, context):
     if not ielts:
         await safe_edit(q, t("ielts_not_in", lang), reply_markup=back_kb(lang))
         return
-    # If they gave at least 1 answer, we can score
     if ielts['history']:
         await generate_ielts_feedback(q.message, context, q.from_user.id, ielts, await get_user(q.from_user.id))
     else:
@@ -2335,16 +2457,14 @@ async def cb_ielts_end(update, context):
 
 
 async def generate_ielts_feedback(message_obj, context, uid, ielts, user):
-    """Called when IELTS test finishes. Sends band score + feedback."""
     lang = await get_user_lang(uid)
     analyzing_msg = await message_obj.reply_text(t("ielts_analyzing", lang))
-    
-    # Build transcript
+
     transcript_lines = []
     for item in ielts['history']:
         transcript_lines.append(f"Q: {item['q']}\nA: {item['a']}")
     transcript = "\n\n".join(transcript_lines)
-    
+
     system_prompt = (
         "You are a strict IELTS Speaking examiner. "
         "Evaluate the candidate's responses and give:\n"
@@ -2357,14 +2477,13 @@ async def generate_ielts_feedback(message_obj, context, uid, ielts, user):
         "Format with emojis and plain text. No markdown (no *, **). "
         "Use blank lines to separate sections. Keep under 2500 characters."
     )
-    
+
     prompt = (
         f"Candidate's IELTS Speaking Test transcript:\n\n{transcript}\n\n"
         f"Evaluate and give the band score and detailed feedback."
     )
-    
+
     try:
-        # Direct Groq call (no suggestion parsing)
         response = await asyncio.to_thread(
             groq_client.chat.completions.create,
             model=GROQ_MODEL,
@@ -2379,12 +2498,12 @@ async def generate_ielts_feedback(message_obj, context, uid, ielts, user):
     except Exception as e:
         logger.error(f"IELTS eval error: {e}")
         result = "❌ Evaluation failed. Please try again."
-    
+
     try:
         await analyzing_msg.delete()
     except Exception:
         pass
-    
+
     final_text = (
         f"{t('ielts_done', lang)}\n\n"
         f"{result}\n\n"
@@ -2392,11 +2511,9 @@ async def generate_ielts_feedback(message_obj, context, uid, ielts, user):
         f"👉 /menu — Main menu"
     )
     await safe_reply(message_obj, final_text)
-    
-    # Update user stats
+
     if user:
         await update_user(uid, last_active=datetime.now())
-        # Award achievement
         earned = set(filter(None, (user.get("achievements") or "").split(",")))
         if "ielts_done" not in earned:
             earned.add("ielts_done")
@@ -2404,19 +2521,17 @@ async def generate_ielts_feedback(message_obj, context, uid, ielts, user):
 
 
 async def process_ielts_answer(message, context, user, text):
-    """Process user answer for IELTS speaking test."""
     ielts = context.user_data.get('ielts_speaking')
     if not ielts:
         return
-    
+
     lang = user.get("language") or "bn"
     user_answer = text.strip()
-    
+
     if len(user_answer) < 15:
         await message.reply_text(t("ielts_answer_too_short", lang))
         return
-    
-    # Save answer
+
     ielts['history'].append({
         'q': ielts.get('current_q', ''),
         'a': user_answer
@@ -2424,7 +2539,7 @@ async def process_ielts_answer(message, context, user, text):
     ielts['q_index'] += 1
     qi = ielts['q_index']
     stage = ielts['stage']
-    
+
     if stage == 1:
         if qi < len(IELTS_PART1_QUESTIONS):
             next_q = IELTS_PART1_QUESTIONS[qi]
@@ -2437,7 +2552,6 @@ async def process_ielts_answer(message, context, user, text):
                 ])
             )
         else:
-            # Move to Part 2
             ielts['stage'] = 2
             ielts['q_index'] = 0
             ielts['current_q'] = IELTS_PART2_CUE
@@ -2448,7 +2562,6 @@ async def process_ielts_answer(message, context, user, text):
                 ])
             )
     elif stage == 2:
-        # Move to Part 3
         ielts['stage'] = 3
         ielts['q_index'] = 0
         next_q = IELTS_PART3_QUESTIONS[0]
@@ -2470,13 +2583,12 @@ async def process_ielts_answer(message, context, user, text):
                 ])
             )
         else:
-            # Done
             await generate_ielts_feedback(message, context, user['user_id'], ielts, user)
             context.user_data.pop('ielts_speaking', None)
 
 
 # ==========================================================
-# NEW: PDF Quiz Commands
+# PDF Quiz Commands
 # ==========================================================
 async def pdfquiz_command(update, context):
     if not await is_user_joined(context.bot, update.effective_user.id):
@@ -2547,10 +2659,9 @@ async def cb_pdfquiz_menu(update, context):
 
 
 async def generate_pdf_quiz(message, context, uid, pdf_text, file_name, user):
-    """Generate MCQ quiz from PDF and send first question."""
     lang = user.get("language") or "bn"
     gen_msg = await message.reply_text(t("pdfquiz_generating", lang))
-    
+
     system_prompt = (
         "You are an expert quiz maker. Create 10 multiple-choice questions from the given content. "
         "Return ONLY a JSON array. No explanation, no markdown fences.\n\n"
@@ -2563,9 +2674,9 @@ async def generate_pdf_quiz(message, context, uid, pdf_text, file_name, user):
         "- Questions should be based on the content\n"
         "- Simple, clear English"
     )
-    
+
     prompt = f"Content:\n\n{pdf_text}\n\nCreate 10 MCQs based on this content."
-    
+
     try:
         response = await asyncio.to_thread(
             groq_client.chat.completions.create,
@@ -2582,18 +2693,17 @@ async def generate_pdf_quiz(message, context, uid, pdf_text, file_name, user):
     except Exception as e:
         logger.error(f"Quiz gen error: {e}")
         quiz = None
-    
+
     try:
         await gen_msg.delete()
     except Exception:
         pass
-    
+
     if not quiz:
         await message.reply_text(t("pdfquiz_fail", lang))
         context.user_data.pop('pdf_quiz_mode', None)
         return
-    
-    # Save quiz state
+
     context.user_data['pdf_quiz'] = {
         'questions': quiz,
         'current': 0,
@@ -2601,13 +2711,11 @@ async def generate_pdf_quiz(message, context, uid, pdf_text, file_name, user):
         'answers': [],
     }
     context.user_data.pop('pdf_quiz_mode', None)
-    
-    # Send Q1
+
     await send_quiz_question(message, context, uid, user)
 
 
 async def send_quiz_question(message, context, uid, user):
-    """Send the current quiz question with inline option buttons."""
     lang = user.get("language") or "bn"
     state = context.user_data.get('pdf_quiz')
     if not state:
@@ -2618,7 +2726,7 @@ async def send_quiz_question(message, context, uid, user):
         await finish_quiz(message, context, uid, user)
         return
     q = questions[idx]
-    
+
     text = (
         f"{t('pdfquiz_title', lang)}\n\n"
         f"{t('pdfquiz_q', lang, n=idx+1)}\n\n"
@@ -2631,7 +2739,7 @@ async def send_quiz_question(message, context, uid, user):
             f"{letters[i]}) {opt[:50]}", callback_data=f"pq_{i}"
         )])
     rows.append([InlineKeyboardButton("🛑 Stop Quiz", callback_data="pq_stop")])
-    
+
     try:
         await message.reply_text(text, reply_markup=InlineKeyboardMarkup(rows))
     except Exception as e:
@@ -2639,7 +2747,6 @@ async def send_quiz_question(message, context, uid, user):
 
 
 async def finish_quiz(message, context, uid, user):
-    """Send final score summary."""
     lang = user.get("language") or "bn"
     state = context.user_data.pop('pdf_quiz', None)
     if not state:
@@ -2647,7 +2754,7 @@ async def finish_quiz(message, context, uid, user):
     total = len(state['questions'])
     score = state['score']
     pct = int(score / total * 100) if total > 0 else 0
-    
+
     if pct >= 80:
         emoji = "🏆"
         label = "Outstanding!"
@@ -2660,7 +2767,7 @@ async def finish_quiz(message, context, uid, user):
     else:
         emoji = "📚"
         label = "Keep Learning"
-    
+
     text = (
         f"{t('pdfquiz_done', lang)}\n\n"
         f"{t('pdfquiz_score', lang)}\n"
@@ -2672,7 +2779,6 @@ async def finish_quiz(message, context, uid, user):
 
 
 async def process_quiz_answer(update, context, option_idx):
-    """Process a quiz answer click."""
     q = update.callback_query
     uid = q.from_user.id
     lang = await get_user_lang(uid)
@@ -2681,18 +2787,18 @@ async def process_quiz_answer(update, context, option_idx):
     if not state:
         await q.answer("Quiz expired", show_alert=True)
         return
-    
+
     idx = state['current']
     questions = state['questions']
     if idx >= len(questions):
         await q.answer("Done", show_alert=False)
         return
-    
+
     question = questions[idx]
     correct_idx = question['answer']
     letters = ["A", "B", "C", "D", "E", "F"]
     correct_text = question['options'][correct_idx] if correct_idx < len(question['options']) else "?"
-    
+
     if option_idx == correct_idx:
         state['score'] += 1
         result_text = f"{t('pdfquiz_correct', lang)} ✅"
@@ -2701,15 +2807,15 @@ async def process_quiz_answer(update, context, option_idx):
             f"{t('pdfquiz_wrong', lang)}\n"
             f"{t('pdfquiz_answer', lang)}: {letters[correct_idx]}) {correct_text}"
         )
-    
+
     await q.answer("✅" if option_idx == correct_idx else "❌", show_alert=False)
     try:
         await q.edit_message_reply_markup(reply_markup=None)
     except Exception:
         pass
-    
+
     await q.message.reply_text(result_text)
-    
+
     state['current'] += 1
     if state['current'] >= len(questions):
         await finish_quiz(q.message, context, uid, user)
@@ -3213,6 +3319,7 @@ async def cb_vocab_book(update, context):
         await q.message.reply_text(f"📘 Sir English Vocabulary Book\n\n👇 Link:\n{PDF_URL}")
 
 
+# ★ NEW: cb_files_menu shows Free + Premium sections
 async def cb_files_menu(update, context):
     q = update.callback_query
     await q.answer()
@@ -3220,36 +3327,82 @@ async def cb_files_menu(update, context):
     lang = await get_user_lang(uid)
     if not await is_user_joined(context.bot, uid):
         return
-    files = await get_all_files()
-    if not files:
+    free_files = await get_free_files()
+    premium_files = await get_premium_files()
+
+    if not free_files and not premium_files:
         await safe_edit(q, t("files_none", lang), reply_markup=back_kb(lang))
         return
+
     rows = []
-    for f in files:
-        name = f['file_name'] or "file"
-        display = name if len(name) < 30 else name[:27] + "..."
-        rows.append([InlineKeyboardButton(f"📎 {display}", callback_data=f"fget_{f['id']}")])
+    text_lines = []
+
+    if free_files:
+        text_lines.append(t("files_free_title", lang))
+        for f in free_files:
+            name = f['file_name'] or "file"
+            display = name if len(name) < 30 else name[:27] + "..."
+            rows.append([InlineKeyboardButton(f"🆓 {display}", callback_data=f"fget_{f['id']}")])
+
+    if premium_files:
+        text_lines.append("")
+        text_lines.append(t("files_premium_title", lang))
+        for f in premium_files:
+            name = f['file_name'] or "file"
+            display = name if len(name) < 30 else name[:27] + "..."
+            rows.append([InlineKeyboardButton(f"🔐 {display}", callback_data=f"fget_{f['id']}")])
+
     rows.append([InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")])
     await safe_edit(
         q,
-        f"{t('files_menu_title', lang)}\n\n{t('files_menu_desc', lang)}",
+        "\n".join(text_lines),
         reply_markup=InlineKeyboardMarkup(rows)
     )
 
 
+# ★ NEW: cb_file_send locks premium files
 async def cb_file_send(update, context):
     q = update.callback_query
     uid = q.from_user.id
     lang = await get_user_lang(uid)
-    await q.answer(t("file_sending", lang))
     try:
         fid = int(q.data.split("_")[1])
     except Exception:
+        await q.answer()
         return
+
     file = await get_file_by_db_id(fid)
     if not file:
-        await q.message.reply_text(t("file_not_found", lang))
+        await q.answer(t("file_not_found", lang), show_alert=True)
         return
+
+    if file.get("is_premium"):
+        user = await get_user(uid)
+        if not user or not user.get("is_premium"):
+            await q.answer()
+            await safe_edit(
+                q,
+                t("premium_file_locked", lang,
+                  name=file['file_name'],
+                  bdt=PREMIUM_PRICE_BDT,
+                  stars=PREMIUM_STARS,
+                  days=PREMIUM_DAYS),
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton(t("premium_bkash_btn", lang, n=PREMIUM_PRICE_BDT),
+                                          callback_data="pay_bkash")],
+                    [InlineKeyboardButton(t("premium_rocket_btn", lang, n=PREMIUM_PRICE_BDT),
+                                          callback_data="pay_rocket")],
+                    [InlineKeyboardButton(t("premium_trc20_btn", lang), callback_data="pay_trc20")],
+                    [InlineKeyboardButton(t("premium_bsc20_btn", lang), callback_data="pay_bsc20")],
+                    [InlineKeyboardButton(t("premium_buy", lang, n=PREMIUM_STARS),
+                                          callback_data="buy_premium")],
+                    [InlineKeyboardButton("⬅️ Files", callback_data="m_files")],
+                    [InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")],
+                ])
+            )
+            return
+
+    await q.answer(t("file_sending", lang))
     try:
         await context.bot.send_document(
             chat_id=uid, document=file['file_id'], caption=file.get('caption') or ""
@@ -3257,6 +3410,44 @@ async def cb_file_send(update, context):
     except Exception as e:
         logger.error(f"Send file error: {e}")
         await q.message.reply_text(t("file_send_fail", lang))
+
+
+# ★ NEW: cb_save_file_type - admin selects Free/Premium after uploading file
+async def cb_save_file_type(update, context):
+    q = update.callback_query
+    uid = q.from_user.id
+    if uid not in ADMIN_IDS:
+        await q.answer("⛔", show_alert=True)
+        return
+    await q.answer()
+
+    action = q.data.replace("savetype_", "")
+
+    if action == "cancel":
+        for k in ['pending_file_caption', 'pending_file_id_save', 'pending_file_name_save']:
+            context.user_data.pop(k, None)
+        await safe_edit(q, "❌ Cancelled.")
+        return
+
+    is_premium = (action == "premium")
+    file_id = context.user_data.pop('pending_file_id_save', None)
+    file_name = context.user_data.pop('pending_file_name_save', 'file')
+    caption = context.user_data.pop('pending_file_caption', '')
+
+    if not file_id:
+        await safe_edit(q, t("addfile_nothing", "en"))
+        return
+
+    ok = await save_file(file_id, file_name, caption, uid, is_premium=is_premium)
+    if ok:
+        file_type = "🔐 Premium" if is_premium else "🆓 Free"
+        await safe_edit(
+            q,
+            t("addfile_type_saved", "en",
+              name=file_name, type=file_type, caption=caption or "(none)")
+        )
+    else:
+        await safe_edit(q, t("addfile_save_fail", "en"))
 
 
 async def cb_word_game(update, context):
@@ -3503,12 +3694,33 @@ async def precheckout_cb(update, context):
     await update.pre_checkout_query.answer(ok=True)
 
 
+# ★ NEW: successful_payment_cb sends all premium files
 async def successful_payment_cb(update, context):
     uid = update.effective_user.id
     lang = await get_user_lang(uid)
     until = datetime.now() + timedelta(days=PREMIUM_DAYS)
     await update_user(uid, is_premium=True, premium_until=until)
     await update.message.reply_text(t("premium_success", lang, days=PREMIUM_DAYS))
+
+    premium_files = await get_premium_files()
+    if premium_files:
+        try:
+            await update.message.reply_text(t("premium_files_sent", lang))
+        except Exception:
+            pass
+        for f in premium_files:
+            try:
+                await context.bot.send_document(
+                    chat_id=uid,
+                    document=f['file_id'],
+                    caption=f.get('caption') or f.get('file_name') or ""
+                )
+                await asyncio.sleep(0.3)
+            except Exception as e:
+                logger.error(f"Premium file send failed: {e}")
+    else:
+        await update.message.reply_text(t("premium_no_files", lang))
+
     new = await check_achievements(uid)
     if new:
         await update.message.reply_text(
@@ -3725,24 +3937,29 @@ async def handle_message(update, context):
     lang = user.get("language") or "bn"
     today = datetime.now().date()
 
-    # ================= ADMIN FILE UPLOAD (CAPTION MODE) =================
+    # ★ NEW: ADMIN FILE UPLOAD — after caption, ask Free/Premium
     if context.user_data.get('awaiting_file_caption') and uid in ADMIN_IDS and message.text:
         caption = message.text.strip()
         file_id = context.user_data.pop('pending_file_id', None)
         file_name = context.user_data.pop('pending_file_name', 'file')
         context.user_data.pop('awaiting_file_caption', None)
         if file_id:
-            ok = await save_file(file_id, file_name, caption, uid)
-            if ok:
-                await message.reply_text(t("addfile_saved", "en", name=file_name, caption=caption))
-            else:
-                await message.reply_text(t("addfile_save_fail", "en"))
+            context.user_data['pending_file_id_save'] = file_id
+            context.user_data['pending_file_name_save'] = file_name
+            context.user_data['pending_file_caption'] = caption
+            await message.reply_text(
+                t("addfile_ask_type", "en", name=file_name),
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton(t("addfile_free_btn", "en"), callback_data="savetype_free")],
+                    [InlineKeyboardButton(t("addfile_premium_btn", "en"), callback_data="savetype_premium")],
+                    [InlineKeyboardButton("❌ Cancel", callback_data="savetype_cancel")],
+                ])
+            )
         return
 
     # ================= IELTS SPEAKING MODE =================
     ielts = context.user_data.get('ielts_speaking')
     if ielts:
-        # Accept text OR voice
         if message.text and not message.text.startswith("/"):
             await process_ielts_answer(message, context, user, message.text.strip())
             return
@@ -3783,7 +4000,7 @@ async def handle_message(update, context):
                     await msg.edit_text(t("voice_fail", lang))
                     return
                 score, wrong_words = calculate_pronunciation_score(target, user_said)
-                
+
                 if score >= 90:
                     emoji, label = "🏆", t("pron_excellent", lang)
                 elif score >= 75:
@@ -3794,7 +4011,7 @@ async def handle_message(update, context):
                     emoji, label = "📚", t("pron_keep_practicing", lang)
                 else:
                     emoji, label = "🔁", t("pron_try_again", lang)
-                
+
                 feedback = (
                     f"{t('pron_result', lang)}\n\n"
                     f"{emoji} {score}/100 — {label}\n\n"
@@ -3806,10 +4023,9 @@ async def handle_message(update, context):
                     for w in wrong_words:
                         if w.strip():
                             feedback += f"• {w}\n"
-                
+
                 await msg.edit_text(feedback)
-                
-                # Send correct pronunciation as voice
+
                 if HAS_TTS:
                     try:
                         tts_path = f"/tmp/correct_{uid}.mp3"
@@ -3824,14 +4040,13 @@ async def handle_message(update, context):
                             except: pass
                     except Exception:
                         pass
-                
+
                 await message.reply_text(
                     f"👉 Send another voice to try again.\n"
                     f"🔄 /pronounce for new sentence\n"
                     f"❌ /cancelpronounce to exit"
                 )
-                
-                # Update user stats
+
                 await update_user(uid, last_active=datetime.now(),
                                   voices_sent=(user.get("voices_sent") or 0) + 1)
             except Exception as e:
@@ -3842,7 +4057,6 @@ async def handle_message(update, context):
                     pass
             return
         else:
-            # Non-voice message in pronunciation mode
             if message.text and not message.text.startswith("/"):
                 await message.reply_text(
                     "🎤 Please send a VOICE message. Text won't work here.\n"
@@ -3850,7 +4064,7 @@ async def handle_message(update, context):
                 )
                 return
 
-    # ================= PDF QUIZ MODE (waiting for PDF) =================
+    # ================= PDF QUIZ MODE =================
     if context.user_data.get('pdf_quiz_mode') and message.document:
         doc = message.document
         file_size = doc.file_size or 0
@@ -3890,10 +4104,8 @@ async def handle_message(update, context):
             except: pass
         return
 
-    # ================= PDF QUIZ (answer mode) =================
     pdf_quiz = context.user_data.get('pdf_quiz')
     if pdf_quiz and message.text and not message.text.startswith("/"):
-        # If user types text instead of clicking, gently remind
         await message.reply_text(
             "👆 Please click one of the option buttons above.\n"
             "🛑 To stop the quiz, click the Stop button."
@@ -4057,14 +4269,13 @@ async def handle_message(update, context):
             await msg.edit_text("❌ Error processing voice.")
         return
 
-    # ================= DOCUMENT (PDF ANALYSIS or ADMIN UPLOAD) =================
+    # ================= DOCUMENT =================
     if message.document:
         doc = message.document
         file_size = doc.file_size or 0
         file_name = doc.file_name or "document.pdf"
         mime = (doc.mime_type or "").lower()
 
-        # ---- Admin file upload mode ----
         if uid in ADMIN_IDS and context.user_data.get('awaiting_file'):
             context.user_data['pending_file_id'] = doc.file_id
             context.user_data['pending_file_name'] = file_name
@@ -4073,7 +4284,6 @@ async def handle_message(update, context):
             await message.reply_text(t("addfile_received", "en", name=file_name))
             return
 
-        # ---- Normal user PDF analysis ----
         if file_size > MAX_PDF_SIZE_MB * 1024 * 1024:
             await message.reply_text(t("pdf_too_large", lang, n=MAX_PDF_SIZE_MB))
             return
@@ -4404,7 +4614,6 @@ def run_bot():
             ("delfile", delfile_command),
             ("cancel", cancel_command),
             ("skip", skip_command),
-            # NEW
             ("pronounce", pronounce_command),
             ("cancelpronounce", cancel_pronounce_command),
             ("ielts", ielts_command),
@@ -4440,7 +4649,6 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_reminder, pattern="^m_reminder$"))
         application.add_handler(CallbackQueryHandler(cb_help, pattern="^m_help$"))
 
-        # NEW callbacks
         application.add_handler(CallbackQueryHandler(cb_pronunciation, pattern="^m_pronounce$"))
         application.add_handler(CallbackQueryHandler(cb_pron_new, pattern="^pron_new$"))
         application.add_handler(CallbackQueryHandler(cb_cancel_pronounce, pattern="^cancel_pronounce$"))
@@ -4453,6 +4661,8 @@ def run_bot():
         application.add_handler(CallbackQueryHandler(cb_vocab_book, pattern="^m_vocab_book$"))
         application.add_handler(CallbackQueryHandler(cb_files_menu, pattern="^m_files$"))
         application.add_handler(CallbackQueryHandler(cb_file_send, pattern="^fget_"))
+        # ★ NEW: admin Free/Premium selection
+        application.add_handler(CallbackQueryHandler(cb_save_file_type, pattern="^savetype_"))
 
         application.add_handler(CallbackQueryHandler(cb_buy_premium, pattern="^buy_premium$"))
         application.add_handler(CallbackQueryHandler(cb_pay_bkash, pattern="^pay_bkash$"))
