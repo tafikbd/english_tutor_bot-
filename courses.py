@@ -358,7 +358,7 @@ LANG_NAMES = {
 
 
 def build_lesson_prompt(course_key, day, lang):
-    """Lesson prompt: English words + explanations in user's language."""
+    """Lesson prompt with full example — AI copies the format exactly."""
     d = get_day_info(course_key, day)
     if not d:
         return None
@@ -369,20 +369,104 @@ def build_lesson_prompt(course_key, day, lang):
     grammar = d.get("g", "")
     user_lang = LANG_NAMES.get(lang, "English")
 
-    # Review day (no vocab)
+    # Review day
     if not vocab:
         return (
-            f"You are teaching Day {day}/30 of a {course_name} English course.\n"
-            f"Today is REVIEW DAY. Topic: {topic}\n\n"
-            f"IMPORTANT: Explain everything in {user_lang}.\n"
-            f"English words/phrases stay in English.\n"
-            f"Every English sentence must have a {user_lang} translation.\n\n"
-            f"Create:\n"
-            f"1. Short recap of the last 4 days\n"
-            f"2. 5 review questions\n"
-            f"3. 1 short English dialogue with {user_lang} translation\n\n"
-            f"Use plain text + emojis. NO markdown. Under 1800 chars."
+            f"Teach Day {day}/30 of {course_name} — REVIEW DAY.\n"
+            f"Topic: {topic}\n"
+            f"Explain EVERYTHING in {user_lang}.\n"
+            f"English words stay in English; translations in {user_lang}.\n"
+            f"Create: recap + 5 questions + 1 short dialogue with {user_lang} translation.\n"
+            f"Plain text + emojis. Under 1800 chars."
         )
+
+    vocab_str = "\n".join([f"  - {w}" for w in vocab])
+
+    # Bengali-specific example (most common user)
+    if lang == "bn":
+        example_block = (
+            "📅 DAY 1 — Greetings\n\n"
+            "🔤 VOCABULARY:\n\n"
+            "1️⃣ hello — /heh-LOH/\n"
+            "   📖 অর্থ: হ্যালো / শুভেচ্ছা\n"
+            "   ✏️ Hello, how are you?\n"
+            "   🇧🇩 হ্যালো, আপনি কেমন আছেন?\n\n"
+            "2️⃣ hi — /hai/\n"
+            "   📖 অর্থ: হাই / ওহে\n"
+            "   ✏️ Hi! Nice to meet you.\n"
+            "   🇧🇩 হাই! আপনার সাথে পরিচিত হয়ে ভালো লাগলো।\n\n"
+            "3️⃣ good morning — /good MOR-ning/\n"
+            "   📖 অর্থ: সুপ্রভাত\n"
+            "   ✏️ Good morning, everyone.\n"
+            "   🇧🇩 সুপ্রভাত, সবাইকে।\n\n"
+            "📝 GRAMMAR:\n"
+            "🎯 নিয়ম: নিজের পরিচয় দিতে \"Hi, I'm ___\" ব্যবহার করুন।\n"
+            "   Example 1: Hi, I'm Alex.\n"
+            "   🇧🇩 হাই, আমি আলেক্স।\n\n"
+            "   Example 2: Hello, I'm Maya.\n"
+            "   🇧🇩 হ্যালো, আমি মায়া।\n\n"
+            "💬 USEFUL PHRASES:\n"
+            "• Hi, I'm ___ — নিজের পরিচয় দেওয়া\n"
+            "• Hello, nice to meet you — নতুন কারো সাথে পরিচিত হওয়া\n"
+            "• Good morning, how are you? — সকালের শুভেচ্ছা\n"
+            "• Goodbye, see you later — বিদায়\n\n"
+            "🎭 DIALOGUE:\n"
+            "A: Hi, I'm Sam.\n"
+            "   🇧🇩 হাই, আমি স্যাম।\n"
+            "B: Hello, I'm Lily.\n"
+            "   🇧🇩 হ্যালো, আমি লিলি।\n"
+            "A: Nice to meet you, Lily.\n"
+            "   🇧🇩 আপনার সাথে পরিচিত হয়ে ভালো লাগলো, লিলি।\n"
+            "B: Nice to meet you too, Sam.\n"
+            "   🇧🇩 আমারও ভালো লাগলো, স্যাম।\n\n"
+            "✍️ PRACTICE:\n"
+            "1. Hi, I'm John.\n"
+            "   🇧🇩 হাই, আমি জন।\n"
+            "2. Good morning, I'm Sarah.\n"
+            "   🇧🇩 সুপ্রভাত, আমি সারা।\n"
+            "3. Goodbye, I'm Tom.\n"
+            "   🇧🇩 বিদায়, আমি টম।\n"
+        )
+    else:
+        # Generic example for other langs
+        example_block = (
+            f"DAY 1 — Greetings\n\n"
+            f"VOCABULARY:\n"
+            f"1. hello — [{user_lang} meaning]\n"
+            f"   Example: Hello, how are you?\n"
+            f"   Translation: [SAME SENTENCE in {user_lang}]\n\n"
+            f"(do this for all 5 words)\n\n"
+            f"GRAMMAR: [Rule in {user_lang}]\n"
+            f"DIALOGUE: each line + [{user_lang} translation below]\n"
+            f"PRACTICE: 3 sentences + [{user_lang} translation]"
+        )
+
+    return (
+        f"You are an English teacher. Teach Day {day} of {course_name}.\n"
+        f"The student's native language is {user_lang}.\n\n"
+        f"TOPIC: {topic}\n"
+        f"GRAMMAR: {grammar}\n"
+        f"5 VOCABULARY WORDS:\n{vocab_str}\n\n"
+        f"╔══════════════════════════════════════════╗\n"
+        f"║  MOST IMPORTANT RULE — FOLLOW EXACTLY:   ║\n"
+        f"╚══════════════════════════════════════════╝\n"
+        f"Every English sentence MUST have its translation\n"
+        f"on the VERY NEXT line, in {user_lang} script.\n"
+        f"The translation line MUST start with 🇧🇩 (for Bangla) or the flag of {user_lang}.\n"
+        f"DO NOT repeat the English text. WRITE THE ACTUAL {user_lang} TRANSLATION.\n"
+        f"If you don't know a word, use a simple {user_lang} equivalent.\n\n"
+        f"EXAMPLE OF CORRECT OUTPUT:\n"
+        f"────────────────────────────────────────────\n"
+        f"{example_block}"
+        f"────────────────────────────────────────────\n\n"
+        f"NOW GENERATE DAY {day} ({topic}) USING THE SAME FORMAT.\n"
+        f"Use these 5 words: {', '.join(vocab)}\n"
+        f"Grammar point: {grammar}\n\n"
+        f"Format rules:\n"
+        f"- Plain text + emojis. No markdown.\n"
+        f"- Under 2000 characters.\n"
+        f"- Every 🇧🇩 line = real {user_lang} translation, NOT English."
+    )
 
     vocab_str = ", ".join(vocab)
 
