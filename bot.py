@@ -793,7 +793,7 @@ def ask_groq(user_text, history=None, user=None, custom_system=None, json_mode=F
             "model": GROQ_MODEL,
             "messages": messages,
             "temperature": 0.4,
-            "max_tokens": 1200,
+            "max_tokens": 2000,
         }
         response = groq_client.chat.completions.create(**kwargs)
         raw_text = response.choices[0].message.content.strip()
