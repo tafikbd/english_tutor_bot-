@@ -908,6 +908,33 @@ def transcribe_sync(voice_path):
         logger.error(f"Whisper error: {e}")
         return None
 
+def build_photo_prompt(lang="bn", user_caption=None):
+    """Builds language-aware prompt for photo analysis."""
+    if user_caption and user_caption.strip():
+        # If user provided caption, use it as-is
+        return user_caption.strip()
+
+    
+    # Default prompts per language
+    defaults = {
+        "bn": "Describe this image in English. Then give a Bangla translation. Use plain text with emojis only.",
+        "en": "Describe this image in simple English. Use plain text with emojis only.",
+        "hi": "Describe this image in English. Then give a Hindi translation. Use plain text with emojis only.",
+        "ru": "Describe this image in English. Then give a Russian translation. Use plain text with emojis only.",
+        "ar": "Describe this image in English. Then give an Arabic translation. Use plain text with emojis only.",
+        "es": "Describe this image in English. Then give a Spanish translation. Use plain text with emojis only.",
+        "fr": "Describe this image in English. Then give a French translation. Use plain text with emojis only.",
+        "pt": "Describe this image in English. Then give a Portuguese translation. Use plain text with emojis only.",
+        "id": "Describe this image in English. Then give an Indonesian translation. Use plain text with emojis only.",
+        "ur": "Describe this image in English. Then give an Urdu translation. Use plain text with emojis only.",
+        "tr": "Describe this image in English. Then give a Turkish translation. Use plain text with emojis only.",
+        "de": "Describe this image in English. Then give a German translation. Use plain text with emojis only.",
+        "zh": "Describe this image in English. Then give a Chinese translation. Use plain text with emojis only.",
+        "it": "Describe this image in English. Then give an Italian translation. Use plain text with emojis only.",
+        "vi": "Describe this image in English. Then give a Vietnamese translation. Use plain text with emojis only.",
+    }
+    return defaults.get(lang, defaults["en"])
+
 
 def analyze_image_sync(image_path, prompt):
     try:
@@ -920,7 +947,7 @@ def analyze_image_sync(image_path, prompt):
             "2. Use PLAIN TEXT only with emojis. "
             "3. Separate each item with a BLANK LINE. "
             "4. Keep responses under 1500 characters. "
-            "5. Reply in the user's language. "
+            "5. Follow the language instruction in the prompt exactly. " 
             "6. Start with a 1-line summary, then bullet points."
         )
         response = groq_client.chat.completions.create(
@@ -5079,7 +5106,7 @@ async def handle_message(update, context):
             photo = message.photo[-1]
             f = await context.bot.get_file(photo.file_id)
             await f.download_to_drive(path)
-            caption = message.caption or "Describe this image in English. Then give a Bangla translation. Use plain text with emojis only."
+            caption = build_photo_prompt(lang, message.caption)
             answer = await asyncio.to_thread(analyze_image_sync, path, caption)
             try: os.remove(path)
             except Exception: pass
