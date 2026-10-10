@@ -908,14 +908,60 @@ def transcribe_sync(voice_path):
         logger.error(f"Whisper error: {e}")
         return None
 
+def build_pdf_prompt(lang="bn", user_caption=None, file_name="document.pdf", pdf_text=""):
+    """Builds language-aware PDF analysis prompt."""
+    
+    # If user gave custom caption, respect it
+    if user_caption and user_caption.strip():
+        base_request = user_caption.strip()
+    else:
+        base_request = (
+            "Please analyze this PDF and:\n"
+            "1) Give a short summary\n"
+            "2) List 5-7 key points\n"
+            "3) Suggest what the user can learn from it"
+        )
+    
+    # Language-specific instruction
+    if lang == "en":
+        lang_rule = (
+            "The user is learning English. Provide the ENTIRE response in English only. "
+            "Do NOT provide translations to any other language."
+        )
+    else:
+        # Map lang codes to full names
+        lang_names = {
+            "bn": "Bengali", "hi": "Hindi", "ru": "Russian", "ar": "Arabic",
+            "es": "Spanish", "fr": "French", "pt": "Portuguese", "id": "Indonesian",
+            "ur": "Urdu", "tr": "Turkish", "de": "German", "zh": "Chinese",
+            "it": "Italian", "vi": "Vietnamese",
+        }
+        target = lang_names.get(lang, "Bengali")
+        lang_rule = (
+            f"The user's preferred language is {target}. "
+            f"Provide the analysis with English sections followed by {target} translations. "
+            f"Use {target} script (native characters). "
+            f"Format: English heading/section, then '{target} translation' section below it."
+        )
+    
+    prompt = (
+        f"PDF file: '{file_name}'\n\n"
+        f"Content:\n{pdf_text}\n\n"
+        f"USER REQUEST:\n{base_request}\n\n"
+        f"LANGUAGE INSTRUCTION (MANDATORY):\n{lang_rule}\n\n"
+        f"FORMAT:\n"
+        f"- Use plain text with emojis only\n"
+        f"- No markdown (no asterisks, no bold)\n"
+        f"- Keep it under 2000 characters\n"
+        f"- Include both English and target language sections as instructed above"
+    )
+    return prompt
+
 def build_photo_prompt(lang="bn", user_caption=None):
     """Builds language-aware prompt for photo analysis."""
     if user_caption and user_caption.strip():
-        # If user provided caption, use it as-is
         return user_caption.strip()
-
     
-    # Default prompts per language
     defaults = {
         "bn": "Describe this image in English. Then give a Bangla translation. Use plain text with emojis only.",
         "en": "Describe this image in simple English. Use plain text with emojis only.",
@@ -935,6 +981,44 @@ def build_photo_prompt(lang="bn", user_caption=None):
     }
     return defaults.get(lang, defaults["en"])
 
+
+def build_pdf_prompt(lang="bn", user_caption=None, file_name="document.pdf", pdf_text=""):
+    """Builds language-aware PDF analysis prompt."""
+    if user_caption and user_caption.strip():
+        base_request = user_caption.strip()
+    else:
+        base_request = (
+            "Please analyze this PDF and:\n"
+            "1) Give a short summary\n"
+            "2) List 5-7 key points\n"
+            "3) Suggest what the user can learn from it"
+        )
+    if lang == "en":
+        lang_rule = (
+            "The user is learning English. Provide the ENTIRE response in English only. "
+            "Do NOT provide translations to any other language."
+        )
+    else:
+        lang_names = {
+            "bn": "Bengali", "hi": "Hindi", "ru": "Russian", "ar": "Arabic",
+            "es": "Spanish", "fr": "French", "pt": "Portuguese", "id": "Indonesian",
+            "ur": "Urdu", "tr": "Turkish", "de": "German", "zh": "Chinese",
+            "it": "Italian", "vi": "Vietnamese",
+        }
+        target = lang_names.get(lang, "Bengali")
+        lang_rule = (
+            f"The user's preferred language is {target}. "
+            f"Provide the analysis with English sections followed by {target} translations. "
+            f"Use {target} script. Format: English section, then {target} translation below."
+        )
+    prompt = (
+        f"PDF file: '{file_name}'\n\n"
+        f"Content:\n{pdf_text}\n\n"
+        f"USER REQUEST:\n{base_request}\n\n"
+        f"LANGUAGE INSTRUCTION (MANDATORY):\n{lang_rule}\n\n"
+        f"FORMAT: Plain text with emojis. No markdown. Under 2000 characters."
+    )
+    return prompt
 
 def analyze_image_sync(image_path, prompt):
     try:
@@ -4977,90 +5061,87 @@ async def handle_message(update, context):
             logger.error(f"Voice handler: {e}")
             await msg.edit_text("❌ Error processing voice.")
         return
+if message.document:
+    doc = message.document
+    file_size = doc.file_size or 0
+    file_name = doc.file_name or "document.pdf"
+    mime = (doc.mime_type or "").lower()
 
-    if message.document:
-        doc = message.document
-        file_size = doc.file_size or 0
-        file_name = doc.file_name or "document.pdf"
-        mime = (doc.mime_type or "").lower()
-
-        if uid in ADMIN_IDS and context.user_data.get('awaiting_file'):
-            context.user_data['pending_file_id'] = doc.file_id
-            context.user_data['pending_file_name'] = file_name
-            context.user_data['awaiting_file'] = False
-            context.user_data['awaiting_file_caption'] = True
-            await message.reply_text(t("addfile_received", "en", name=file_name))
-            return
-
-        if file_size > MAX_PDF_SIZE_MB * 1024 * 1024:
-            await message.reply_text(t("pdf_too_large", lang, n=MAX_PDF_SIZE_MB))
-            return
-        if "pdf" not in mime and not file_name.lower().endswith(".pdf"):
-            await message.reply_text("❌ Only PDF files are supported for analysis.")
-            return
-        if not HAS_PDF:
-            await message.reply_text("❌ PDF support is not enabled.")
-            return
-        if not user.get("is_premium"):
-            last_date = user.get("last_pdf_date")
-            count = user.get("pdf_count_today") or 0
-            if last_date != today:
-                count = 0
-                await update_user(uid, pdf_count_today=0, last_pdf_date=today)
-            if count >= FREE_PDF_PER_DAY:
-                await message.reply_text(t("pdf_limit", lang, n=FREE_PDF_PER_DAY))
-                return
-            await update_user(uid, pdf_count_today=count + 1)
-
-        msg = await message.reply_text(t("processing_pdf", lang))
-        pdf_path = f"/tmp/doc_{uid}.pdf"
-        try:
-            f = await context.bot.get_file(doc.file_id)
-            await f.download_to_drive(pdf_path)
-            result = await asyncio.to_thread(extract_pdf_text_sync, pdf_path)
-            try: os.remove(pdf_path)
-            except Exception: pass
-            if not result:
-                await msg.edit_text(t("pdf_fail", lang))
-                return
-            pdf_text, total_pages = result
-            if total_pages > MAX_PDF_PAGES:
-                await msg.edit_text(t("pdf_too_big", lang, n=MAX_PDF_PAGES))
-            else:
-                await msg.edit_text(t("pdf_analyzing", lang))
-            user_caption = (message.caption or "").strip()
-            if user_caption:
-                prompt = (
-                    f"The user sent a PDF file named '{file_name}' with this request: {user_caption}\n\n"
-                    f"PDF Content:\n{pdf_text}\n\n"
-                    f"Analyze the PDF and answer the user's request."
-                )
-            else:
-                prompt = (
-                    f"The user sent a PDF file named '{file_name}'.\n\n"
-                    f"PDF Content:\n{pdf_text}\n\n"
-                    f"Please: 1) Give a short summary, 2) List 5-7 key points, "
-                    f"3) Suggest what the user can learn from it."
-                )
-            answer, suggestions = await asyncio.to_thread(ask_groq, prompt, None, user)
-            if not answer:
-                answer = t("ai_error", lang)
-            await save_history(uid, "user", f"[PDF] {file_name} - {user_caption[:100]}")
-            await save_history(uid, "assistant", answer)
-            await update_user(uid, last_active=datetime.now(),
-                              pdfs_sent=(user.get("pdfs_sent") or 0) + 1)
-            kb = suggestions_kb(suggestions, context)
-            await safe_reply_feedback(message, answer, message.message_id, kb)
-            try: await msg.delete()
-            except Exception: pass
-            await check_achievements(uid)
-        except Exception as e:
-            logger.error(f"PDF handler: {e}")
-            try:
-                await msg.edit_text("❌ PDF প্রসেস করতে সমস্যা হয়েছে।")
-            except Exception:
-                pass
+    if uid in ADMIN_IDS and context.user_data.get('awaiting_file'):
+        context.user_data['pending_file_id'] = doc.file_id
+        context.user_data['pending_file_name'] = file_name
+        context.user_data['awaiting_file'] = False
+        context.user_data['awaiting_file_caption'] = True
+        await message.reply_text(t("addfile_received", "en", name=file_name))
         return
+
+    if file_size > MAX_PDF_SIZE_MB * 1024 * 1024:
+        await message.reply_text(t("pdf_too_large", lang, n=MAX_PDF_SIZE_MB))
+        return
+    if "pdf" not in mime and not file_name.lower().endswith(".pdf"):
+        await message.reply_text("❌ Only PDF files are supported for analysis.")
+        return
+    if not HAS_PDF:
+        await message.reply_text("❌ PDF support is not enabled.")
+        return
+    if not user.get("is_premium"):
+        last_date = user.get("last_pdf_date")
+        count = user.get("pdf_count_today") or 0
+        if last_date != today:
+            count = 0
+            await update_user(uid, pdf_count_today=0, last_pdf_date=today)
+        if count >= FREE_PDF_PER_DAY:
+            await message.reply_text(t("pdf_limit", lang, n=FREE_PDF_PER_DAY))
+            return
+        await update_user(uid, pdf_count_today=count + 1)
+
+    msg = await message.reply_text(t("processing_pdf", lang))
+    pdf_path = f"/tmp/doc_{uid}.pdf"
+    try:
+        f = await context.bot.get_file(doc.file_id)
+        await f.download_to_drive(pdf_path)
+        result = await asyncio.to_thread(extract_pdf_text_sync, pdf_path)
+        try: os.remove(pdf_path)
+        except Exception: pass
+        if not result:
+            await msg.edit_text(t("pdf_fail", lang))
+            return
+        pdf_text, total_pages = result
+        if total_pages > MAX_PDF_PAGES:
+            await msg.edit_text(t("pdf_too_big", lang, n=MAX_PDF_PAGES))
+        else:
+            await msg.edit_text(t("pdf_analyzing", lang))
+        user_caption = (message.caption or "").strip()
+        prompt = build_pdf_prompt(lang, user_caption, file_name, pdf_text)
+        pdf_system = (
+            "You analyze PDF documents for English learners. "
+            "STRICT RULES: "
+            "1. Use PLAIN TEXT with emojis only. No markdown. "
+            "2. Follow the language instruction in the user message exactly. "
+            "3. Keep response under 2000 characters. "
+            "4. Start with a short summary, then key points."
+        )
+        answer, suggestions = await asyncio.to_thread(
+            ask_groq, prompt, None, user, pdf_system
+        )
+        if not answer:
+            answer = t("ai_error", lang)
+        await save_history(uid, "user", f"[PDF] {file_name} - {user_caption[:100]}")
+        await save_history(uid, "assistant", answer)
+        await update_user(uid, last_active=datetime.now(),
+                          pdfs_sent=(user.get("pdfs_sent") or 0) + 1)
+        kb = suggestions_kb(suggestions, context)
+        await safe_reply_feedback(message, answer, message.message_id, kb)
+        try: await msg.delete()
+        except Exception: pass
+        await check_achievements(uid)
+    except Exception as e:
+        logger.error(f"PDF handler: {e}")
+        try:
+            await msg.edit_text("❌ PDF প্রসেস করতে সমস্যা হয়েছে।")
+        except Exception:
+            pass
+    return
 
     if message.photo:
         if context.user_data.get('awaiting_payment'):
