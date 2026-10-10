@@ -697,7 +697,42 @@ T = {
     "pdfquiz_not_in": {"bn": "⚠️ মোডে নেই।", "en": "⚠️ Not in mode.", "hi": "⚠️ मोड में नहीं।", "ru": "⚠️ Не в режиме."},
     "pdfquiz_done": {"bn": "🎉 কুইজ শেষ!", "en": "🎉 Quiz Complete!", "hi": "🎉 पूरा!", "ru": "🎉 Завершено!"},
 }
-
+"force_sub_title": {
+    "bn": "🔒 Force Subscribe প্রয়োজন",
+    "en": "🔒 Force Subscribe Required",
+    "hi": "🔒 Force Subscribe Required",
+    "ru": "🔒 Force Subscribe Required",
+},
+"force_sub_desc": {
+    "bn": "বট ব্যবহার করতে হলে আমাদের Grammar Channel-এ join করুন।\n\n👇 নিচের বাটনে ক্লিক করুন:",
+    "en": "To use this bot, please join our Grammar Channel.\n\n👇 Click below:",
+    "hi": "बॉट का उपयोग करने के लिए चैनल join करें।",
+    "ru": "Чтобы использовать бота, присоединитесь к каналу.",
+},
+"force_sub_join_btn": {
+    "bn": "📢 Channel-এ Join করুন",
+    "en": "📢 Join Channel",
+    "hi": "📢 Join Channel",
+    "ru": "📢 Join Channel",
+},
+"force_sub_check_btn": {
+    "bn": "✅ Join করেছি — চেক করুন",
+    "en": "✅ I Joined — Check",
+    "hi": "✅ Check",
+    "ru": "✅ Check",
+},
+"force_sub_not_joined": {
+    "bn": "❌ আপনি এখনো Join করেননি। Channel-এ Join করে আবার চেষ্টা করুন।",
+    "en": "❌ You haven't joined yet. Please join and try again.",
+    "hi": "❌ पहले join करें।",
+    "ru": "❌ Вы ещё не присоединились. Присоединитесь и попробуйте снова.",
+},
+"force_sub_thanks": {
+    "bn": "🎉 ধন্যবাদ! এখন আপনি বট ব্যবহার করতে পারবেন।",
+    "en": "🎉 Thanks! You can now use the bot.",
+    "hi": "🎉 धन्यवाद!",
+    "ru": "🎉 Спасибо!",
+},
 
 def t(key, lang="bn", **kwargs):
     entry = T.get(key)
