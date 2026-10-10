@@ -1515,58 +1515,58 @@ async def complete_course(uid, course, final_score):
         return False
 
 
-async def get_cached_lesson(course, day):
+async def get_cached_lesson(course, day, lang="bn"):
     if db_pool is None:
         return None
     try:
         async with db_pool.acquire() as conn:
             row = await conn.fetchrow(
-                "SELECT content FROM c_lessons WHERE course=$1 AND day=$2",
-                course, day
+                "SELECT content FROM c_lessons WHERE course=$1 AND day=$2 AND lang=$3",
+                course, day, lang
             )
             return row["content"] if row else None
     except Exception:
         return None
 
 
-async def save_cached_lesson(course, day, content):
+async def save_cached_lesson(course, day, content, lang="bn"):
     if db_pool is None:
         return
     try:
         async with db_pool.acquire() as conn:
             await conn.execute("""
-                INSERT INTO c_lessons (course, day, content)
-                VALUES ($1, $2, $3)
-                ON CONFLICT (course, day) DO NOTHING
-            """, course, day, content)
+                INSERT INTO c_lessons (course, day, lang, content)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (course, day, lang) DO NOTHING
+            """, course, day, lang, content)
     except Exception:
         pass
 
 
-async def get_cached_quiz(course, day):
+async def get_cached_quiz(course, day, lang="bn"):
     if db_pool is None:
         return None
     try:
         async with db_pool.acquire() as conn:
             row = await conn.fetchrow(
-                "SELECT content FROM c_quizzes WHERE course=$1 AND day=$2",
-                course, day
+                "SELECT content FROM c_quizzes WHERE course=$1 AND day=$2 AND lang=$3",
+                course, day, lang
             )
             return row["content"] if row else None
     except Exception:
         return None
 
 
-async def save_cached_quiz(course, day, content):
+async def save_cached_quiz(course, day, content, lang="bn"):
     if db_pool is None:
         return
     try:
         async with db_pool.acquire() as conn:
             await conn.execute("""
-                INSERT INTO c_quizzes (course, day, content)
-                VALUES ($1, $2, $3)
-                ON CONFLICT (course, day) DO NOTHING
-            """, course, day, content)
+                INSERT INTO c_quizzes (course, day, lang, content)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (course, day, lang) DO NOTHING
+            """, course, day, lang, content)
     except Exception:
         pass
 
@@ -1669,11 +1669,23 @@ def back_kb(lang="bn"):
 
 
 def lang_kb():
+    """Language selection keyboard with 15 languages."""
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("🇧🇩 বাংলা", callback_data="setlang_bn"),
          InlineKeyboardButton("🇬🇧 English", callback_data="setlang_en")],
         [InlineKeyboardButton("🇮🇳 हिन्दी", callback_data="setlang_hi"),
          InlineKeyboardButton("🇷🇺 Русский", callback_data="setlang_ru")],
+        [InlineKeyboardButton("🇸🇦 العربية", callback_data="setlang_ar"),
+         InlineKeyboardButton("🇪🇸 Español", callback_data="setlang_es")],
+        [InlineKeyboardButton("🇫🇷 Français", callback_data="setlang_fr"),
+         InlineKeyboardButton("🇵🇹 Português", callback_data="setlang_pt")],
+        [InlineKeyboardButton("🇮🇩 Indonesia", callback_data="setlang_id"),
+         InlineKeyboardButton("🇵🇰 اردو", callback_data="setlang_ur")],
+        [InlineKeyboardButton("🇹🇷 Türkçe", callback_data="setlang_tr"),
+         InlineKeyboardButton("🇩🇪 Deutsch", callback_data="setlang_de")],
+        [InlineKeyboardButton("🇨🇳 中文", callback_data="setlang_zh"),
+         InlineKeyboardButton("🇮🇹 Italiano", callback_data="setlang_it")],
+        [InlineKeyboardButton("🇻🇳 Tiếng Việt", callback_data="setlang_vi")],
     ])
 
 
@@ -4307,15 +4319,16 @@ async def cb_course_day(update, context):
 
     topic = get_topic_display(course, day, lang)
 
-    # ===== Check static / cache first =====
+    # ===== Static content for Bengali Beginner =====
     lesson_text = None
     if course == "beginner" and lang == "bn" and HAS_STATIC_BN:
         lesson_text = get_static_lesson_bn(course, day)
 
+    # ===== Cache lookup (language-specific) =====
     if not lesson_text:
-        lesson_text = await get_cached_lesson(course, day)
+        lesson_text = await get_cached_lesson(course, day, lang)
 
-    # ===== If no cache, generate with NEW loading message =====
+    # ===== Generate if not cached =====
     loading_msg = None
     if not lesson_text:
         try:
@@ -4335,16 +4348,14 @@ async def cb_course_day(update, context):
         if not lesson_text:
             lesson_text = "❌ Lesson generate failed. আবার চেষ্টা করুন।"
         else:
-            await save_cached_lesson(course, day, lesson_text)
+            await save_cached_lesson(course, day, lesson_text, lang)
 
-    # ===== Delete loading message =====
     if loading_msg:
         try:
             await loading_msg.delete()
         except Exception:
             pass
 
-    # ===== Render content =====
     header = (
         f"📅 Day {day}/{COURSE_TOTAL_DAYS} — {get_course_name(course, lang)}\n"
         f"📌 {topic}\n\n"
@@ -4356,17 +4367,6 @@ async def cb_course_day(update, context):
     else:
         body = lesson_text
 
-    practice_hint = (
-        "\n\n━━━━━━━━━━━━━━━━━\n"
-        "💡 শেখার নিয়ম:\n"
-        "1. লেসনটা একবার পড়ুন\n"
-        "2. জোরে পড়ুন ২ বার\n"
-        "3. Practice-এর ৩টা বাক্য নিজে লিখুন\n"
-        "4. এই মেসেজে REPLY দিয়ে পাঠান\n"
-        "5. আমি ভুল ঠিক করে দেব ✅\n"
-    )
-    body = body + practice_hint
-
     kb_rows = []
     kb_rows.append([InlineKeyboardButton(
         f"🎯 Take Quiz — Day {day}",
@@ -4383,35 +4383,6 @@ async def cb_course_day(update, context):
     kb_rows.append([InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")])
 
     await safe_edit(q, header + body, reply_markup=InlineKeyboardMarkup(kb_rows))
-
-    practice_hint = (
-        "\n\n━━━━━━━━━━━━━━━━━\n"
-        "💡 শেখার নিয়ম:\n"
-        "1. লেসনটা একবার পড়ুন\n"
-        "2. জোরে পড়ুন ২ বার\n"
-        "3. Practice-এর ৩টা বাক্য নিজে লিখুন\n"
-        "4. এই মেসেজে REPLY দিয়ে পাঠান\n"
-        "5. আমি ভুল ঠিক করে দেব ✅\n"
-    )
-    body = body + practice_hint
-
-    kb_rows = []
-    kb_rows.append([InlineKeyboardButton(
-        f"🎯 Take Quiz — Day {day}",
-        callback_data=f"course_quiz_{course}_{day}"
-    )])
-
-    nav_row = []
-    if day > 1:
-        nav_row.append(InlineKeyboardButton("⬅️ Prev", callback_data=f"course_day_{course}_{day-1}"))
-    nav_row.append(InlineKeyboardButton("🏠 Course", callback_data="course_home"))
-    if day < current_day:
-        nav_row.append(InlineKeyboardButton("Next ➡️", callback_data=f"course_day_{course}_{day+1}"))
-    kb_rows.append(nav_row)
-    kb_rows.append([InlineKeyboardButton(t("menu_btn", lang), callback_data="m_menu")])
-
-    await safe_edit(q, header + body, reply_markup=InlineKeyboardMarkup(kb_rows))
-
 
 async def cb_course_quiz(update, context):
     q = update.callback_query
@@ -4426,7 +4397,7 @@ async def cb_course_quiz(update, context):
     except Exception:
         return
 
-    cached = await get_cached_quiz(course, day)
+    cached = await get_cached_quiz(course, day, lang)
     quiz_data = None
     if cached:
         try:
@@ -4452,7 +4423,7 @@ async def cb_course_quiz(update, context):
             await safe_edit(q, "❌ Quiz generate failed. আবার চেষ্টা করুন।",
                             reply_markup=back_kb(lang))
             return
-        await save_cached_quiz(course, day, json.dumps(quiz_data))
+        await save_cached_quiz(course, day, json.dumps(quiz_data), lang)
 
     context.user_data[f"cq_{course}_{day}"] = {
         "quiz": quiz_data[:3],
@@ -4462,26 +4433,6 @@ async def cb_course_quiz(update, context):
         "day": day,
     }
     await send_cq_question(q, context, uid, lang, course, day)
-
-
-async def send_cq_question(q, context, uid, lang, course, day):
-    state = context.user_data.get(f"cq_{course}_{day}")
-    if not state:
-        return
-    idx = state["current"]
-    quiz = state["quiz"]
-
-    if idx >= len(quiz):
-        score = state["score"]
-        total = len(quiz)
-        pct = int(score / total * 100)
-
-        prog = await get_course_progress(uid, course)
-        current_day = (prog["current_day"] if prog else 0) or 0
-        if day > current_day:
-            await complete_course_day(uid, course, day)
-            await add_coins(uid, 10)
-
         if day == COURSE_TOTAL_DAYS:
             await complete_course(uid, course, score)
             text = (
