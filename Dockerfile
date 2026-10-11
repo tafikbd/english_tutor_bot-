@@ -1,5 +1,6 @@
-python-telegram-bot==20.7
-groq==0.4.2
-python-dotenv==1.0.0
-psycopg2-binary==2.9.9
-httpx==0.26.0
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["python", "bot.py"]
