@@ -4535,7 +4535,17 @@ async def cb_course_quiz(update, context):
         if not prompt:
             await safe_edit(q, "❌ Quiz error.", reply_markup=back_kb(lang))
             return
-        raw, _ = await asyncio.to_thread(ask_groq, prompt, None, None, None, True)
+            try:
+    raw, _ = await asyncio.wait_for(
+        asyncio.to_thread(ask_groq, prompt, None, None, None, True),
+        timeout=30.0
+    )
+except asyncio.TimeoutError:
+    logger.error("Quiz generation timeout")
+    raw = None
+except Exception as e:
+    logger.error(f"Quiz generation error: {e}")
+    raw = None
         if raw:
             m = re.search(r'\[\s*\{.*\}\s*\]', raw, re.DOTALL)
             if m:
