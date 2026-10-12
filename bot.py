@@ -4536,9 +4536,17 @@ async def cb_course_quiz(update, context):
             await safe_edit(q, "❌ Quiz error.", reply_markup=back_kb(lang))
             return
             try:
+    try:
     raw, _ = await asyncio.wait_for(
         asyncio.to_thread(ask_groq, prompt, None, None, None, True),
-        timeout=30.0
+        timeout=25.0
+    )
+except asyncio.TimeoutError:
+    logger.error("Quiz timeout")
+    raw = None
+except Exception as e:
+    logger.error(f"Quiz error: {e}")
+    raw = None
     )
 except asyncio.TimeoutError:
     logger.error("Quiz generation timeout")
