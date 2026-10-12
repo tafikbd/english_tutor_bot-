@@ -4530,44 +4530,46 @@ async def cb_course_quiz(update, context):
             quiz_data = None
 
     if not quiz_data:
-    await safe_edit(q, "⏳ Quiz তৈরি হচ্ছে...", reply_markup=None)
-    prompt = build_quiz_prompt(course, day, lang)
-    if not prompt:
-        await safe_edit(q, "❌ Quiz error.", reply_markup=back_kb(lang))
-        return
-    try:
-        raw, _ = await asyncio.wait_for(
-            asyncio.to_thread(ask_groq, prompt, None, None, None, True),
-            timeout=25.0,
-        )
-    except asyncio.TimeoutError:
-        logger.error("Quiz timeout")
-        raw = None
-    except Exception as e:
-        logger.error(f"Quiz error: {e}")
-        raw = None
+        await safe_edit(q, "⏳ Quiz তৈরি হচ্ছে...", reply_markup=None)
+        prompt = build_quiz_prompt(course, day, lang)
+        if not prompt:
+            await safe_edit(q, "❌ Quiz error.", reply_markup=back_kb(lang))
+            return
+        try:
+            raw, _ = await asyncio.wait_for(
+                asyncio.to_thread(ask_groq, prompt, None, None, None, True),
+                timeout=25.0,
+            )
+        except asyncio.TimeoutError:
+            logger.error("Quiz timeout")
+            raw = None
+        except Exception as e:
+            logger.error(f"Quiz error: {e}")
+            raw = None
 
-    if raw:
-        m = re.search(r'\[\s*\{.*\}\s*\]', raw, re.DOTALL)
-        if m:
-            try:
-                quiz_data = json.loads(m.group(0))
-            except Exception:
-                pass
+        if raw:
+            m = re.search(r'\[\s*\{.*\}\s*\]', raw, re.DOTALL)
+            if m:
+                try:
+                    quiz_data = json.loads(m.group(0))
+                except Exception:
+                    pass
 
-    if not quiz_data or len(quiz_data) < 1:
-        await safe_edit(q, "❌ Quiz generate failed. আবার চেষ্টা করুন।",
-                        reply_markup=back_kb(lang))
-        return
-    await save_cached_quiz(course, day, json.dumps(quiz_data), lang)
+        if not quiz_data or len(quiz_data) < 1:
+            await safe_edit(q, "❌ Quiz generate failed. আবার চেষ্টা করুন।",
+                            reply_markup=back_kb(lang))
+            return
+        await save_cached_quiz(course, day, json.dumps(quiz_data), lang)
 
-context.user_data[f"cq_{course}_{day}"] = {
-    "quiz": quiz_data[:3],
-    "current": 0,
-    "score": 0,
-    "course": course,
-    "day": day,
-}
+    context.user_data[f"cq_{course}_{day}"] = {
+        "quiz": quiz_data[:3],
+        "current": 0,
+        "score": 0,
+        "course": course,
+        "day": day,
+    }
+    await send_cq_question(q, context, uid, lang, course, day)
+
 async def send_cq_question(q, context, uid, lang, course, day):
     state = context.user_data.get(f"cq_{course}_{day}")
     if not state:
